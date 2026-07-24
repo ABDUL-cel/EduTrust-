@@ -248,3 +248,32 @@ a {
     .section-heading h2 { font-size: 1.8rem; }
     .pricing-card.featured { transform: scale(1); }
   }
+
+/*   Admin Login*/
+
+.login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%);
+        }
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-box h2 { text-align: center; margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-group input:focus { border-color: #3B82F6; outline: none; }
