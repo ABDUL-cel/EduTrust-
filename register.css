@@ -1,0 +1,285 @@
+/* =========================
+   RESET
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #172033;
+    background: #eff6ff;
+}
+
+
+/* =========================
+   PAGE
+========================= */
+
+.register-page {
+    min-height: 100vh;
+    padding: 40px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================
+   MAIN CONTAINER
+========================= */
+
+.register-container {
+    width: 100%;
+    max-width: 1100px;
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    overflow: hidden;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+}
+
+
+/* =========================
+   INTRODUCTION
+========================= */
+
+.register-intro {
+    padding: 55px 45px;
+    color: #ffffff;
+    background: #2563eb;
+}
+
+
+.logo {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+
+.logo span {
+    color: #dbeafe;
+}
+
+
+.register-intro h1 {
+    margin-top: 100px;
+    font-size: 46px;
+    line-height: 1.1;
+}
+
+
+.register-intro > p {
+    margin-top: 25px;
+    color: #dbeafe;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+
+.register-benefits {
+    display: grid;
+    gap: 15px;
+    margin-top: 35px;
+}
+
+
+.register-benefits p {
+    color: #ffffff;
+    font-size: 15px;
+}
+
+
+/* =========================
+   FORM AREA
+========================= */
+
+.register-form-container {
+    padding: 55px 45px;
+}
+
+
+.form-heading {
+    margin-bottom: 30px;
+}
+
+
+.form-heading h2 {
+    color: #0f172a;
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+
+.form-heading p {
+    color: #64748b;
+}
+
+
+.form-heading a {
+    color: #2563eb;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+form {
+    display: grid;
+    gap: 20px;
+}
+
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+
+.form-group {
+    display: grid;
+    gap: 8px;
+}
+
+
+.form-group label {
+    color: #334155;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.form-group input {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    font-size: 15px;
+    transition: 0.3s ease;
+}
+
+
+.form-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px #dbeafe;
+}
+
+
+.form-group input::placeholder {
+    color: #94a3b8;
+}
+
+
+/* =========================
+   TERMS
+========================= */
+
+.terms {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+.terms input {
+    margin-top: 4px;
+}
+
+
+.terms a {
+    color: #2563eb;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.register-button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+
+.register-button:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 850px) {
+
+    .register-container {
+        grid-template-columns: 1fr;
+    }
+
+
+    .register-intro {
+        padding: 40px 30px;
+    }
+
+
+    .register-intro h1 {
+        margin-top: 50px;
+        font-size: 38px;
+    }
+
+
+    .register-form-container {
+        padding: 40px 30px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .register-page {
+        padding: 20px 12px;
+    }
+
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+
+    .register-intro h1 {
+        font-size: 34px;
+    }
+
+
+    .form-heading h2 {
+        font-size: 25px;
+    }
+
+}
