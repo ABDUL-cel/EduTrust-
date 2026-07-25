@@ -165,7 +165,32 @@ if (window.innerWidth <= 768) {
 });
 
 
+const notificationButton =
+    document.querySelector("#notification-button");
 
+
+const notificationDropdown =
+    document.querySelector("#notification-dropdown");
+
+
+if (notificationButton && notificationDropdown) {
+
+    notificationButton.addEventListener("click", function (event) {
+
+        event.stopPropagation();
+
+        notificationDropdown.classList.toggle("show");
+
+    });
+
+
+    document.addEventListener("click", function () {
+
+        notificationDropdown.classList.remove("show");
+
+    });
+
+}
 
 const settingsToggle =
     document.querySelector(".settings-toggle");
