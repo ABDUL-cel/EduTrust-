@@ -164,6 +164,29 @@ if (window.innerWidth <= 768) {
 
 });
 
+
+const menuToggle =
+    document.querySelector("#menu-toggle");
+
+
+const sidebar =
+    document.querySelector(".sidebar");
+
+
+menuToggle.addEventListener("click", function () {
+
+    if (window.innerWidth <= 768) {
+
+        sidebar.classList.toggle("show");
+
+    } else {
+
+        sidebar.classList.toggle("collapsed");
+
+    }
+
+});
+
 const settingsToggle =
     document.querySelector(".settings-toggle");
 
