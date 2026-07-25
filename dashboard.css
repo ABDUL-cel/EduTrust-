@@ -1121,3 +1121,181 @@ td {
     }
 
 }
+
+/* ================================
+   SCHOOL MANAGEMENT
+================================ */
+
+.school-management-grid {
+
+    display: grid;
+
+    grid-template-columns: 1.5fr 1fr;
+
+    gap: 20px;
+
+}
+
+
+.school-details {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+
+}
+
+
+.detail-item {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    padding: 16px;
+
+    background: #f1f3f6;
+
+    border-radius: 10px;
+
+}
+
+
+.detail-item span {
+
+    color: #8992a3;
+
+    font-size: 12px;
+
+}
+
+
+.detail-item strong {
+
+    color: #172033;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+}
+
+
+.status-overview {
+
+    text-align: center;
+
+    padding: 25px 15px;
+
+}
+
+
+.large-status-icon {
+
+    width: 60px;
+
+    height: 60px;
+
+    margin: 0 auto 15px;
+
+    border-radius: 50%;
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+}
+
+
+.status-overview h3 {
+
+    color: #15803d;
+
+    font-size: 20px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.status-overview p {
+
+    color: #8992a3;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+}
+
+
+.status-information {
+
+    border-top: 1px solid #eef0f4;
+
+    padding-top: 18px;
+
+}
+
+
+.status-information div {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 10px 0;
+
+}
+
+
+.status-information span {
+
+    color: #8992a3;
+
+    font-size: 12px;
+
+}
+
+
+.status-information strong {
+
+    font-size: 12px;
+
+}
+
+
+@media (max-width: 900px) {
+
+    .school-management-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .school-details {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
