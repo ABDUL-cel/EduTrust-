@@ -25,6 +25,7 @@ loginForm.addEventListener("submit", function (event) {
         message.style.color = "red";
 
         return;
+
     }
 
 
@@ -38,18 +39,24 @@ loginForm.addEventListener("submit", function (event) {
         message.style.color = "red";
 
         return;
+
     }
 
-// Success message
 
-message.textContent = "Login successful!";
-message.style.color = "green";
+    // Login successful
+
+    message.textContent =
+        "Login successful!";
+
+    message.style.color = "green";
 
 
-// Redirect to dashboard
+    // Go to dashboard
 
-setTimeout(function () {
+    setTimeout(function () {
 
-    window.location.href = "dashboard.html";
+        window.location.href = "dashboard.html";
 
-}, 1000);
+    }, 1000);
+
+});
