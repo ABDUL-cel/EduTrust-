@@ -1068,7 +1068,46 @@ body {
     color: #dc2626;
 
 }
+/* ================================
+   SIDEBAR COLLAPSE
+================================ */
 
+.sidebar {
+
+    transition: width 0.3s ease;
+
+}
+
+
+.sidebar.collapsed {
+
+    width: 80px;
+
+}
+
+
+.sidebar.collapsed .nav-text,
+.sidebar.collapsed .sidebar-section-title,
+.sidebar.collapsed .reports-arrow,
+.sidebar.collapsed .profile-info {
+
+    display: none;
+
+}
+
+
+.sidebar.collapsed .nav-item {
+
+    justify-content: center;
+
+}
+
+
+.sidebar.collapsed .nav-icon {
+
+    margin: 0;
+
+}
 
 /* ================================
    MAIN AREA
