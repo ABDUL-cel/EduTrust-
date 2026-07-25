@@ -40,13 +40,16 @@ loginForm.addEventListener("submit", function (event) {
         return;
     }
 
+// Success message
 
-    // Success message
-
-    message.textContent =
-        "Login successful!";
-
-    message.style.color = "green";
+message.textContent = "Login successful!";
+message.style.color = "green";
 
 
-});
+// Redirect to dashboard
+
+setTimeout(function () {
+
+    window.location.href = "dashboard.html";
+
+}, 1000);
