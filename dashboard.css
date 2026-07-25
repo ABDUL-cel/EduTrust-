@@ -20,6 +20,184 @@ body {
 }
 
 /* ================================
+   NOTIFICATION DROPDOWN
+================================ */
+
+.notification-wrapper {
+
+    position: relative;
+
+}
+
+
+.notification-dropdown {
+
+    position: absolute;
+
+    top: 54px;
+
+    right: 0;
+
+    width: 340px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+
+    overflow: hidden;
+
+    display: none;
+
+    z-index: 1000;
+
+}
+
+
+.notification-dropdown.show {
+
+    display: block;
+
+}
+
+
+.dropdown-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 18px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+}
+
+
+.dropdown-header strong {
+
+    font-size: 15px;
+
+}
+
+
+.dropdown-header span {
+
+    color: #2563eb;
+
+    font-size: 12px;
+
+}
+
+
+.notification-item {
+
+    display: flex;
+
+    gap: 12px;
+
+    padding: 15px 18px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    cursor: pointer;
+
+}
+
+
+.notification-item:hover {
+
+    background: #f8fafc;
+
+}
+
+
+.notification-icon {
+
+    font-size: 20px;
+
+}
+
+
+.notification-item div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+}
+
+
+.notification-item strong {
+
+    font-size: 13px;
+
+}
+
+
+.notification-item small {
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+
+}
+
+
+.view-all-notifications {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #2563eb;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+
+.view-all-notifications:hover {
+
+    background: #f8fafc;
+
+}
+
+
+@media (max-width: 520px) {
+
+    .notification-dropdown {
+
+        position: fixed;
+
+        top: 70px;
+
+        left: 16px;
+
+        right: 16px;
+
+        width: auto;
+
+    }
+
+}
+
+/* ================================
    PROFESSIONAL TOPBAR
 ================================ */
 
