@@ -110,106 +110,206 @@ else if (page === "school") {
     showSchoolProfile();
 
 }
-
-else if (page === "user-roles") {
-
-    showUserRoles();
-
-}
-
-else if (page === "payment-settings") {
-
-    showPaymentSettings();
-
-}
-
-else if (page === "security") {
-
-    showSecurity();
-
-}
-
-else if (page === "email-settings") {
-
-    showEmailSettings();
-
-}
-
-else if (page === "backup") {
-
-    showBackup();
-
-}
-if (item.classList.contains("submenu-item")) {
-
-    pageTitle.textContent = item.textContent.trim();
-
-} else {
-
-    pageTitle.textContent =
-        item.querySelector("span:last-child").textContent.trim();
-
-}
-        // Close sidebar on mobile after selecting a page
-
-if (window.innerWidth <= 768) {
-
-    sidebar.classList.remove("show");
-
-}
+const navItems =
+    document.querySelectorAll(
+        ".nav-item[data-page], .submenu-item[data-page]"
+    );
 
 
-    });
+const contentArea =
+    document.getElementById("contentArea");
 
 
-});
+const sidebar =
+    document.querySelector(".sidebar");
+
+
+const menuToggle =
+    document.getElementById("menu-toggle");
 
 
 const notificationButton =
-    document.querySelector("#notification-button");
+    document.getElementById("notification-button");
 
 
 const notificationDropdown =
-    document.querySelector("#notification-dropdown");
+    document.getElementById("notification-dropdown");
 
 
-if (notificationButton && notificationDropdown) {
 
-    notificationButton.addEventListener("click", function (event) {
+/* ================================
+   MAIN NAVIGATION
+================================ */
 
-        event.stopPropagation();
+navItems.forEach(function (item) {
 
-        notificationDropdown.classList.toggle("show");
+    item.addEventListener("click", function () {
+
+        const page =
+            item.getAttribute("data-page");
+
+
+        navItems.forEach(function (nav) {
+
+            nav.classList.remove("active");
+
+        });
+
+
+        item.classList.add("active");
+
+
+        if (page === "overview") {
+
+            showOverview();
+
+        }
+
+        else if (page === "school") {
+
+            showSchoolManagement();
+
+        }
+
+        else if (page === "classes") {
+
+            showClasses();
+
+        }
+
+        else if (page === "sessions") {
+
+            showAcademicSessions();
+
+        }
+
+        else if (page === "fees") {
+
+            showSchoolFees();
+
+        }
+
+        else if (page === "fee-structures") {
+
+            showFeeStructures();
+
+        }
+
+        else if (page === "payments") {
+
+            showParentPayments();
+
+        }
+
+        else if (page === "outstanding") {
+
+            showOutstandingFees();
+
+        }
+
+        else if (page === "students") {
+
+            showStudents();
+
+        }
+
+        else if (page === "parents") {
+
+            showParents();
+
+        }
+
+        else if (page === "staff") {
+
+            showStaff();
+
+        }
+
+        else if (page === "announcements") {
+
+            showAnnouncements();
+
+        }
+
+        else if (page === "messages") {
+
+            showMessages();
+
+        }
+
+        else if (page === "notifications") {
+
+            showNotifications();
+
+        }
+
+        else if (page === "school-profile") {
+
+            showSchoolProfile();
+
+        }
+
+        else if (page === "user-roles") {
+
+            showUserRoles();
+
+        }
+
+        else if (page === "payment-settings") {
+
+            showPaymentSettings();
+
+        }
+
+        else if (page === "security") {
+
+            showSecurity();
+
+        }
+
+        else if (page === "email-settings") {
+
+            showEmailSettings();
+
+        }
+
+        else if (page === "backup") {
+
+            showBackup();
+
+        }
+
+        else {
+
+            showComingSoon(
+                item.textContent.trim()
+            );
+
+        }
+
+
+        if (window.innerWidth <= 768) {
+
+            sidebar.classList.remove("show");
+
+        }
 
     });
-
-
-    document.addEventListener("click", function () {
-
-        notificationDropdown.classList.remove("show");
-
-    });
-
-}
-
-const settingsToggle =
-    document.querySelector(".settings-toggle");
-
-const settingsGroup =
-    settingsToggle.closest(".nav-group");
-
-settingsToggle.addEventListener("click", function () {
-
-    settingsGroup.classList.toggle("open");
 
 });
+
+
+
+/* ================================
+   REPORTS DROPDOWN
+================================ */
 
 const reportsToggle =
     document.querySelector(".reports-toggle");
 
 
 const reportsGroup =
-    document.querySelector(".nav-group");
+    reportsToggle.closest(".nav-group");
 
 
 reportsToggle.addEventListener("click", function () {
@@ -217,6 +317,96 @@ reportsToggle.addEventListener("click", function () {
     reportsGroup.classList.toggle("open");
 
 });
+
+
+
+/* ================================
+   SETTINGS DROPDOWN
+================================ */
+
+const settingsToggle =
+    document.querySelector(".settings-toggle");
+
+
+const settingsGroup =
+    settingsToggle.closest(".nav-group");
+
+
+settingsToggle.addEventListener("click", function () {
+
+    settingsGroup.classList.toggle("open");
+
+});
+
+
+
+/* ================================
+   NOTIFICATIONS
+================================ */
+
+if (
+    notificationButton &&
+    notificationDropdown
+) {
+
+    notificationButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            notificationDropdown.classList.toggle("show");
+
+        }
+    );
+
+
+    document.addEventListener(
+        "click",
+        function () {
+
+            notificationDropdown.classList.remove("show");
+
+        }
+    );
+
+}
+
+
+
+/* ================================
+   SIDEBAR MENU
+================================ */
+
+if (
+    menuToggle &&
+    sidebar
+) {
+
+    menuToggle.addEventListener(
+        "click",
+        function () {
+
+            if (
+                window.innerWidth <= 768
+            ) {
+
+                sidebar.classList.toggle("show");
+
+            }
+
+            else {
+
+                sidebar.classList.toggle(
+                    "collapsed"
+                );
+
+            }
+
+        }
+    );
+
+                          }
 
 function showNotifications() {
 
