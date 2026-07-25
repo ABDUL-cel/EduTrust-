@@ -20,6 +20,326 @@ body {
 }
 
 /* ================================
+   PROFESSIONAL TOPBAR
+================================ */
+
+.topbar {
+
+    height: 72px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 24px;
+
+    padding: 0 28px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+}
+
+
+.menu-toggle {
+
+    width: 42px;
+
+    height: 42px;
+
+    border: none;
+
+    background: #f1f5f9;
+
+    border-radius: 10px;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+}
+
+
+.topbar-search {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    max-width: 520px;
+
+    padding: 11px 16px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+}
+
+
+.search-icon {
+
+    font-size: 16px;
+
+}
+
+
+.topbar-search input {
+
+    width: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #172033;
+
+    font-size: 14px;
+
+}
+
+
+.topbar-search input::placeholder {
+
+    color: #8b95a5;
+
+}
+
+
+.topbar-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+
+.topbar-action {
+
+    position: relative;
+
+    width: 42px;
+
+    height: 42px;
+
+    border: none;
+
+    background: transparent;
+
+    border-radius: 10px;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+}
+
+
+.topbar-action:hover {
+
+    background: #f1f5f9;
+
+}
+
+
+.notification-badge {
+
+    position: absolute;
+
+    top: 2px;
+
+    right: 2px;
+
+    min-width: 17px;
+
+    height: 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0 4px;
+
+    border-radius: 20px;
+
+    background: #ef4444;
+
+    color: #ffffff;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+}
+
+
+.profile-button {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 6px 10px;
+
+    border: none;
+
+    background: transparent;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+}
+
+
+.profile-button:hover {
+
+    background: #f1f5f9;
+
+}
+
+
+.profile-avatar {
+
+    width: 38px;
+
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+}
+
+
+.profile-info {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+
+}
+
+
+.profile-info strong {
+
+    color: #172033;
+
+    font-size: 13px;
+
+}
+
+
+.profile-info small {
+
+    color: #8b95a5;
+
+    font-size: 11px;
+
+}
+
+
+@media (max-width: 768px) {
+
+    .topbar {
+
+        height: 64px;
+
+        padding: 0 16px;
+
+        gap: 12px;
+
+    }
+
+
+    .topbar-search {
+
+        max-width: none;
+
+    }
+
+
+    .profile-info {
+
+        display: none;
+
+    }
+
+
+    .profile-button {
+
+        padding: 4px;
+
+    }
+
+}
+
+
+@media (max-width: 520px) {
+
+    .topbar-search input {
+
+        font-size: 12px;
+
+    }
+
+
+    .topbar-search input::placeholder {
+
+        font-size: 11px;
+
+    }
+
+
+    .topbar-actions {
+
+        gap: 4px;
+
+    }
+
+        }
+
+/* ================================
    REPORTS SUBMENU
 ================================ */
 
