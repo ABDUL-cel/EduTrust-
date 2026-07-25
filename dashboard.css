@@ -19,6 +19,18 @@ body {
 
 }
 
+/* ================================
+   OUTSTANDING FEES
+================================ */
+
+.status.unpaid {
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+}
+
 
 /* ================================
    DASHBOARD LAYOUT
