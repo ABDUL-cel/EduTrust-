@@ -39,6 +39,11 @@ else if (page === "school") {
     showSchoolManagement();
 
 }
+    else if (page === "classes") {
+
+    showClasses();
+
+    }
 
 else {
 
@@ -354,6 +359,310 @@ function showSchoolManagement() {
 
 
                     </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    `;
+
+}
+
+function showClasses() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Classes
+                    </h2>
+
+                    <p>
+                        Manage your school's classes and class information.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    + Add New Class
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Classes
+                    </p>
+
+                    <h3>
+                        24
+                    </h3>
+
+                    <small>
+                        Across all levels
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Primary Classes
+                    </p>
+
+                    <h3>
+                        12
+                    </h3>
+
+                    <small>
+                        Primary section
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Secondary Classes
+                    </p>
+
+                    <h3>
+                        12
+                    </h3>
+
+                    <small>
+                        Secondary section
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Students
+                    </p>
+
+                    <h3>
+                        1,248
+                    </h3>
+
+                    <small>
+                        Assigned to classes
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            All Classes
+                        </h3>
+
+                        <p>
+                            View and manage all school classes.
+                        </p>
+
+                    </div>
+
+
+                    <button class="text-button">
+
+                        View All
+
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Class Name
+                                </th>
+
+                                <th>
+                                    Section
+                                </th>
+
+                                <th>
+                                    Students
+                                </th>
+
+                                <th>
+                                    Class Teacher
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <tr>
+
+                                <td>
+                                    Primary 1A
+                                </td>
+
+                                <td>
+                                    Primary
+                                </td>
+
+                                <td>
+                                    42
+                                </td>
+
+                                <td>
+                                    Mr. Ibrahim
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Primary 2A
+                                </td>
+
+                                <td>
+                                    Primary
+                                </td>
+
+                                <td>
+                                    38
+                                </td>
+
+                                <td>
+                                    Mrs. Aisha
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    JSS 1A
+                                </td>
+
+                                <td>
+                                    Junior Secondary
+                                </td>
+
+                                <td>
+                                    45
+                                </td>
+
+                                <td>
+                                    Mr. Musa
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    SS 2A
+                                </td>
+
+                                <td>
+                                    Senior Secondary
+                                </td>
+
+                                <td>
+                                    36
+                                </td>
+
+                                <td>
+                                    Mrs. Fatima
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                        </tbody>
+
+
+                    </table>
 
 
                 </div>
