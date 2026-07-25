@@ -30,17 +30,23 @@ navItems.forEach(function (item) {
 
         if (page === "overview") {
 
-            showOverview();
+    showOverview();
 
-        }
+}
 
-        else {
+else if (page === "school") {
 
-            showComingSoon(
-                item.querySelector("span:last-child").textContent
-            );
+    showSchoolManagement();
 
-        }
+}
+
+else {
+
+    showComingSoon(
+        item.querySelector("span:last-child").textContent
+    );
+
+}
 
 
     });
@@ -130,6 +136,231 @@ function showOverview() {
                 </div>
 
             </div>
+
+        </div>
+
+    `;
+
+}
+function showSchoolManagement() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        School Management
+                    </h2>
+
+                    <p>
+                        Manage your school's basic information and details.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    Edit School Information
+
+                </button>
+
+            </div>
+
+
+            <div class="school-management-grid">
+
+
+                <div class="dashboard-card school-information-card">
+
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                School Information
+                            </h3>
+
+                            <p>
+                                Your school's basic information
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="school-details">
+
+
+                        <div class="detail-item">
+
+                            <span>
+                                School Name
+                            </span>
+
+                            <strong>
+                                Greenfield School
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                            <span>
+                                School Email
+                            </span>
+
+                            <strong>
+                                info@greenfieldschool.com
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                            <span>
+                                Phone Number
+                            </span>
+
+                            <strong>
+                                +234 801 234 5678
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                            <span>
+                                School Address
+                            </span>
+
+                            <strong>
+                                Ilorin, Kwara State, Nigeria
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                            <span>
+                                School Type
+                            </span>
+
+                            <strong>
+                                Private School
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                            <span>
+                                Established
+                            </span>
+
+                            <strong>
+                                2010
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="dashboard-card school-status-card">
+
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                School Status
+                            </h3>
+
+                            <p>
+                                Current school account status
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="status-overview">
+
+
+                        <div class="large-status-icon">
+                            ✓
+                        </div>
+
+
+                        <h3>
+                            Active
+                        </h3>
+
+
+                        <p>
+                            Your school account is active
+                            and fully operational.
+                        </p>
+
+
+                    </div>
+
+
+                    <div class="status-information">
+
+
+                        <div>
+
+                            <span>
+                                Account Created
+                            </span>
+
+                            <strong>
+                                July 2026
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Current Session
+                            </span>
+
+                            <strong>
+                                2025/2026
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
 
         </div>
 
