@@ -97,6 +97,11 @@ else if (page === "school") {
     showMessages();
 
                         }
+                            else if (page === "notifications") {
+
+    showNotifications();
+
+                            }
 
 else {
 
@@ -109,7 +114,7 @@ else {
 
 if (window.innerWidth <= 768) {
 
-    sidebar.classList.remove("active");
+    sidebar.classList.remove("show");
 
 }
 
@@ -118,6 +123,240 @@ if (window.innerWidth <= 768) {
 
 
 });
+
+function showNotifications() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Notifications
+                    </h2>
+
+                    <p>
+                        Stay updated with important activities across your school.
+                    </p>
+
+                </div>
+
+                <button class="text-button">
+
+                    Mark All As Read
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Notifications
+                    </p>
+
+                    <h3>
+                        248
+                    </h3>
+
+                    <small>
+                        All recent activities
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Unread
+                    </p>
+
+                    <h3>
+                        12
+                    </h3>
+
+                    <small>
+                        Require attention
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Payments
+                    </p>
+
+                    <h3>
+                        86
+                    </h3>
+
+                    <small>
+                        Payment updates
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        System Updates
+                    </p>
+
+                    <h3>
+                        24
+                    </h3>
+
+                    <small>
+                        Recent system activities
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Recent Notifications
+                        </h3>
+
+                        <p>
+                            Your latest system and school activities.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="notification-list">
+
+
+                    <div class="notification-item unread">
+
+                        <div class="notification-icon payment">
+                            💰
+                        </div>
+
+                        <div class="notification-content">
+
+                            <h4>
+                                Payment Received
+                            </h4>
+
+                            <p>
+                                Amina Yusuf completed a school fee payment of ₦150,000.
+                            </p>
+
+                            <small>
+                                10 minutes ago
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="notification-item unread">
+
+                        <div class="notification-icon announcement">
+                            📢
+                        </div>
+
+                        <div class="notification-content">
+
+                            <h4>
+                                New Announcement Published
+                            </h4>
+
+                            <p>
+                                First Term Examination Schedule was published successfully.
+                            </p>
+
+                            <small>
+                                2 hours ago
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="notification-item">
+
+                        <div class="notification-icon user">
+                            👤
+                        </div>
+
+                        <div class="notification-content">
+
+                            <h4>
+                                New Parent Account
+                            </h4>
+
+                            <p>
+                                A new parent account has been successfully activated.
+                            </p>
+
+                            <small>
+                                Yesterday
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="notification-item">
+
+                        <div class="notification-icon warning">
+                            ⚠️
+                        </div>
+
+                        <div class="notification-content">
+
+                            <h4>
+                                Outstanding Fees Reminder
+                            </h4>
+
+                            <p>
+                                186 students currently have outstanding fee balances.
+                            </p>
+
+                            <small>
+                                2 days ago
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
 function showMessages() {
 
     contentArea.innerHTML = `
