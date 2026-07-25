@@ -173,3 +173,16 @@ logoutButton.addEventListener("click", function () {
     window.location.href = "index.html";
 
 });
+
+const mobileMenuButton =
+    document.getElementById("mobileMenuButton");
+
+const sidebar =
+    document.querySelector(".sidebar");
+
+
+mobileMenuButton.addEventListener("click", function () {
+
+    sidebar.classList.toggle("show");
+
+});
