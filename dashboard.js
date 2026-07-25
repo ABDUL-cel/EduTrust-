@@ -1,3 +1,4 @@
+const sidebar = document.querySelector(".sidebar");
 const navItems = document.querySelectorAll(".nav-item");
 
 const pageTitle = document.getElementById("pageTitle");
@@ -76,6 +77,13 @@ else {
     showComingSoon(
         item.querySelector("span:last-child").textContent
     );
+
+}
+        // Close sidebar on mobile after selecting a page
+
+if (window.innerWidth <= 768) {
+
+    sidebar.classList.remove("active");
 
 }
 
