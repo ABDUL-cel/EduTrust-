@@ -20,6 +20,103 @@ body {
 }
 
 /* ================================
+   REPORTS SUBMENU
+================================ */
+
+.nav-group {
+
+    width: 100%;
+
+}
+
+
+.reports-toggle {
+
+    width: 100%;
+
+    border: none;
+
+    cursor: pointer;
+
+}
+
+
+.reports-arrow {
+
+    margin-left: auto;
+
+    transition: transform 0.3s ease;
+
+}
+
+
+.nav-group.open .reports-arrow {
+
+    transform: rotate(180deg);
+
+}
+
+
+.submenu {
+
+    display: none;
+
+    padding-left: 48px;
+
+}
+
+
+.nav-group.open .submenu {
+
+    display: block;
+
+}
+
+
+.submenu-item {
+
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border: none;
+
+    background: transparent;
+
+    text-align: left;
+
+    color: #687386;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    border-radius: 8px;
+
+}
+
+
+.submenu-item:hover {
+
+    background: #f1f5f9;
+
+    color: #2563eb;
+
+}
+
+
+.submenu-item.active {
+
+    background: #eef4ff;
+
+    color: #2563eb;
+
+    font-weight: 600;
+
+}
+
+
+/* ================================
    NOTIFICATIONS
 ================================ */
 
