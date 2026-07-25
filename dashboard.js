@@ -65,6 +65,12 @@ else if (page === "school") {
 
             }
 
+                else if (page === "outstanding") {
+
+    showOutstandingFees();
+
+                }
+
 else {
 
     showComingSoon(
@@ -78,6 +84,295 @@ else {
 
 
 });
+
+function showOutstandingFees() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Outstanding Fees
+                    </h2>
+
+                    <p>
+                        Monitor unpaid and partially paid school fees.
+                    </p>
+
+                </div>
+
+                <button class="primary-button">
+                    Send Fee Reminder
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Outstanding
+                    </p>
+
+                    <h3>
+                        ₦2.1M
+                    </h3>
+
+                    <small>
+                        Awaiting payment
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Students With Balance
+                    </p>
+
+                    <h3>
+                        186
+                    </h3>
+
+                    <small>
+                        Require attention
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Partially Paid
+                    </p>
+
+                    <h3>
+                        74
+                    </h3>
+
+                    <small>
+                        Incomplete payments
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Payment Rate
+                    </p>
+
+                    <h3>
+                        80%
+                    </h3>
+
+                    <small>
+                        Current session
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Outstanding Payments
+                        </h3>
+
+                        <p>
+                            Students with unpaid or incomplete fees.
+                        </p>
+
+                    </div>
+
+                    <button class="text-button">
+                        Filter
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Student
+                                </th>
+
+                                <th>
+                                    Parent / Guardian
+                                </th>
+
+                                <th>
+                                    Class
+                                </th>
+
+                                <th>
+                                    Total Fee
+                                </th>
+
+                                <th>
+                                    Paid
+                                </th>
+
+                                <th>
+                                    Balance
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <tr>
+
+                                <td>
+                                    Maryam Bello
+                                </td>
+
+                                <td>
+                                    Zainab Bello
+                                </td>
+
+                                <td>
+                                    Primary 5
+                                </td>
+
+                                <td>
+                                    ₦180,000
+                                </td>
+
+                                <td>
+                                    ₦120,000
+                                </td>
+
+                                <td>
+                                    ₦60,000
+                                </td>
+
+                                <td>
+
+                                    <span class="status pending">
+                                        Partial
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Ahmad Musa
+                                </td>
+
+                                <td>
+                                    Ibrahim Musa
+                                </td>
+
+                                <td>
+                                    JSS 1
+                                </td>
+
+                                <td>
+                                    ₦210,000
+                                </td>
+
+                                <td>
+                                    ₦95,000
+                                </td>
+
+                                <td>
+                                    ₦115,000
+                                </td>
+
+                                <td>
+
+                                    <span class="status pending">
+                                        Partial
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Fatima Yusuf
+                                </td>
+
+                                <td>
+                                    Amina Yusuf
+                                </td>
+
+                                <td>
+                                    Primary 4
+                                </td>
+
+                                <td>
+                                    ₦150,000
+                                </td>
+
+                                <td>
+                                    ₦0
+                                </td>
+
+                                <td>
+                                    ₦150,000
+                                </td>
+
+                                <td>
+
+                                    <span class="status unpaid">
+                                        Unpaid
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
 
 function showParentPayments() {
 
