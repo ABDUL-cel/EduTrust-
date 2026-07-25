@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | EduTrust</title>
+
+    <link rel="stylesheet" href="dashboard.css">
+
+</head>
+
+
+<body>
+
+
+    <div class="dashboard-layout">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+
+            <div class="sidebar-logo">
+
+                <a href="index.html">
+                    Edu<span>Trust</span>
+                </a>
+
+            </div>
+
+
+            <div class="school-profile">
+
+                <div class="school-avatar">
+                    GS
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Greenfield School
+                    </h3>
+
+                    <p>
+                        Administrator
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <nav class="sidebar-navigation">
+
+
+                <p class="menu-title">
+                    MAIN MENU
+                </p>
+
+
+                <button
+                    class="nav-item active"
+                    data-page="overview"
+                >
+
+                    <span class="nav-icon">
+                        🏠
+                    </span>
+
+                    <span>
+                        Overview
+                    </span>
+
+                </button>
+
+
+                <p class="menu-title">
+                    SCHOOL MANAGEMENT
+                </p>
+
+
+                <button
+                    class="nav-item"
+                    data-page="school"
+                >
+
+                    <span class="nav-icon">
+                        🏫
+                    </span>
+
+                    <span>
+                        School Management
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="classes"
+                >
+
+                    <span class="nav-icon">
+                        📚
+                    </span>
+
+                    <span>
+                        Classes
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="sessions"
+                >
+
+                    <span class="nav-icon">
+                        📅
+                    </span>
+
+                    <span>
+                        Academic Sessions
+                    </span>
+
+                </button>
+
+
+                <p class="menu-title">
+                    FINANCE
+                </p>
+
+
+                <button
+                    class="nav-item"
+                    data-page="fees"
+                >
+
+                    <span class="nav-icon">
+                        💰
+                    </span>
+
+                    <span>
+                        School Fees
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="fee-structures"
+                >
+
+                    <span class="nav-icon">
+                        🧾
+                    </span>
+
+                    <span>
+                        Fee Structures
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="payments"
+                >
+
+                    <span class="nav-icon">
+                        💳
+                    </span>
+
+                    <span>
+                        Parent Payments
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="outstanding"
+                >
+
+                    <span class="nav-icon">
+                        ⚠️
+                    </span>
+
+                    <span>
+                        Outstanding Fees
+                    </span>
+
+                </button>
+
+
+                <p class="menu-title">
+                    PEOPLE
+                </p>
+
+
+                <button
+                    class="nav-item"
+                    data-page="students"
+                >
+
+                    <span class="nav-icon">
+                        👨‍🎓
+                    </span>
+
+                    <span>
+                        Students
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="parents"
+                >
+
+                    <span class="nav-icon">
+                        👨‍👩‍👧
+                    </span>
+
+                    <span>
+                        Parents
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="staff"
+                >
+
+                    <span class="nav-icon">
+                        👨‍🏫
+                    </span>
+
+                    <span>
+                        Staff
+                    </span>
+
+                </button>
+
+
+                <p class="menu-title">
+                    SYSTEM
+                </p>
+
+
+                <button
+                    class="nav-item"
+                    data-page="reports"
+                >
+
+                    <span class="nav-icon">
+                        📊
+                    </span>
+
+                    <span>
+                        Reports
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="settings"
+                >
+
+                    <span class="nav-icon">
+                        ⚙️
+                    </span>
+
+                    <span>
+                        Settings
+                    </span>
+
+                </button>
+
+
+            </nav>
+
+
+            <div class="sidebar-bottom">
+
+
+                <button
+                    class="logout-button"
+                    id="logoutButton"
+                >
+
+                    🚪
+
+                    <span>
+                        Logout
+                    </span>
+
+                </button>
+
+
+            </div>
+
+
+        </aside>
+
+
+        <!-- MAIN AREA -->
+
+        <main class="main-area">
+
+
+            <!-- TOP BAR -->
+
+            <header class="topbar">
+
+
+                <div class="topbar-left">
+
+
+                    <button
+                        class="mobile-menu-button"
+                        id="mobileMenuButton"
+                    >
+
+                        ☰
+
+                    </button>
+
+
+                    <div>
+
+                        <p class="welcome-text">
+                            Welcome back,
+                        </p>
+
+                        <h1 id="pageTitle">
+                            Overview
+                        </h1>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="topbar-right">
+
+
+                    <button
+                        class="notification-button"
+                    >
+
+                        🔔
+
+                        <span class="notification-dot"></span>
+
+                    </button>
+
+
+                    <div class="admin-profile">
+
+
+                        <div class="admin-avatar">
+                            AK
+                        </div>
+
+
+                        <div class="admin-info">
+
+                            <h4>
+                                Abdulazeez Khalid
+                            </h4>
+
+                            <p>
+                                Administrator
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </header>
+
+
+            <!-- CONTENT AREA -->
+
+            <section
+                class="content-area"
+                id="contentArea"
+            >
+
+
+                <!-- OVERVIEW PAGE -->
+
+
+                <div
+                    class="page-content"
+                    id="overviewPage"
+                >
+
+
+                    <div class="page-introduction">
+
+
+                        <div>
+
+                            <h2>
+                                School Overview
+                            </h2>
+
+                            <p>
+                                Here's what's happening in your school today.
+                            </p>
+
+                        </div>
+
+
+                        <button class="primary-button">
+
+                            + Add Student
+
+                        </button>
+
+
+                    </div>
+
+
+                    <div class="stats-grid">
+
+
+                        <div class="stat-card">
+
+
+                            <div class="stat-card-top">
+
+                                <span class="stat-icon blue">
+                                    👨‍🎓
+                                </span>
+
+                                <span class="stat-change positive">
+                                    +12%
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                Total Students
+                            </p>
+
+                            <h3>
+                                1,248
+                            </h3>
+
+                            <small>
+                                Compared to last term
+                            </small>
+
+
+                        </div>
+
+
+                        <div class="stat-card">
+
+
+                            <div class="stat-card-top">
+
+                                <span class="stat-icon green">
+                                    💰
+                                </span>
+
+                                <span class="stat-change positive">
+                                    +8.4%
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                Fees Collected
+                            </p>
+
+                            <h3>
+                                ₦8.4M
+                            </h3>
+
+                            <small>
+                                This academic session
+                            </small>
+
+
+                        </div>
+
+
+                        <div class="stat-card">
+
+
+                            <div class="stat-card-top">
+
+                                <span class="stat-icon orange">
+                                    ⏳
+                                </span>
+
+                                <span class="stat-change warning">
+                                    Needs attention
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                Outstanding Fees
+                            </p>
+
+                            <h3>
+                                ₦2.1M
+                            </h3>
+
+                            <small>
+                                From 186 students
+                            </small>
+
+
+                        </div>
+
+
+                        <div class="stat-card">
+
+
+                            <div class="stat-card-top">
+
+                                <span class="stat-icon purple">
+                                    👨‍👩‍👧
+                                </span>
+
+                                <span class="stat-change positive">
+                                    +24
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                Active Parents
+                            </p>
+
+                            <h3>
+                                936
+                            </h3>
+
+                            <small>
+                                Registered accounts
+                            </small>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="dashboard-grid">
+
+
+                        <div class="dashboard-card">
+
+
+                            <div class="card-header">
+
+
+                                <div>
+
+                                    <h3>
+                                        Recent Payments
+                                    </h3>
+
+                                    <p>
+                                        Latest fee payments from parents
+                                    </p>
+
+                                </div>
+
+
+                                <button class="text-button">
+                                    View all
+                                </button>
+
+
+                            </div>
+
+
+                            <div class="table-container">
+
+
+                                <table>
+
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>
+                                                Parent
+                                            </th>
+
+                                            <th>
+                                                Student
+                                            </th>
+
+                                            <th>
+                                                Amount
+                                            </th>
+
+                                            <th>
+                                                Status
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+
+                                        <tr>
+
+                                            <td>
+                                                Amina Yusuf
+                                            </td>
+
+                                            <td>
+                                                Fatima Yusuf
+                                            </td>
+
+                                            <td>
+                                                ₦150,000
+                                            </td>
+
+                                            <td>
+                                                <span class="status paid">
+                                                    Paid
+                                                </span>
+                                            </td>
+
+                                        </tr>
+
+
+                                        <tr>
+
+                                            <td>
+                                                Ibrahim Musa
+                                            </td>
+
+                                            <td>
+                                                Ahmad Musa
+                                            </td>
+
+                                            <td>
+                                                ₦95,000
+                                            </td>
+
+                                            <td>
+                                                <span class="status paid">
+                                                    Paid
+                                                </span>
+                                            </td>
+
+                                        </tr>
+
+
+                                        <tr>
+
+                                            <td>
+                                                Zainab Bello
+                                            </td>
+
+                                            <td>
+                                                Maryam Bello
+                                            </td>
+
+                                            <td>
+                                                ₦120,000
+                                            </td>
+
+                                            <td>
+                                                <span class="status pending">
+                                                    Pending
+                                                </span>
+                                            </td>
+
+                                        </tr>
+
+
+                                    </tbody>
+
+
+                                </table>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="dashboard-card">
+
+
+                            <div class="card-header">
+
+                                <div>
+
+                                    <h3>
+                                        Fee Collection
+                                    </h3>
+
+                                    <p>
+                                        Current academic session
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="collection-progress">
+
+
+                                <div class="progress-circle">
+
+                                    <strong>
+                                        80%
+                                    </strong>
+
+                                    <span>
+                                        Collected
+                                    </span>
+
+                                </div>
+
+
+                                <div class="progress-details">
+
+
+                                    <div>
+
+                                        <span class="progress-dot collected"></span>
+
+                                        <span>
+                                            Collected
+                                        </span>
+
+                                        <strong>
+                                            ₦8.4M
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <span class="progress-dot outstanding"></span>
+
+                                        <span>
+                                            Outstanding
+                                        </span>
+
+                                        <strong>
+                                            ₦2.1M
+                                        </strong>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+        </main>
+
+
+    </div>
+
+
+    <script src="dashboard.js"></script>
+
+</body>
+
+  </html>
