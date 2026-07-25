@@ -71,6 +71,11 @@ else if (page === "school") {
     showOutstandingFees();
 
                 }
+        else if (page === "students") {
+
+    showStudents();
+
+        }
 
 else {
 
@@ -92,6 +97,344 @@ if (window.innerWidth <= 768) {
 
 
 });
+
+function showStudents() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Students
+                    </h2>
+
+                    <p>
+                        Manage student records and academic information.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    + Add New Student
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Students
+                    </p>
+
+                    <h3>
+                        1,248
+                    </h3>
+
+                    <small>
+                        All registered students
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Active Students
+                    </p>
+
+                    <h3>
+                        1,220
+                    </h3>
+
+                    <small>
+                        Currently enrolled
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        New Students
+                    </p>
+
+                    <h3>
+                        86
+                    </h3>
+
+                    <small>
+                        This academic session
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Outstanding Fees
+                    </p>
+
+                    <h3>
+                        186
+                    </h3>
+
+                    <small>
+                        Students with balance
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Student Directory
+                        </h3>
+
+                        <p>
+                            View and manage all registered students.
+                        </p>
+
+                    </div>
+
+
+                    <button class="text-button">
+
+                        View All
+
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Student
+                                </th>
+
+                                <th>
+                                    Student ID
+                                </th>
+
+                                <th>
+                                    Class
+                                </th>
+
+                                <th>
+                                    Parent / Guardian
+                                </th>
+
+                                <th>
+                                    Fee Status
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <tr>
+
+                                <td>
+                                    Fatima Yusuf
+                                </td>
+
+                                <td>
+                                    EDU-2025-001
+                                </td>
+
+                                <td>
+                                    Primary 4
+                                </td>
+
+                                <td>
+                                    Amina Yusuf
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Paid
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Ahmad Musa
+                                </td>
+
+                                <td>
+                                    EDU-2025-002
+                                </td>
+
+                                <td>
+                                    JSS 1
+                                </td>
+
+                                <td>
+                                    Ibrahim Musa
+                                </td>
+
+                                <td>
+
+                                    <span class="status pending">
+                                        Partial
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Maryam Bello
+                                </td>
+
+                                <td>
+                                    EDU-2025-003
+                                </td>
+
+                                <td>
+                                    Primary 5
+                                </td>
+
+                                <td>
+                                    Zainab Bello
+                                </td>
+
+                                <td>
+
+                                    <span class="status pending">
+                                        Outstanding
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Hassan Abdullahi
+                                </td>
+
+                                <td>
+                                    EDU-2025-004
+                                </td>
+
+                                <td>
+                                    SS 2
+                                </td>
+
+                                <td>
+                                    Yusuf Abdullahi
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Paid
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                        </tbody>
+
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    `;
+
+}
 
 function showOutstandingFees() {
 
