@@ -105,12 +105,14 @@ else if (page === "school") {
     showNotifications();
 
                             }
+if (item.classList.contains("submenu-item")) {
 
-else {
+    pageTitle.textContent = item.textContent.trim();
 
-    showComingSoon(
-        item.querySelector("span:last-child").textContent
-    );
+} else {
+
+    pageTitle.textContent =
+        item.querySelector("span:last-child").textContent.trim();
 
 }
         // Close sidebar on mobile after selecting a page
