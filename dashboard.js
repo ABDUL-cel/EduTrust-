@@ -82,6 +82,12 @@ else if (page === "school") {
 
             }
 
+                else if (page === "parents") {
+
+    showParents();
+
+                }
+
 else {
 
     showComingSoon(
@@ -102,6 +108,267 @@ if (window.innerWidth <= 768) {
 
 
 });
+
+function showParents() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Parents & Guardians
+                    </h2>
+
+                    <p>
+                        Manage parents and guardians connected to students.
+                    </p>
+
+                </div>
+
+                <button class="primary-button">
+
+                    + Add Parent
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Parents
+                    </p>
+
+                    <h3>
+                        1,020
+                    </h3>
+
+                    <small>
+                        Registered parents
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Active Accounts
+                    </p>
+
+                    <h3>
+                        950
+                    </h3>
+
+                    <small>
+                        Currently active
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Linked Students
+                    </p>
+
+                    <h3>
+                        1,248
+                    </h3>
+
+                    <small>
+                        Connected to parents
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Pending Invitations
+                    </p>
+
+                    <h3>
+                        70
+                    </h3>
+
+                    <small>
+                        Awaiting account activation
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Parents Directory
+                        </h3>
+
+                        <p>
+                            View and manage registered parents and guardians.
+                        </p>
+
+                    </div>
+
+                    <button class="text-button">
+
+                        View All
+
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Parent / Guardian
+                                </th>
+
+                                <th>
+                                    Phone
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+
+                                <th>
+                                    Students
+                                </th>
+
+                                <th>
+                                    Account Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <tr>
+
+                                <td>
+                                    Amina Yusuf
+                                </td>
+
+                                <td>
+                                    08012345678
+                                </td>
+
+                                <td>
+                                    amina@example.com
+                                </td>
+
+                                <td>
+                                    2 Students
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Ibrahim Musa
+                                </td>
+
+                                <td>
+                                    08023456789
+                                </td>
+
+                                <td>
+                                    ibrahim@example.com
+                                </td>
+
+                                <td>
+                                    1 Student
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Zainab Bello
+                                </td>
+
+                                <td>
+                                    08034567890
+                                </td>
+
+                                <td>
+                                    zainab@example.com
+                                </td>
+
+                                <td>
+                                    1 Student
+                                </td>
+
+                                <td>
+
+                                    <span class="status pending">
+                                        Pending
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
 
 function showStaff() {
 
