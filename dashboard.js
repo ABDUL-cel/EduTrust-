@@ -1,4 +1,3 @@
-const sidebar = document.querySelector(".sidebar");
 const navItems = document.querySelectorAll(".nav-item");
 
 const pageTitle = document.getElementById("pageTitle");
