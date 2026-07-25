@@ -31,6 +31,103 @@ body {
 
 }
 
+/* ================================
+   ANNOUNCEMENTS
+================================ */
+
+.announcement-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+.announcement-item {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 16px;
+
+    padding: 20px 0;
+
+    border-bottom: 1px solid #e5e7eb;
+
+}
+
+
+.announcement-item:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.announcement-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #eef4ff;
+
+    border-radius: 10px;
+
+    font-size: 20px;
+
+    flex-shrink: 0;
+
+}
+
+
+.announcement-content {
+
+    flex: 1;
+
+}
+
+
+.announcement-content h4 {
+
+    margin: 0 0 6px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    color: #172033;
+
+}
+
+
+.announcement-content p {
+
+    margin: 0 0 6px;
+
+    color: #687386;
+
+    font-size: 13px;
+
+}
+
+
+.announcement-content small {
+
+    color: #8b95a5;
+
+    font-size: 12px;
+
+}
+
 
 /* ================================
    DASHBOARD LAYOUT
