@@ -165,27 +165,7 @@ if (window.innerWidth <= 768) {
 });
 
 
-const menuToggle =
-    document.querySelector("#menu-toggle");
 
-
-const sidebar =
-    document.querySelector(".sidebar");
-
-
-menuToggle.addEventListener("click", function () {
-
-    if (window.innerWidth <= 768) {
-
-        sidebar.classList.toggle("show");
-
-    } else {
-
-        sidebar.classList.toggle("collapsed");
-
-    }
-
-});
 
 const settingsToggle =
     document.querySelector(".settings-toggle");
@@ -4323,15 +4303,25 @@ logoutButton.addEventListener("click", function () {
 
 });
 
-const mobileMenuButton =
-    document.getElementById("mobileMenuButton");
+const sidebar = document.querySelector(".sidebar");
 
-const sidebar =
-    document.querySelector(".sidebar");
+const menuToggle = document.querySelector("#menu-toggle");
 
 
-mobileMenuButton.addEventListener("click", function () {
+if (menuToggle && sidebar) {
 
-    sidebar.classList.toggle("show");
+    menuToggle.addEventListener("click", function () {
 
-});
+        if (window.innerWidth <= 768) {
+
+            sidebar.classList.toggle("show");
+
+        } else {
+
+            sidebar.classList.toggle("collapsed");
+
+        }
+
+    });
+
+}
