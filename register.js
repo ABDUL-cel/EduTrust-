@@ -74,14 +74,14 @@ registerForm.addEventListener("submit", function (event) {
 
     // Success message
 
-    message.textContent =
-        "Registration successful!";
-
-    message.style.color = "green";
+message.textContent = "Registration successful!";
+message.style.color = "green";
 
 
-    // Clear the form
+// Redirect to login page
 
-    registerForm.reset();
+setTimeout(function () {
 
-});
+    window.location.href = "login.html";
+
+}, 1500);
