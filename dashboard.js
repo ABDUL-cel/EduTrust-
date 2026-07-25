@@ -105,6 +105,41 @@ else if (page === "school") {
     showNotifications();
 
                             }
+        else if (page === "school-profile") {
+
+    showSchoolProfile();
+
+}
+
+else if (page === "user-roles") {
+
+    showUserRoles();
+
+}
+
+else if (page === "payment-settings") {
+
+    showPaymentSettings();
+
+}
+
+else if (page === "security") {
+
+    showSecurity();
+
+}
+
+else if (page === "email-settings") {
+
+    showEmailSettings();
+
+}
+
+else if (page === "backup") {
+
+    showBackup();
+
+}
 if (item.classList.contains("submenu-item")) {
 
     pageTitle.textContent = item.textContent.trim();
@@ -126,6 +161,18 @@ if (window.innerWidth <= 768) {
 
     });
 
+
+});
+
+const settingsToggle =
+    document.querySelector(".settings-toggle");
+
+const settingsGroup =
+    settingsToggle.closest(".nav-group");
+
+settingsToggle.addEventListener("click", function () {
+
+    settingsGroup.classList.toggle("open");
 
 });
 
