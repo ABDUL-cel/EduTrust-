@@ -92,6 +92,11 @@ else if (page === "school") {
     showAnnouncements();
 
                     }
+                        else if (page === "messages") {
+
+    showMessages();
+
+                        }
 
 else {
 
@@ -113,7 +118,268 @@ if (window.innerWidth <= 768) {
 
 
 });
+function showMessages() {
 
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Messages
+                    </h2>
+
+                    <p>
+                        Communicate directly with parents, staff, and students.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    + Compose Message
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Messages
+                    </p>
+
+                    <h3>
+                        248
+                    </h3>
+
+                    <small>
+                        All conversations
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Unread Messages
+                    </p>
+
+                    <h3>
+                        12
+                    </h3>
+
+                    <small>
+                        Require attention
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Parents
+                    </p>
+
+                    <h3>
+                        156
+                    </h3>
+
+                    <small>
+                        Conversations
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Staff
+                    </p>
+
+                    <h3>
+                        80
+                    </h3>
+
+                    <small>
+                        Conversations
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Recent Conversations
+                        </h3>
+
+                        <p>
+                            Your latest direct messages.
+                        </p>
+
+                    </div>
+
+
+                    <button class="text-button">
+
+                        View All
+
+                    </button>
+
+                </div>
+
+
+                <div class="message-list">
+
+
+                    <div class="message-item">
+
+
+                        <div class="message-avatar">
+                            AY
+                        </div>
+
+
+                        <div class="message-content">
+
+                            <div class="message-top">
+
+                                <h4>
+                                    Amina Yusuf
+                                </h4>
+
+                                <small>
+                                    10:45 AM
+                                </small>
+
+                            </div>
+
+
+                            <p>
+                                I would like to confirm the outstanding fee balance for my child.
+                            </p>
+
+
+                            <span class="message-role">
+                                Parent
+                            </span>
+
+                        </div>
+
+
+                        <span class="unread-dot"></span>
+
+                    </div>
+
+
+                    <div class="message-item">
+
+
+                        <div class="message-avatar">
+                            MI
+                        </div>
+
+
+                        <div class="message-content">
+
+                            <div class="message-top">
+
+                                <h4>
+                                    Mr. Ibrahim
+                                </h4>
+
+                                <small>
+                                    Yesterday
+                                </small>
+
+                            </div>
+
+
+                            <p>
+                                The updated class attendance records are ready.
+                            </p>
+
+
+                            <span class="message-role">
+                                Teacher
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="message-item">
+
+
+                        <div class="message-avatar">
+                            ZB
+                        </div>
+
+
+                        <div class="message-content">
+
+                            <div class="message-top">
+
+                                <h4>
+                                    Zainab Bello
+                                </h4>
+
+                                <small>
+                                    2 days ago
+                                </small>
+
+                            </div>
+
+
+                            <p>
+                                Thank you for the payment reminder.
+                            </p>
+
+
+                            <span class="message-role">
+                                Parent
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    `;
+
+}
 function showAnnouncements() {
 
     contentArea.innerHTML = `
