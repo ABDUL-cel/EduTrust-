@@ -49,6 +49,11 @@ else if (page === "school") {
     showAcademicSessions();
 
         }
+            else if (page === "fees") {
+
+    showSchoolFees();
+
+            }
 
 else {
 
@@ -1019,6 +1024,495 @@ function showAcademicSessions() {
     `;
 
 }
+
+function showSchoolFees() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        School Fee Management
+                    </h2>
+
+                    <p>
+                        Create, manage, and monitor school fee payments.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    + Create Fee Structure
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <span class="stat-icon blue">
+                            💰
+                        </span>
+
+                        <span class="stat-change positive">
+                            +8.4%
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Total Expected
+                    </p>
+
+
+                    <h3>
+                        ₦10.5M
+                    </h3>
+
+
+                    <small>
+                        This academic session
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <span class="stat-icon green">
+                            ✓
+                        </span>
+
+
+                        <span class="stat-change positive">
+                            80%
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Total Collected
+                    </p>
+
+
+                    <h3>
+                        ₦8.4M
+                    </h3>
+
+
+                    <small>
+                        Successfully paid
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <span class="stat-icon orange">
+                            ⏳
+                        </span>
+
+
+                        <span class="stat-change warning">
+                            Attention
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Outstanding
+                    </p>
+
+
+                    <h3>
+                        ₦2.1M
+                    </h3>
+
+
+                    <small>
+                        Awaiting payment
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <span class="stat-icon purple">
+                            👨‍🎓
+                        </span>
+
+
+                        <span class="stat-change positive">
+                            85%
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Students Paid
+                    </p>
+
+
+                    <h3>
+                        1,062
+                    </h3>
+
+
+                    <small>
+                        Out of 1,248 students
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+
+                    <div>
+
+                        <h3>
+                            Current Fee Structure
+                        </h3>
+
+
+                        <p>
+                            2025/2026 academic session
+                        </p>
+
+                    </div>
+
+
+                    <button class="text-button">
+
+                        Manage Fees
+
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Fee Category
+                                </th>
+
+                                <th>
+                                    Class Level
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                                <th>
+                                    Students
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <tr>
+
+                                <td>
+                                    Tuition Fee
+                                </td>
+
+                                <td>
+                                    Primary 1 - 6
+                                </td>
+
+                                <td>
+                                    ₦150,000
+                                </td>
+
+                                <td>
+                                    520
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Tuition Fee
+                                </td>
+
+                                <td>
+                                    JSS 1 - 3
+                                </td>
+
+                                <td>
+                                    ₦180,000
+                                </td>
+
+                                <td>
+                                    380
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Tuition Fee
+                                </td>
+
+                                <td>
+                                    SS 1 - 3
+                                </td>
+
+                                <td>
+                                    ₦200,000
+                                </td>
+
+                                <td>
+                                    348
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-grid">
+
+
+                <div class="dashboard-card">
+
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Payment Progress
+                            </h3>
+
+
+                            <p>
+                                Fee collection progress
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="collection-progress">
+
+
+                        <div class="progress-circle">
+
+                            <strong>
+                                80%
+                            </strong>
+
+
+                            <span>
+                                Collected
+                            </span>
+
+                        </div>
+
+
+                        <div class="progress-details">
+
+
+                            <div>
+
+                                <span class="progress-dot collected"></span>
+
+                                <span>
+                                    Collected
+                                </span>
+
+                                <strong>
+                                    ₦8.4M
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="progress-dot outstanding"></span>
+
+                                <span>
+                                    Outstanding
+                                </span>
+
+                                <strong>
+                                    ₦2.1M
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Quick Actions
+                            </h3>
+
+
+                            <p>
+                                Common fee management tasks
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-actions">
+
+
+                        <button class="quick-action-button">
+
+                            <span>
+                                ➕
+                            </span>
+
+                            Add Fee Structure
+
+                        </button>
+
+
+                        <button class="quick-action-button">
+
+                            <span>
+                                📄
+                            </span>
+
+                            View Payment History
+
+                        </button>
+
+
+                        <button class="quick-action-button">
+
+                            <span>
+                                📢
+                            </span>
+
+                            Send Fee Reminder
+
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    `;
+
+        }
 
 
 function showComingSoon(pageName) {
