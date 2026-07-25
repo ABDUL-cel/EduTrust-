@@ -44,6 +44,11 @@ else if (page === "school") {
     showClasses();
 
     }
+        else if (page === "sessions") {
+
+    showAcademicSessions();
+
+        }
 
 else {
 
@@ -652,6 +657,344 @@ function showClasses() {
 
                                     <span class="status paid">
                                         Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    `;
+
+}
+
+function showAcademicSessions() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Academic Sessions
+                    </h2>
+
+                    <p>
+                        Manage academic sessions and school terms.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    + Create New Session
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Current Session
+                    </p>
+
+                    <h3>
+                        2025/2026
+                    </h3>
+
+                    <small>
+                        Active academic session
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Current Term
+                    </p>
+
+                    <h3>
+                        First Term
+                    </h3>
+
+                    <small>
+                        Current school term
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Terms Completed
+                    </p>
+
+                    <h3>
+                        0
+                    </h3>
+
+                    <small>
+                        This academic session
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Session Status
+                    </p>
+
+                    <h3>
+                        Active
+                    </h3>
+
+                    <small>
+                        Currently running
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Current Academic Session
+                        </h3>
+
+                        <p>
+                            2025/2026 academic year details.
+                        </p>
+
+                    </div>
+
+
+                    <span class="status paid">
+                        Active
+                    </span>
+
+                </div>
+
+
+                <div class="school-details">
+
+
+                    <div class="detail-item">
+
+                        <span>
+                            Session Name
+                        </span>
+
+                        <strong>
+                            2025/2026
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-item">
+
+                        <span>
+                            Start Date
+                        </span>
+
+                        <strong>
+                            September 8, 2025
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-item">
+
+                        <span>
+                            Current Term
+                        </span>
+
+                        <strong>
+                            First Term
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-item">
+
+                        <span>
+                            Expected End Date
+                        </span>
+
+                        <strong>
+                            July 24, 2026
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Academic Terms
+                        </h3>
+
+                        <p>
+                            Manage the terms within this academic session.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Term
+                                </th>
+
+                                <th>
+                                    Start Date
+                                </th>
+
+                                <th>
+                                    End Date
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <tr>
+
+                                <td>
+                                    First Term
+                                </td>
+
+                                <td>
+                                    September 8, 2025
+                                </td>
+
+                                <td>
+                                    December 19, 2025
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Completed
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Second Term
+                                </td>
+
+                                <td>
+                                    January 12, 2026
+                                </td>
+
+                                <td>
+                                    April 3, 2026
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Completed
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Third Term
+                                </td>
+
+                                <td>
+                                    April 27, 2026
+                                </td>
+
+                                <td>
+                                    July 24, 2026
+                                </td>
+
+                                <td>
+
+                                    <span class="status pending">
+                                        Current
                                     </span>
 
                                 </td>
