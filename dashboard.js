@@ -59,6 +59,11 @@ else if (page === "school") {
     showFeeStructures();
 
         }
+            else if (page === "payments") {
+
+    showParentPayments();
+
+            }
 
 else {
 
@@ -73,6 +78,375 @@ else {
 
 
 });
+
+function showParentPayments() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Parent Payments
+                    </h2>
+
+                    <p>
+                        View and monitor payments made by parents.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    Export Payments
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <span class="stat-icon blue">
+                            💳
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Total Payments
+                    </p>
+
+
+                    <h3>
+                        1,062
+                    </h3>
+
+
+                    <small>
+                        This academic session
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <span class="stat-icon green">
+                            💰
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Amount Collected
+                    </p>
+
+
+                    <h3>
+                        ₦8.4M
+                    </h3>
+
+
+                    <small>
+                        Successfully received
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <span class="stat-icon orange">
+                            ⏳
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Pending Payments
+                    </p>
+
+
+                    <h3>
+                        186
+                    </h3>
+
+
+                    <small>
+                        Awaiting payment
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <span class="stat-icon purple">
+                            📈
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Collection Rate
+                    </p>
+
+
+                    <h3>
+                        80%
+                    </h3>
+
+
+                    <small>
+                        Current academic session
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+
+                    <div>
+
+                        <h3>
+                            Payment History
+                        </h3>
+
+
+                        <p>
+                            Recent payments made by parents.
+                        </p>
+
+                    </div>
+
+
+                    <button class="text-button">
+
+                        View All
+
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Parent
+                                </th>
+
+                                <th>
+                                    Student
+                                </th>
+
+                                <th>
+                                    Class
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <tr>
+
+                                <td>
+                                    Amina Yusuf
+                                </td>
+
+                                <td>
+                                    Fatima Yusuf
+                                </td>
+
+                                <td>
+                                    Primary 4
+                                </td>
+
+                                <td>
+                                    ₦150,000
+                                </td>
+
+                                <td>
+                                    24 Jul 2026
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Paid
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Ibrahim Musa
+                                </td>
+
+                                <td>
+                                    Ahmad Musa
+                                </td>
+
+                                <td>
+                                    JSS 1
+                                </td>
+
+                                <td>
+                                    ₦95,000
+                                </td>
+
+                                <td>
+                                    23 Jul 2026
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Paid
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Zainab Bello
+                                </td>
+
+                                <td>
+                                    Maryam Bello
+                                </td>
+
+                                <td>
+                                    Primary 5
+                                </td>
+
+                                <td>
+                                    ₦120,000
+                                </td>
+
+                                <td>
+                                    22 Jul 2026
+                                </td>
+
+                                <td>
+
+                                    <span class="status pending">
+                                        Pending
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Yusuf Abdullahi
+                                </td>
+
+                                <td>
+                                    Hassan Abdullahi
+                                </td>
+
+                                <td>
+                                    SS 2
+                                </td>
+
+                                <td>
+                                    ₦200,000
+                                </td>
+
+                                <td>
+                                    21 Jul 2026
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Paid
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    `;
+
+}
 
 function showFeeStructures() {
 
