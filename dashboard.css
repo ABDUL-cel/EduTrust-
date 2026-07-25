@@ -1299,3 +1299,68 @@ td {
     }
 
 }
+
+/* ================================
+   QUICK ACTIONS
+================================ */
+
+.quick-actions {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+
+.quick-action-button {
+
+    width: 100%;
+
+    border: 1px solid #e7eaf0;
+
+    background: #f1f3f6;
+
+    color: #172033;
+
+    padding: 14px;
+
+    border-radius: 9px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition: 0.25s ease;
+
+}
+
+
+.quick-action-button:hover {
+
+    background: #e0ecff;
+
+    border-color: #2563eb;
+
+    color: #2563eb;
+
+}
+
+
+.quick-action-button span {
+
+    font-size: 17px;
+
+}
