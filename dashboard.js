@@ -77,6 +77,12 @@ else if (page === "school") {
 
         }
 
+            else if (page === "staff") {
+
+    showStaff();
+
+            }
+
 else {
 
     showComingSoon(
@@ -97,6 +103,308 @@ if (window.innerWidth <= 768) {
 
 
 });
+
+function showStaff() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Staff & Teachers
+                    </h2>
+
+                    <p>
+                        Manage teachers, administrators, and other school staff.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    + Add Staff Member
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Staff
+                    </p>
+
+                    <h3>
+                        86
+                    </h3>
+
+                    <small>
+                        All school staff
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Teachers
+                    </p>
+
+                    <h3>
+                        62
+                    </h3>
+
+                    <small>
+                        Teaching staff
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Administrative Staff
+                    </p>
+
+                    <h3>
+                        14
+                    </h3>
+
+                    <small>
+                        School administration
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Support Staff
+                    </p>
+
+                    <h3>
+                        10
+                    </h3>
+
+                    <small>
+                        Other school staff
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Staff Directory
+                        </h3>
+
+                        <p>
+                            View and manage all school staff.
+                        </p>
+
+                    </div>
+
+
+                    <button class="text-button">
+
+                        View All
+
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Name
+                                </th>
+
+                                <th>
+                                    Role
+                                </th>
+
+                                <th>
+                                    Department
+                                </th>
+
+                                <th>
+                                    Phone
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <tr>
+
+                                <td>
+                                    Mr. Ibrahim
+                                </td>
+
+                                <td>
+                                    Teacher
+                                </td>
+
+                                <td>
+                                    Mathematics
+                                </td>
+
+                                <td>
+                                    08012345678
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Mrs. Aisha
+                                </td>
+
+                                <td>
+                                    Teacher
+                                </td>
+
+                                <td>
+                                    English
+                                </td>
+
+                                <td>
+                                    08023456789
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Mr. Musa
+                                </td>
+
+                                <td>
+                                    Accountant
+                                </td>
+
+                                <td>
+                                    Finance
+                                </td>
+
+                                <td>
+                                    08034567890
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Mrs. Fatima
+                                </td>
+
+                                <td>
+                                    Administrator
+                                </td>
+
+                                <td>
+                                    Administration
+                                </td>
+
+                                <td>
+                                    08045678901
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                        </tbody>
+
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    `;
+
+}
 
 function showStudents() {
 
