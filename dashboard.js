@@ -1,4 +1,7 @@
-const navItems = document.querySelectorAll(".nav-item");
+const navItems =
+    document.querySelectorAll(
+        ".nav-item, .submenu-item"
+    );
 
 const pageTitle = document.getElementById("pageTitle");
 
@@ -121,6 +124,20 @@ if (window.innerWidth <= 768) {
 
     });
 
+
+});
+
+const reportsToggle =
+    document.querySelector(".reports-toggle");
+
+
+const reportsGroup =
+    document.querySelector(".nav-group");
+
+
+reportsToggle.addEventListener("click", function () {
+
+    reportsGroup.classList.toggle("open");
 
 });
 
