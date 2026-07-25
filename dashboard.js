@@ -87,6 +87,11 @@ else if (page === "school") {
     showParents();
 
                 }
+                    else if (page === "announcements") {
+
+    showAnnouncements();
+
+                    }
 
 else {
 
@@ -108,6 +113,249 @@ if (window.innerWidth <= 768) {
 
 
 });
+
+function showAnnouncements() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Announcements
+                    </h2>
+
+                    <p>
+                        Share important updates and information with your school community.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-button">
+
+                    + Create Announcement
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Total Announcements
+                    </p>
+
+                    <h3>
+                        24
+                    </h3>
+
+                    <small>
+                        This academic session
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Published
+                    </p>
+
+                    <h3>
+                        20
+                    </h3>
+
+                    <small>
+                        Currently visible
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Drafts
+                    </p>
+
+                    <h3>
+                        4
+                    </h3>
+
+                    <small>
+                        Not yet published
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Audience
+                    </p>
+
+                    <h3>
+                        2,500+
+                    </h3>
+
+                    <small>
+                        School community
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Recent Announcements
+                        </h3>
+
+                        <p>
+                            Manage your school's latest announcements.
+                        </p>
+
+                    </div>
+
+
+                    <button class="text-button">
+
+                        View All
+
+                    </button>
+
+                </div>
+
+
+                <div class="announcement-list">
+
+
+                    <div class="announcement-item">
+
+
+                        <div class="announcement-icon">
+                            📢
+                        </div>
+
+
+                        <div class="announcement-content">
+
+                            <h4>
+                                First Term Examination Schedule
+                            </h4>
+
+                            <p>
+                                The first term examination will begin on Monday.
+                            </p>
+
+                            <small>
+                                Published 2 days ago • Parents & Students
+                            </small>
+
+                        </div>
+
+
+                        <span class="status paid">
+                            Published
+                        </span>
+
+                    </div>
+
+
+                    <div class="announcement-item">
+
+
+                        <div class="announcement-icon">
+                            💰
+                        </div>
+
+
+                        <div class="announcement-content">
+
+                            <h4>
+                                School Fee Payment Reminder
+                            </h4>
+
+                            <p>
+                                Parents are reminded to complete outstanding school fee payments.
+                            </p>
+
+                            <small>
+                                Published 5 days ago • Parents
+                            </small>
+
+                        </div>
+
+
+                        <span class="status paid">
+                            Published
+                        </span>
+
+                    </div>
+
+
+                    <div class="announcement-item">
+
+
+                        <div class="announcement-icon">
+                            📅
+                        </div>
+
+
+                        <div class="announcement-content">
+
+                            <h4>
+                                Upcoming School Holiday
+                            </h4>
+
+                            <p>
+                                The school will be closed for the upcoming holiday.
+                            </p>
+
+                            <small>
+                                Draft • Staff & Parents
+                            </small>
+
+                        </div>
+
+
+                        <span class="status pending">
+                            Draft
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    `;
+
+}
 
 function showParents() {
 
