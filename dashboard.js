@@ -54,6 +54,11 @@ else if (page === "school") {
     showSchoolFees();
 
             }
+        else if (page === "fee-structures") {
+
+    showFeeStructures();
+
+        }
 
 else {
 
@@ -69,6 +74,337 @@ else {
 
 });
 
+function showFeeStructures() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-content">
+
+            <div class="page-introduction">
+
+                <div>
+
+                    <h2>
+                        Fee Structures
+                    </h2>
+
+                    <p>
+                        Create and manage fees for different classes and academic terms.
+                    </p>
+
+                </div>
+
+                <button class="primary-button">
+
+                    + Create Fee Structure
+
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <p>
+                        Active Structures
+                    </p>
+
+                    <h3>
+                        12
+                    </h3>
+
+                    <small>
+                        Current academic session
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Primary Section
+                    </p>
+
+                    <h3>
+                        6
+                    </h3>
+
+                    <small>
+                        Active fee structures
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Secondary Section
+                    </p>
+
+                    <h3>
+                        6
+                    </h3>
+
+                    <small>
+                        Active fee structures
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <p>
+                        Academic Session
+                    </p>
+
+                    <h3>
+                        2025/26
+                    </h3>
+
+                    <small>
+                        Current session
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Active Fee Structures
+                        </h3>
+
+                        <p>
+                            Fees currently assigned to school classes.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Structure Name
+                                </th>
+
+                                <th>
+                                    Class
+                                </th>
+
+                                <th>
+                                    Term
+                                </th>
+
+                                <th>
+                                    Total Amount
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <tr>
+
+                                <td>
+                                    Primary Basic Fees
+                                </td>
+
+                                <td>
+                                    Primary 1 - 6
+                                </td>
+
+                                <td>
+                                    First Term
+                                </td>
+
+                                <td>
+                                    ₦180,000
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Junior Secondary Fees
+                                </td>
+
+                                <td>
+                                    JSS 1 - 3
+                                </td>
+
+                                <td>
+                                    First Term
+                                </td>
+
+                                <td>
+                                    ₦210,000
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    Senior Secondary Fees
+                                </td>
+
+                                <td>
+                                    SS 1 - 3
+                                </td>
+
+                                <td>
+                                    First Term
+                                </td>
+
+                                <td>
+                                    ₦230,000
+                                </td>
+
+                                <td>
+
+                                    <span class="status paid">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Fee Breakdown
+                        </h3>
+
+                        <p>
+                            Example breakdown for Primary 1 - 6.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="school-details">
+
+                    <div class="detail-item">
+
+                        <span>
+                            Tuition Fee
+                        </span>
+
+                        <strong>
+                            ₦150,000
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-item">
+
+                        <span>
+                            Examination Fee
+                        </span>
+
+                        <strong>
+                            ₦10,000
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-item">
+
+                        <span>
+                            Development Fee
+                        </span>
+
+                        <strong>
+                            ₦20,000
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-item">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong>
+                            ₦180,000
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
 
 function showOverview() {
 
