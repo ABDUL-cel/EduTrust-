@@ -2465,8 +2465,6 @@ function showStudents() {
             Select class
         </option>
 
-        <!-- Nursery -->
-
         <option value="Nursery 1">
             Nursery 1
         </option>
@@ -2479,8 +2477,6 @@ function showStudents() {
             Nursery 3
         </option>
 
-
-        <!-- Primary -->
 
         <option value="Primary 1">
             Primary 1
@@ -2506,9 +2502,6 @@ function showStudents() {
             Primary 6
         </option>
 
-
-        <!-- Junior Secondary School -->
-
         <option value="JSS 1">
             JSS 1
         </option>
@@ -2520,9 +2513,6 @@ function showStudents() {
         <option value="JSS 3">
             JSS 3
         </option>
-
-
-        <!-- Senior Secondary School -->
 
         <option value="SS 1">
             SS 1
