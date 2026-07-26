@@ -296,6 +296,406 @@ if (
     );
 
                           }
+/* ================================
+   SETTINGS PAGES
+================================ */
+
+function showSchoolProfile() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-header">
+
+            <h1>School Profile</h1>
+
+            <p>
+                Manage your school's information and profile details.
+            </p>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <h2>School Information</h2>
+
+            <form class="settings-form">
+
+                <div class="form-group">
+
+                    <label>School Name</label>
+
+                    <input
+                        type="text"
+                        placeholder="Enter school name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>School Email</label>
+
+                    <input
+                        type="email"
+                        placeholder="school@example.com"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>School Phone</label>
+
+                    <input
+                        type="tel"
+                        placeholder="08012345678"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>School Address</label>
+
+                    <textarea
+                        placeholder="Enter school address"
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                >
+                    Save Changes
+                </button>
+
+            </form>
+
+        </div>
+
+    `;
+
+}
+
+function showUserRoles() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-header">
+
+            <h1>User Roles</h1>
+
+            <p>
+                Manage administrators, staff, teachers and access permissions.
+            </p>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <div class="section-heading">
+
+                <h2>System Users</h2>
+
+                <button class="primary-button">
+                    + Add User
+                </button>
+
+            </div>
+
+
+            <div class="user-role-list">
+
+                <div class="role-item">
+
+                    <div>
+
+                        <strong>Administrator</strong>
+
+                        <p>Full access to the EduTrust system</p>
+
+                    </div>
+
+                    <span class="role-badge">
+                        Full Access
+                    </span>
+
+                </div>
+
+
+                <div class="role-item">
+
+                    <div>
+
+                        <strong>Teacher</strong>
+
+                        <p>Access to students and academic records</p>
+
+                    </div>
+
+                    <span class="role-badge">
+                        Limited Access
+                    </span>
+
+                </div>
+
+
+                <div class="role-item">
+
+                    <div>
+
+                        <strong>Accountant</strong>
+
+                        <p>Access to school fees and payment records</p>
+
+                    </div>
+
+                    <span class="role-badge">
+                        Finance Access
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+function showPaymentSettings() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-header">
+
+            <h1>Payment Settings</h1>
+
+            <p>
+                Configure how your school receives and manages payments.
+            </p>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <h2>Payment Configuration</h2>
+
+
+            <div class="settings-option">
+
+                <div>
+
+                    <strong>Online Payments</strong>
+
+                    <p>
+                        Allow parents to pay school fees online.
+                    </p>
+
+                </div>
+
+
+                <label class="switch">
+
+                    <input type="checkbox">
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <div class="settings-option">
+
+                <div>
+
+                    <strong>Payment Notifications</strong>
+
+                    <p>
+                        Receive notifications when payments are made.
+                    </p>
+
+                </div>
+
+
+                <label class="switch">
+
+                    <input type="checkbox">
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+function showSecurity() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-header">
+
+            <h1>Security</h1>
+
+            <p>
+                Manage your account security and password settings.
+            </p>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <h2>Security Settings</h2>
+
+
+            <div class="settings-option">
+
+                <div>
+
+                    <strong>Two-Factor Authentication</strong>
+
+                    <p>
+                        Add an extra layer of security to your account.
+                    </p>
+
+                </div>
+
+
+                <label class="switch">
+
+                    <input type="checkbox">
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="primary-button"
+            >
+                Change Password
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+function showEmailSettings() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-header">
+
+            <h1>Email Settings</h1>
+
+            <p>
+                Manage school email notifications and communication preferences.
+            </p>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <h2>Email Notifications</h2>
+
+
+            <div class="settings-option">
+
+                <div>
+
+                    <strong>Payment Notifications</strong>
+
+                    <p>
+                        Send email alerts when payments are received.
+                    </p>
+
+                </div>
+
+                <input type="checkbox">
+
+            </div>
+
+
+            <div class="settings-option">
+
+                <div>
+
+                    <strong>New Student Notifications</strong>
+
+                    <p>
+                        Receive alerts when a new student is registered.
+                    </p>
+
+                </div>
+
+                <input type="checkbox">
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+function showBackup() {
+
+    contentArea.innerHTML = `
+
+        <div class="page-header">
+
+            <h1>Backup</h1>
+
+            <p>
+                Protect your school's important information.
+            </p>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <h2>Data Backup</h2>
+
+            <p>
+                Create a backup of your school records and important data.
+            </p>
+
+
+            <button
+                type="button"
+                class="primary-button"
+            >
+                Create Backup
+            </button>
+
+        </div>
+
+    `;
+
+}
 
 function showNotifications() {
 
