@@ -2601,7 +2601,7 @@ function showStudents() {
 
 </div>
     `;
-}
+
 
 
     const searchInput =
