@@ -2767,101 +2767,106 @@ function showStudents() {
         filterStudents
     );
 
+/* ================================
+   STUDENT MODAL
+================================ */
 
-    /* OPEN MODAL */
-
-    const addStudentButton =
-        document.getElementById(
-            "add-student-button"
-        );
+const addStudentButton =
+    document.getElementById(
+        "add-student-button"
+    );
 
 
-    const studentModal =
-        document.getElementById(
-            "student-modal"
-        );
+const studentModal =
+    document.getElementById(
+        "student-modal"
+    );
+
+
+const closeStudentModal =
+    document.getElementById(
+        "close-student-modal"
+    );
+
+
+const cancelStudentModal =
+    document.getElementById(
+        "cancel-student-modal"
+    );
+
+
+const studentForm =
+    document.getElementById(
+        "student-form"
+    );
+
+
+
+/* OPEN */
 
 addStudentButton.addEventListener(
     "click",
     function () {
 
-        studentModal.classList.add(
-            "show"
-        );
+        studentModal.style.display =
+            "flex";
 
     }
 );
 
 
-    /* CLOSE MODAL */
 
-    const closeStudentModal =
-        document.getElementById(
-            "close-student-modal"
+/* CLOSE WITH X */
+
+closeStudentModal.addEventListener(
+    "click",
+    function () {
+
+        studentModal.style.display =
+            "none";
+
+    }
+);
+
+
+
+/* CLOSE WITH CANCEL */
+
+cancelStudentModal.addEventListener(
+    "click",
+    function () {
+
+        studentModal.style.display =
+            "none";
+
+    }
+);
+
+
+
+/* SUBMIT */
+
+studentForm.addEventListener(
+    "submit",
+    function (event) {
+
+        event.preventDefault();
+
+
+        alert(
+            "Student added successfully!"
         );
 
 
-    const cancelStudentModal =
-        document.getElementById(
-            "cancel-student-modal"
-        );
+        studentForm.reset();
 
 
-    closeStudentModal.addEventListener(
-        "click",
-        function () {
+        studentModal.style.display =
+            "none";
 
-            studentModal.classList.remove(
-                "show"
-            );
+    }
+);
 
-        }
-    );
-
-
-    cancelStudentModal.addEventListener(
-        "click",
-        function () {
-
-            studentModal.classList.remove(
-                "show"
-            );
-
-        }
-    );
-
-
-    /* SUBMIT FORM */
-
-    const studentForm =
-        document.getElementById(
-            "student-form"
-        );
-
-
-    studentForm.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-
-            alert(
-                "Student added successfully!"
-            );
-
-
-            studentForm.reset();
-
-
-            studentModal.classList.remove(
-                "show"
-            );
-
-        }
-    );
-
-} 
 
 
 function showOutstandingFees() {
