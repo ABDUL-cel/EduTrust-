@@ -1998,343 +1998,461 @@ function showStaff() {
 
 }
 
+
 function showStudents() {
 
     contentArea.innerHTML = `
 
-        <div class="page-content">
+        <div class="page-header">
+
+            <div>
+
+                <h1>Students</h1>
+
+                <p>
+                    Manage all students registered in your school.
+                </p>
+
+            </div>
 
 
-            <div class="page-introduction">
+            <button
+                class="primary-button"
+                id="add-student-button"
+            >
+                + Add Student
+            </button>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <span class="stat-icon">
+                    👨‍🎓
+                </span>
 
                 <div>
 
-                    <h2>
-                        Students
-                    </h2>
+                    <p>Total Students</p>
 
-                    <p>
-                        Manage student records and academic information.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    + Add New Student
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Students
-                    </p>
-
-                    <h3>
-                        1,248
-                    </h3>
-
-                    <small>
-                        All registered students
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Active Students
-                    </p>
-
-                    <h3>
-                        1,220
-                    </h3>
-
-                    <small>
-                        Currently enrolled
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        New Students
-                    </p>
-
-                    <h3>
-                        86
-                    </h3>
-
-                    <small>
-                        This academic session
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Outstanding Fees
-                    </p>
-
-                    <h3>
-                        186
-                    </h3>
-
-                    <small>
-                        Students with balance
-                    </small>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Student Directory
-                        </h3>
-
-                        <p>
-                            View and manage all registered students.
-                        </p>
-
-                    </div>
-
-
-                    <button class="text-button">
-
-                        View All
-
-                    </button>
-
-                </div>
-
-
-                <div class="table-container">
-
-
-                    <table>
-
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Student
-                                </th>
-
-                                <th>
-                                    Student ID
-                                </th>
-
-                                <th>
-                                    Class
-                                </th>
-
-                                <th>
-                                    Parent / Guardian
-                                </th>
-
-                                <th>
-                                    Fee Status
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-
-                            <tr>
-
-                                <td>
-                                    Fatima Yusuf
-                                </td>
-
-                                <td>
-                                    EDU-2025-001
-                                </td>
-
-                                <td>
-                                    Primary 4
-                                </td>
-
-                                <td>
-                                    Amina Yusuf
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Paid
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Ahmad Musa
-                                </td>
-
-                                <td>
-                                    EDU-2025-002
-                                </td>
-
-                                <td>
-                                    JSS 1
-                                </td>
-
-                                <td>
-                                    Ibrahim Musa
-                                </td>
-
-                                <td>
-
-                                    <span class="status pending">
-                                        Partial
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Maryam Bello
-                                </td>
-
-                                <td>
-                                    EDU-2025-003
-                                </td>
-
-                                <td>
-                                    Primary 5
-                                </td>
-
-                                <td>
-                                    Zainab Bello
-                                </td>
-
-                                <td>
-
-                                    <span class="status pending">
-                                        Outstanding
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Hassan Abdullahi
-                                </td>
-
-                                <td>
-                                    EDU-2025-004
-                                </td>
-
-                                <td>
-                                    SS 2
-                                </td>
-
-                                <td>
-                                    Yusuf Abdullahi
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Paid
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                        </tbody>
-
-
-                    </table>
+                    <h2>1,248</h2>
 
                 </div>
 
             </div>
 
+
+            <div class="stat-card">
+
+                <span class="stat-icon">
+                    🟢
+                </span>
+
+                <div>
+
+                    <p>Active Students</p>
+
+                    <h2>1,180</h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span class="stat-icon">
+                    🔴
+                </span>
+
+                <div>
+
+                    <p>Inactive Students</p>
+
+                    <h2>68</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="content-card students-card">
+
+
+            <div class="table-header">
+
+                <div>
+
+                    <h2>Student List</h2>
+
+                    <p>
+                        View and manage registered students.
+                    </p>
+
+                </div>
+
+
+                <div class="table-actions">
+
+                    <input
+                        type="search"
+                        id="student-search"
+                        placeholder="Search students..."
+                    >
+
+
+                    <select id="student-class-filter">
+
+                        <option value="all">
+                            All Classes
+                        </option>
+
+                        <option value="jss1">
+                            JSS 1
+                        </option>
+
+                        <option value="jss2">
+                            JSS 2
+                        </option>
+
+                        <option value="jss3">
+                            JSS 3
+                        </option>
+
+                        <option value="ss1">
+                            SS 1
+                        </option>
+
+                        <option value="ss2">
+                            SS 2
+                        </option>
+
+                        <option value="ss3">
+                            SS 3
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Student</th>
+
+                            <th>Admission No.</th>
+
+                            <th>Class</th>
+
+                            <th>Gender</th>
+
+                            <th>Status</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="students-table-body">
+
+                        <tr>
+
+                            <td>
+
+                                <div class="student-info">
+
+                                    <span class="student-avatar">
+                                        AM
+                                    </span>
+
+                                    <div>
+
+                                        <strong>
+                                            Aisha Mohammed
+                                        </strong>
+
+                                        <small>
+                                            aisha@example.com
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                EDU-2026-001
+                            </td>
+
+
+                            <td>
+                                JSS 1
+                            </td>
+
+
+                            <td>
+                                Female
+                            </td>
+
+
+                            <td>
+
+                                <span class="status-badge active">
+                                    Active
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <button
+                                    class="table-action-button"
+                                >
+                                    View
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>
+
+                                <div class="student-info">
+
+                                    <span class="student-avatar">
+                                        YA
+                                    </span>
+
+                                    <div>
+
+                                        <strong>
+                                            Yusuf Abdullahi
+                                        </strong>
+
+                                        <small>
+                                            yusuf@example.com
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                EDU-2026-002
+                            </td>
+
+
+                            <td>
+                                SS 2
+                            </td>
+
+
+                            <td>
+                                Male
+                            </td>
+
+
+                            <td>
+
+                                <span class="status-badge active">
+                                    Active
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <button
+                                    class="table-action-button"
+                                >
+                                    View
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>
+
+                                <div class="student-info">
+
+                                    <span class="student-avatar">
+                                        FK
+                                    </span>
+
+                                    <div>
+
+                                        <strong>
+                                            Fatima Khalid
+                                        </strong>
+
+                                        <small>
+                                            fatima@example.com
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                EDU-2026-003
+                            </td>
+
+
+                            <td>
+                                JSS 3
+                            </td>
+
+
+                            <td>
+                                Female
+                            </td>
+
+
+                            <td>
+
+                                <span class="status-badge inactive">
+                                    Inactive
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <button
+                                    class="table-action-button"
+                                >
+                                    View
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </div>
 
     `;
 
+
+    const searchInput =
+        document.getElementById("student-search");
+
+
+    const classFilter =
+        document.getElementById(
+            "student-class-filter"
+        );
+
+
+    const tableRows =
+        document.querySelectorAll(
+            "#students-table-body tr"
+        );
+
+
+    function filterStudents() {
+
+        const searchValue =
+            searchInput.value.toLowerCase();
+
+
+        const classValue =
+            classFilter.value.toLowerCase();
+
+
+        tableRows.forEach(function (row) {
+
+            const rowText =
+                row.textContent.toLowerCase();
+
+
+            const matchesSearch =
+                rowText.includes(searchValue);
+
+
+            const matchesClass =
+                classValue === "all" ||
+                rowText.includes(classValue);
+
+
+            row.style.display =
+                matchesSearch &&
+                matchesClass
+                    ? ""
+                    : "none";
+
+        });
+
+    }
+
+
+    searchInput.addEventListener(
+        "input",
+        filterStudents
+    );
+
+
+    classFilter.addEventListener(
+        "change",
+        filterStudents
+    );
+
+
+    document
+        .getElementById("add-student-button")
+        .addEventListener(
+            "click",
+            function () {
+
+                alert(
+                    "Student registration form coming next."
+                );
+
+            }
+        );
+
 }
+
+
+
 
 function showOutstandingFees() {
 
