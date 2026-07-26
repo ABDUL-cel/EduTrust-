@@ -1999,6 +1999,7 @@ function showStaff() {
 }
 
 
+
 function showStudents() {
 
     contentArea.innerHTML = `
@@ -2106,34 +2107,28 @@ function showStudents() {
                     >
 
 
-                    <select id="student-class-filter">
+                    <select
+                        id="student-class-filter"
+                    >
 
                         <option value="all">
                             All Classes
                         </option>
 
-                        <option value="jss1">
-                            JSS 1
+                        <option value="nursery">
+                            Nursery
                         </option>
 
-                        <option value="jss2">
-                            JSS 2
+                        <option value="primary">
+                            Primary
                         </option>
 
-                        <option value="jss3">
-                            JSS 3
+                        <option value="jss">
+                            JSS
                         </option>
 
-                        <option value="ss1">
-                            SS 1
-                        </option>
-
-                        <option value="ss2">
-                            SS 2
-                        </option>
-
-                        <option value="ss3">
-                            SS 3
+                        <option value="ss">
+                            SS
                         </option>
 
                     </select>
@@ -2168,7 +2163,9 @@ function showStudents() {
                     </thead>
 
 
-                    <tbody id="students-table-body">
+                    <tbody
+                        id="students-table-body"
+                    >
 
                         <tr>
 
@@ -2176,9 +2173,12 @@ function showStudents() {
 
                                 <div class="student-info">
 
-                                    <span class="student-avatar">
+                                    <span
+                                        class="student-avatar"
+                                    >
                                         AM
                                     </span>
+
 
                                     <div>
 
@@ -2214,7 +2214,9 @@ function showStudents() {
 
                             <td>
 
-                                <span class="status-badge active">
+                                <span
+                                    class="status-badge active"
+                                >
                                     Active
                                 </span>
 
@@ -2240,9 +2242,12 @@ function showStudents() {
 
                                 <div class="student-info">
 
-                                    <span class="student-avatar">
+                                    <span
+                                        class="student-avatar"
+                                    >
                                         YA
                                     </span>
+
 
                                     <div>
 
@@ -2278,7 +2283,9 @@ function showStudents() {
 
                             <td>
 
-                                <span class="status-badge active">
+                                <span
+                                    class="status-badge active"
+                                >
                                     Active
                                 </span>
 
@@ -2304,9 +2311,12 @@ function showStudents() {
 
                                 <div class="student-info">
 
-                                    <span class="student-avatar">
+                                    <span
+                                        class="student-avatar"
+                                    >
                                         FK
                                     </span>
+
 
                                     <div>
 
@@ -2331,7 +2341,7 @@ function showStudents() {
 
 
                             <td>
-                                JSS 3
+                                Primary 5
                             </td>
 
 
@@ -2342,7 +2352,9 @@ function showStudents() {
 
                             <td>
 
-                                <span class="status-badge inactive">
+                                <span
+                                    class="status-badge inactive"
+                                >
                                     Inactive
                                 </span>
 
@@ -2369,243 +2381,316 @@ function showStudents() {
 
         </div>
 
-        
-<div class="student-modal" id="student-modal">
 
-    <div class="student-modal-content">
+        <!-- ADD STUDENT MODAL -->
 
-        <div class="modal-header">
+        <div
+            class="student-modal"
+            id="student-modal"
+        >
 
-            <div>
-                <h2>Add New Student</h2>
-                <p>Register a new student in your school.</p>
-            </div>
-
-            <button
-                type="button"
-                class="close-modal"
-                id="close-student-modal"
+            <div
+                class="student-modal-content"
             >
-                ×
-            </button>
+
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <h2>
+                            Add New Student
+                        </h2>
+
+                        <p>
+                            Register a new student in your school.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="close-modal"
+                        id="close-student-modal"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <form
+                    id="student-form"
+                >
+
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label
+                                for="student-first-name"
+                            >
+                                First Name
+                            </label>
+
+
+                            <input
+                                type="text"
+                                id="student-first-name"
+                                placeholder="Enter first name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label
+                                for="student-last-name"
+                            >
+                                Last Name
+                            </label>
+
+
+                            <input
+                                type="text"
+                                id="student-last-name"
+                                placeholder="Enter last name"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label
+                                for="student-gender"
+                            >
+                                Gender
+                            </label>
+
+
+                            <select
+                                id="student-gender"
+                                required
+                            >
+
+                                <option value="">
+                                    Select gender
+                                </option>
+
+
+                                <option value="Male">
+                                    Male
+                                </option>
+
+
+                                <option value="Female">
+                                    Female
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label
+                                for="student-class"
+                            >
+                                Class
+                            </label>
+
+
+                            <select
+                                id="student-class"
+                                required
+                            >
+
+                                <option value="">
+                                    Select class
+                                </option>
+
+
+                                <optgroup
+                                    label="Nursery"
+                                >
+
+                                    <option>
+                                        Nursery 1
+                                    </option>
+
+                                    <option>
+                                        Nursery 2
+                                    </option>
+
+                                    <option>
+                                        Nursery 3
+                                    </option>
+
+                                </optgroup>
+
+
+                                <optgroup
+                                    label="Primary"
+                                >
+
+                                    <option>
+                                        Primary 1
+                                    </option>
+
+                                    <option>
+                                        Primary 2
+                                    </option>
+
+                                    <option>
+                                        Primary 3
+                                    </option>
+
+                                    <option>
+                                        Primary 4
+                                    </option>
+
+                                    <option>
+                                        Primary 5
+                                    </option>
+
+                                    <option>
+                                        Primary 6
+                                    </option>
+
+                                </optgroup>
+
+
+                                <optgroup
+                                    label="Junior Secondary School"
+                                >
+
+                                    <option>
+                                        JSS 1
+                                    </option>
+
+                                    <option>
+                                        JSS 2
+                                    </option>
+
+                                    <option>
+                                        JSS 3
+                                    </option>
+
+                                </optgroup>
+
+
+                                <optgroup
+                                    label="Senior Secondary School"
+                                >
+
+                                    <option>
+                                        SS 1
+                                    </option>
+
+                                    <option>
+                                        SS 2
+                                    </option>
+
+                                    <option>
+                                        SS 3
+                                    </option>
+
+                                </optgroup>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                            for="student-email"
+                        >
+                            Email Address
+                        </label>
+
+
+                        <input
+                            type="email"
+                            id="student-email"
+                            placeholder="student@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                            for="student-phone"
+                        >
+                            Phone Number
+                        </label>
+
+
+                        <input
+                            type="tel"
+                            id="student-phone"
+                            placeholder="Enter phone number"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="modal-actions">
+
+
+                        <button
+                            type="button"
+                            class="cancel-button"
+                            id="cancel-student-modal"
+                        >
+                            Cancel
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+                            Add Student
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
 
         </div>
 
-
-        <form id="student-form">
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="student-first-name">
-                        First Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="student-first-name"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="student-last-name">
-                        Last Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="student-last-name"
-                        required
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="student-gender">
-                        Gender
-                    </label>
-
-                    <select id="student-gender" required>
-
-                        <option value="">
-                            Select gender
-                        </option>
-
-                        <option value="Male">
-                            Male
-                        </option>
-
-                        <option value="Female">
-                            Female
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="form-group">
-
-    <label for="student-class">
-        Class
-    </label>
-
-    <select id="student-class" required>
-
-        <option value="">
-            Select class
-        </option>
-
-        <!-- Nursery -->
-
-        <option value="Nursery 1">
-            Nursery 1
-        </option>
-
-        <option value="Nursery 2">
-            Nursery 2
-        </option>
-
-        <option value="Nursery 3">
-            Nursery 3
-        </option>
-
-
-        <!-- Primary -->
-
-        <option value="Primary 1">
-            Primary 1
-        </option>
-
-        <option value="Primary 2">
-            Primary 2
-        </option>
-
-        <option value="Primary 3">
-            Primary 3
-        </option>
-
-        <option value="Primary 4">
-            Primary 4
-        </option>
-
-        <option value="Primary 5">
-            Primary 5
-        </option>
-
-        <option value="Primary 6">
-            Primary 6
-        </option>
-
-
-        <!-- Junior Secondary School -->
-
-        <option value="JSS 1">
-            JSS 1
-        </option>
-
-        <option value="JSS 2">
-            JSS 2
-        </option>
-
-        <option value="JSS 3">
-            JSS 3
-        </option>
-
-
-        <!-- Senior Secondary School -->
-
-        <option value="SS 1">
-            SS 1
-        </option>
-
-        <option value="SS 2">
-            SS 2
-        </option>
-
-        <option value="SS 3">
-            SS 3
-        </option>
-
-    </select>
-
-</div>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="student-email">
-                    Email Address
-                </label>
-
-                <input
-                    type="email"
-                    id="student-email"
-                    required
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="student-phone">
-                    Phone Number
-                </label>
-
-                <input
-                    type="tel"
-                    id="student-phone"
-                    required
-                >
-
-            </div>
-
-
-            <div class="modal-actions">
-
-                <button
-                    type="button"
-                    class="cancel-button"
-                    id="cancel-student-modal"
-                >
-                    Cancel
-                </button>
-
-
-                <button
-                    type="submit"
-                    class="primary-button"
-                >
-                    Add Student
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
     `;
 
 
+    /* SEARCH */
 
     const searchInput =
-        document.getElementById("student-search");
+        document.getElementById(
+            "student-search"
+        );
 
 
     const classFilter =
@@ -2630,28 +2715,43 @@ function showStudents() {
             classFilter.value.toLowerCase();
 
 
-        tableRows.forEach(function (row) {
+        tableRows.forEach(
+            function (row) {
 
-            const rowText =
-                row.textContent.toLowerCase();
-
-
-            const matchesSearch =
-                rowText.includes(searchValue);
+                const rowText =
+                    row.textContent.toLowerCase();
 
 
-            const matchesClass =
-                classValue === "all" ||
-                rowText.includes(classValue);
+                const matchesSearch =
+                    rowText.includes(
+                        searchValue
+                    );
 
 
-            row.style.display =
-                matchesSearch &&
-                matchesClass
-                    ? ""
-                    : "none";
+                let matchesClass =
+                    true;
 
-        });
+
+                if (
+                    classValue !== "all"
+                ) {
+
+                    matchesClass =
+                        rowText.includes(
+                            classValue
+                        );
+
+                }
+
+
+                row.style.display =
+                    matchesSearch &&
+                    matchesClass
+                        ? ""
+                        : "none";
+
+            }
+        );
 
     }
 
@@ -2668,22 +2768,101 @@ function showStudents() {
     );
 
 
-    document
-        .getElementById("add-student-button")
-        .addEventListener(
-            "click",
-            function () {
+    /* OPEN MODAL */
 
-                alert(
-                    "Student Added Successfully."
-                );
-
-            }
+    const addStudentButton =
+        document.getElementById(
+            "add-student-button"
         );
 
-}
+
+    const studentModal =
+        document.getElementById(
+            "student-modal"
+        );
 
 
+    addStudentButton.addEventListener(
+        "click",
+        function () {
+
+            studentModal.classList.add(
+                "show"
+            );
+
+        }
+    );
+
+
+    /* CLOSE MODAL */
+
+    const closeStudentModal =
+        document.getElementById(
+            "close-student-modal"
+        );
+
+
+    const cancelStudentModal =
+        document.getElementById(
+            "cancel-student-modal"
+        );
+
+
+    closeStudentModal.addEventListener(
+        "click",
+        function () {
+
+            studentModal.classList.remove(
+                "show"
+            );
+
+        }
+    );
+
+
+    cancelStudentModal.addEventListener(
+        "click",
+        function () {
+
+            studentModal.classList.remove(
+                "show"
+            );
+
+        }
+    );
+
+
+    /* SUBMIT FORM */
+
+    const studentForm =
+        document.getElementById(
+            "student-form"
+        );
+
+
+    studentForm.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+
+            alert(
+                "Student added successfully!"
+            );
+
+
+            studentForm.reset();
+
+
+            studentModal.classList.remove(
+                "show"
+            );
+
+        }
+    );
+
+} 
 
 
 function showOutstandingFees() {
