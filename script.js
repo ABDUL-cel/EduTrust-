@@ -1,18 +1,7 @@
-const menuButton =
-    document.querySelector(".menu-button");
 
+const menuButton = document.querySelector(".menu-button");
+const navLinks = document.querySelector(".nav-links");
 
-const navLinks =
-    document.querySelector(".nav-links");
-
-
-menuButton.addEventListener(
-    "click",
-    function () {
-
-        navLinks.classList.toggle(
-            "mobile-menu"
-        );
-
-    }
-);
+menuButton.addEventListener("click", function () {
+    navLinks.classList.toggle("show-menu");
+});
