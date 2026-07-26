@@ -1,4 +1,4 @@
-alert("JavaScript is working");
+alert("Welcome to EduTrust 🎓\nYour School Management Solution");
 const menuButton = document.querySelector(".menu-button");
 const navLinks = document.querySelector(".nav-links");
 
