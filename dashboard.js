@@ -2785,7 +2785,9 @@ addStudentButton.addEventListener(
     "click",
     function () {
 
-        studentModal.style.display = "flex";
+        studentModal.classList.add(
+            "show"
+        );
 
     }
 );
