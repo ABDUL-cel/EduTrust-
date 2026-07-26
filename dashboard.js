@@ -2781,17 +2781,14 @@ function showStudents() {
             "student-modal"
         );
 
+addStudentButton.addEventListener(
+    "click",
+    function () {
 
-    addStudentButton.addEventListener(
-        "click",
-        function () {
+        studentModal.style.display = "flex";
 
-            studentModal.classList.add(
-                "show"
-            );
-
-        }
-    );
+    }
+);
 
 
     /* CLOSE MODAL */
