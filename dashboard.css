@@ -19,6 +19,385 @@ body {
 
 }
 
+
+/* ================================
+   SETTINGS PAGES
+================================ */
+
+.settings-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+    max-width: 700px;
+
+}
+
+
+.settings-form .form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+.settings-form label {
+
+    color: #172033;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+}
+
+
+.settings-form input,
+.settings-form textarea,
+.settings-form select {
+
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #dbe1e8;
+
+    border-radius: 8px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #172033;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+}
+
+
+.settings-form textarea {
+
+    min-height: 120px;
+
+    resize: vertical;
+
+}
+
+
+.settings-form input:focus,
+.settings-form textarea:focus,
+.settings-form select:focus {
+
+    border-color: #2563eb;
+
+    box-shadow: 0 0 0 3px rgba(
+        37,
+        99,
+        235,
+        0.1
+    );
+
+}
+
+
+.primary-button {
+
+    width: fit-content;
+
+    padding: 11px 18px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+}
+
+
+.primary-button:hover {
+
+    background: #1d4ed8;
+
+}
+
+
+/* USER ROLES */
+
+.section-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.user-role-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+.role-item {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 18px 0;
+
+    border-bottom: 1px solid #eef2f7;
+
+}
+
+
+.role-item:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.role-item strong {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #172033;
+
+}
+
+
+.role-item p {
+
+    color: #64748b;
+
+    font-size: 13px;
+
+}
+
+
+.role-badge {
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+}
+
+
+/* SETTINGS OPTIONS */
+
+.settings-option {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 20px 0;
+
+    border-bottom: 1px solid #eef2f7;
+
+}
+
+
+.settings-option:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.settings-option strong {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #172033;
+
+}
+
+
+.settings-option p {
+
+    color: #64748b;
+
+    font-size: 13px;
+
+}
+
+
+/* TOGGLE SWITCH */
+
+.switch {
+
+    position: relative;
+
+    width: 46px;
+
+    height: 24px;
+
+    flex-shrink: 0;
+
+}
+
+
+.switch input {
+
+    width: 0;
+
+    height: 0;
+
+    opacity: 0;
+
+}
+
+
+.slider {
+
+    position: absolute;
+
+    inset: 0;
+
+    background: #cbd5e1;
+
+    border-radius: 30px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+}
+
+
+.slider::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 18px;
+
+    height: 18px;
+
+    left: 3px;
+
+    top: 3px;
+
+    background: #ffffff;
+
+    border-radius: 50%;
+
+    transition: 0.3s;
+
+}
+
+
+.switch input:checked + .slider {
+
+    background: #2563eb;
+
+}
+
+
+.switch input:checked + .slider::before {
+
+    transform: translateX(22px);
+
+}
+
+
+/* BACKUP / SECURITY BUTTON SPACING */
+
+.content-card > .primary-button {
+
+    margin-top: 20px;
+
+}
+
+
+@media (max-width: 600px) {
+
+    .section-heading {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .role-item,
+    .settings-option {
+
+        align-items: flex-start;
+
+    }
+
+
+    .role-item {
+
+        flex-direction: column;
+
+    }
+
+
+    .settings-option {
+
+        flex-direction: row;
+
+    }
+
+}
 /* ================================
    NOTIFICATION DROPDOWN
 ================================ */
