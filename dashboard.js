@@ -2457,43 +2457,90 @@ function showStudents() {
 
                 <div class="form-group">
 
-                    <label for="student-class">
-                        Class
-                    </label>
+    <label for="student-class">
+        Class
+    </label>
 
-                    <select id="student-class" required>
+    <select id="student-class" required>
 
-                        <option value="">
-                            Select class
-                        </option>
+        <option value="">
+            Select class
+        </option>
 
-                        <option value="JSS 1">
-                            JSS 1
-                        </option>
+        <!-- Nursery -->
 
-                        <option value="JSS 2">
-                            JSS 2
-                        </option>
+        <option value="Nursery 1">
+            Nursery 1
+        </option>
 
-                        <option value="JSS 3">
-                            JSS 3
-                        </option>
+        <option value="Nursery 2">
+            Nursery 2
+        </option>
 
-                        <option value="SS 1">
-                            SS 1
-                        </option>
+        <option value="Nursery 3">
+            Nursery 3
+        </option>
 
-                        <option value="SS 2">
-                            SS 2
-                        </option>
 
-                        <option value="SS 3">
-                            SS 3
-                        </option>
+        <!-- Primary -->
 
-                    </select>
+        <option value="Primary 1">
+            Primary 1
+        </option>
 
-                </div>
+        <option value="Primary 2">
+            Primary 2
+        </option>
+
+        <option value="Primary 3">
+            Primary 3
+        </option>
+
+        <option value="Primary 4">
+            Primary 4
+        </option>
+
+        <option value="Primary 5">
+            Primary 5
+        </option>
+
+        <option value="Primary 6">
+            Primary 6
+        </option>
+
+
+        <!-- Junior Secondary School -->
+
+        <option value="JSS 1">
+            JSS 1
+        </option>
+
+        <option value="JSS 2">
+            JSS 2
+        </option>
+
+        <option value="JSS 3">
+            JSS 3
+        </option>
+
+
+        <!-- Senior Secondary School -->
+
+        <option value="SS 1">
+            SS 1
+        </option>
+
+        <option value="SS 2">
+            SS 2
+        </option>
+
+        <option value="SS 3">
+            SS 3
+        </option>
+
+    </select>
+
+</div>
 
             </div>
 
@@ -2554,6 +2601,7 @@ function showStudents() {
 
 </div>
     `;
+}
 
 
     const searchInput =
