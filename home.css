@@ -33,6 +33,256 @@ ul {
 
 
 /* =========================================
+   MOBILE RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 768px) {
+
+    /* GENERAL */
+
+    body {
+        overflow-x: hidden;
+    }
+
+
+    /* NAVIGATION */
+
+    .navbar {
+        padding: 16px 20px;
+    }
+
+
+    .nav-links {
+        display: none;
+    }
+
+
+    .menu-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* HERO */
+
+    .hero-section {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        padding: 70px 20px 60px;
+        text-align: center;
+    }
+
+
+    .hero-content {
+        width: 100%;
+    }
+
+
+    .hero-section h1 {
+        font-size: 42px;
+        line-height: 1.15;
+    }
+
+
+    .hero-description {
+        font-size: 16px;
+        line-height: 1.7;
+    }
+
+
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+
+    .hero-buttons a {
+        width: 100%;
+        text-align: center;
+    }
+
+
+    .hero-trust {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+
+    .hero-visual {
+        width: 100%;
+    }
+
+
+    .hero-card {
+        width: 100%;
+    }
+
+
+    /* SECTION SPACING */
+
+    .problem-section,
+    .features-section,
+    .how-section,
+    .why-section,
+    .audience-section,
+    .pricing-section,
+    .cta-section {
+        padding: 70px 20px;
+    }
+
+
+    /* SECTION HEADINGS */
+
+    .section-heading {
+        width: 100%;
+        text-align: center;
+    }
+
+
+    .section-heading h2,
+    .why-content h2,
+    .cta-content h2 {
+        font-size: 32px;
+        line-height: 1.2;
+    }
+
+
+    /* PROBLEM */
+
+    .problem-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* FEATURES */
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .feature-card {
+        width: 100%;
+    }
+
+
+    /* HOW IT WORKS */
+
+    .steps {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+
+    /* WHY EDUTRUST */
+
+    .why-section {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        text-align: center;
+    }
+
+
+    .why-content {
+        width: 100%;
+    }
+
+
+    .benefits-list {
+        text-align: left;
+    }
+
+
+    .why-visual {
+        width: 100%;
+    }
+
+
+    /* AUDIENCE */
+
+    .audience-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* PRICING */
+
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .pricing-card {
+        width: 100%;
+    }
+
+
+    /* CTA */
+
+    .cta-content {
+        width: 100%;
+    }
+
+
+    .cta-content p {
+        line-height: 1.7;
+    }
+
+
+    /* FOOTER */
+
+    .footer {
+        padding: 50px 20px 25px;
+        text-align: center;
+    }
+
+
+    .footer-brand {
+        margin-bottom: 30px;
+    }
+
+
+    .footer-links {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+   }
+@media (max-width: 768px) {
+
+    .nav-links.mobile-menu {
+
+        position: absolute;
+
+        top: 70px;
+
+        left: 0;
+
+        right: 0;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 20px;
+
+        padding: 25px 20px;
+
+        background: #ffffff;
+
+        border-bottom: 1px solid #e5e7eb;
+
+        box-shadow:
+            0 10px 25px
+            rgba(0, 0, 0, 0.08);
+
+        z-index: 1000;
+
+    }
+
+}
+/* =========================================
    REUSABLE STYLES
 ========================================= */
 
