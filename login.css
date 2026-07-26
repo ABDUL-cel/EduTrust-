@@ -7,7 +7,42 @@
     padding: 0;
     box-sizing: border-box;
 }
+.menu-button {
+    display: none;
+}
 
+@media (max-width: 768px) {
+
+    .menu-button {
+        display: block;
+        border: none;
+        background: transparent;
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .nav-links.show-menu {
+        display: flex;
+
+        position: absolute;
+
+        top: 70px;
+        left: 0;
+        right: 0;
+
+        flex-direction: column;
+
+        padding: 25px 20px;
+
+        background: white;
+
+        z-index: 9999;
+    }
+}
 
 /* =========================
    BODY
