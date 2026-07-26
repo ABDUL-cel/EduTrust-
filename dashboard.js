@@ -2368,7 +2368,189 @@ function showStudents() {
             </div>
 
         </div>
+<div class="student-modal" id="student-modal">
 
+    <div class="student-modal-content">
+
+        <div class="modal-header">
+
+            <div>
+                <h2>Add New Student</h2>
+                <p>Register a new student in your school.</p>
+            </div>
+
+            <button
+                type="button"
+                class="close-modal"
+                id="close-student-modal"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="student-form">
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="student-first-name">
+                        First Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="student-first-name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="student-last-name">
+                        Last Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="student-last-name"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="student-gender">
+                        Gender
+                    </label>
+
+                    <select id="student-gender" required>
+
+                        <option value="">
+                            Select gender
+                        </option>
+
+                        <option value="Male">
+                            Male
+                        </option>
+
+                        <option value="Female">
+                            Female
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="student-class">
+                        Class
+                    </label>
+
+                    <select id="student-class" required>
+
+                        <option value="">
+                            Select class
+                        </option>
+
+                        <option value="JSS 1">
+                            JSS 1
+                        </option>
+
+                        <option value="JSS 2">
+                            JSS 2
+                        </option>
+
+                        <option value="JSS 3">
+                            JSS 3
+                        </option>
+
+                        <option value="SS 1">
+                            SS 1
+                        </option>
+
+                        <option value="SS 2">
+                            SS 2
+                        </option>
+
+                        <option value="SS 3">
+                            SS 3
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="student-email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="student-email"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="student-phone">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="student-phone"
+                    required
+                >
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancel-student-modal"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Add Student
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
     `;
 
 
@@ -2443,7 +2625,7 @@ function showStudents() {
             function () {
 
                 alert(
-                    "Student registration form coming next."
+                    "Student Added Successfully."
                 );
 
             }
