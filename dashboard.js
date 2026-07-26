@@ -4514,29 +4514,7 @@ const logoutButton =
 
 logoutButton.addEventListener("click", function () {
 
-    window.location.href = "index.html";
+    window.location.href = "login.html";
 
 });
 
-const sidebar = document.querySelector(".sidebar");
-
-const menuToggle = document.querySelector("#menu-toggle");
-
-
-if (menuToggle && sidebar) {
-
-    menuToggle.addEventListener("click", function () {
-
-        if (window.innerWidth <= 768) {
-
-            sidebar.classList.toggle("show");
-
-        } else {
-
-            sidebar.classList.toggle("collapsed");
-
-        }
-
-    });
-
-}
