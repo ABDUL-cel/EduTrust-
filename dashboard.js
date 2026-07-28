@@ -2683,6 +2683,76 @@ function showStudents() {
         </div>
 
     `;
+    const addStudentButton =
+    document.getElementById("add-student-button");
+
+const studentModal =
+    document.getElementById("student-modal");
+
+const closeStudentModal =
+    document.getElementById("close-student-modal");
+
+const cancelStudentModal =
+    document.getElementById("cancel-student-modal");
+
+const studentForm =
+    document.getElementById("student-form");
+
+
+if (
+    addStudentButton &&
+    studentModal &&
+    closeStudentModal &&
+    cancelStudentModal &&
+    studentForm
+) {
+
+    addStudentButton.addEventListener(
+        "click",
+        function () {
+
+            studentModal.style.display = "flex";
+
+        }
+    );
+
+
+    closeStudentModal.addEventListener(
+        "click",
+        function () {
+
+            studentModal.style.display = "none";
+
+        }
+    );
+
+
+    cancelStudentModal.addEventListener(
+        "click",
+        function () {
+
+            studentModal.style.display = "none";
+
+        }
+    );
+
+
+    studentForm.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+            alert("Student added successfully!");
+
+            studentForm.reset();
+
+            studentModal.style.display = "none";
+
+        }
+    );
+
+}
 }
 
 
