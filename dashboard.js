@@ -1,4 +1,4 @@
-alert("JavaScript is working");
+
 const navItems =
     document.querySelectorAll(
         ".nav-item[data-page], .submenu-item[data-page]"
