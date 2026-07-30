@@ -388,7 +388,10 @@ ul {
 
 
 .logo {
-    color: #2563eb;
+   background: white;
+   padding: 10px;
+   border-radius: 4px;
+   color: #2563eb;
     font-size: 28px;
     font-weight: 800;
 }
