@@ -3854,12 +3854,9 @@ function showSchoolManagement() {
 
                 </div>
 
-
-                <button class="primary-button">
-
-                    Edit School Information
-
-                </button>
+<button class="primary-button" onclick="openSchoolModal()">
+    Edit School Information
+</button>
 
             </div>
 
