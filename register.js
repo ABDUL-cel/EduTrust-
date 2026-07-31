@@ -111,23 +111,67 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
 
             }
+const schoolType =
+    document.getElementById("school-type").value;
 
+const academicSession =
+    document.getElementById("academic-session").value;
 
-            message.textContent =
-                "Registration successful! Redirecting to login...";
+const currentTerm =
+    document.getElementById("current-term").value;
 
+const schoolMotto =
+    document.getElementById("school-motto").value;
 
-            message.style.color =
-                "green";
+const data = {
+    school_name: schoolName,
+    school_email: email,
+    phone: phone,
+    address: address,
+    school_type: schoolType,
+    academic_session: academicSession,
+    current_term: currentTerm,
+    school_motto: schoolMotto,
+    principal_name: ownerName,
+    principal_email: email,
+    password: password
+};
 
+fetch("http://localhost:5000/api/auth/register", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+})
+.then(response => response.json())
+.then(result => {
 
-            setTimeout(function () {
+    if (result.success) {
 
-                window.location.href =
-                    "login.html";
+        message.style.color = "green";
+        message.textContent = result.message;
 
-            }, 1500);
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500);
 
+    } else {
+
+        message.style.color = "red";
+        message.textContent = result.message;
+
+    }
+
+})
+.catch(error => {
+
+    console.error(error);
+
+    message.style.color = "red";
+    message.textContent = "Unable to connect to the server.";
+
+});
         }
 
     );
