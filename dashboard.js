@@ -5222,4 +5222,31 @@ logoutButton.addEventListener("click", function () {
     window.location.href = "login.html";
 
 });
+/* ============================
+   SCHOOL MODAL
+============================ */
+
+function openSchoolModal(){
+
+    document.getElementById("schoolModal").style.display="flex";
+
+}
+
+function closeSchoolModal(){
+
+    document.getElementById("schoolModal").style.display="none";
+
+}
+
+window.onclick=function(event){
+
+    const modal=document.getElementById("schoolModal");
+
+    if(event.target===modal){
+
+        modal.style.display="none";
+
+    }
+
+}
 
