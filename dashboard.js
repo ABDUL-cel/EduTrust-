@@ -617,92 +617,139 @@ function showPaymentHistory() {
 
     </div>
 
-<div class="payment-history-mobile">
-
-    <div class="payment-card">
-
-        <div class="payment-top">
-
-            <strong>Aisha Bello</strong>
-
-            <span class="paid-status">Paid</span>
-
-        </div>
-
-        <p><strong>Receipt:</strong> EDU0001</p>
-
-        <p><strong>Amount:</strong> ₦30,000</p>
-
-        <p><strong>Method:</strong> Cash</p>
-
-        <p><strong>Date:</strong> 30/07/2026</p>
-
-        <div class="payment-actions">
-
-            <button class="primary-button">
-
-                👁 View
-
-            </button>
-
-            <button class="primary-button">
-
-                🖨 Print
-
-            </button>
-
-        </div>
-
-    </div>
-
-    <div class="payment-card">
-
-        <div class="payment-top">
-
-            <strong>Aliyu Musa</strong>
-
-            <span class="part-status">
-
-                Part Payment
-
-            </span>
-
-        </div>
-
-        <p><strong>Receipt:</strong> EDU0002</p>
-
-        <p><strong>Amount:</strong> ₦20,000</p>
-
-        <p><strong>Method:</strong> Transfer</p>
-
-        <p><strong>Date:</strong> 30/07/2026</p>
-
-        <div class="payment-actions">
-
-            <button class="primary-button">
-
-                👁 View
-
-            </button>
-
-            <button class="primary-button">
-
-                🖨 Print
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
     `;
 
 }
 
-function showReceipts(){
+function showReceipts() {
 
-    alert("Receipts Page");
+    contentArea.innerHTML = `
+
+    <div class="page-content">
+
+        <div class="page-introduction">
+
+            <div>
+
+                <h2>Digital Receipt</h2>
+
+                <p>Print and download official school fee receipts.</p>
+
+            </div>
+
+        </div>
+
+        <div class="receipt-card">
+
+            <div class="receipt-header">
+
+                <h2>EDUTRUST</h2>
+
+                <h3>Greenfield School</h3>
+
+                <p>Official School Fee Receipt</p>
+
+            </div>
+
+            <hr>
+
+            <div class="receipt-body">
+
+                <div class="detail-item">
+
+                    <span>Receipt No.</span>
+
+                    <strong>EDU0001</strong>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <span>Student Name</span>
+
+                    <strong>Aisha Bello</strong>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <span>Admission No.</span>
+
+                    <strong>PRY00125</strong>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <span>Class</span>
+
+                    <strong>Primary 4</strong>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <span>Amount Paid</span>
+
+                    <strong>₦30,000</strong>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <span>Payment Method</span>
+
+                    <strong>Cash</strong>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <span>Outstanding Balance</span>
+
+                    <strong style="color:red;">₦20,000</strong>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <span>Received By</span>
+
+                    <strong>Finance Officer</strong>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <span>Date & Time</span>
+
+                    <strong>02 Aug 2026 | 10:45 AM</strong>
+
+                </div>
+
+            </div>
+
+            <div class="receipt-buttons">
+
+                <button class="primary-button">
+
+                    🖨 Print Receipt
+
+                </button>
+
+                <button class="primary-button">
+
+                    📄 Download PDF
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
 
 }
 
