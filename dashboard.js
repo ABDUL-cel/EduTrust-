@@ -537,7 +537,7 @@ function showPaymentHistory() {
 
         </div>
 
-        <div class="dashboard-card">
+        <div class="table-responsive">
 
             <table class="fee-table">
 
