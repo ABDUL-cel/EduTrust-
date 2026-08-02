@@ -3647,3 +3647,31 @@ textarea{
     border-bottom:1px solid #eee;
 
 }
+
+.paid-status{
+
+    background:#d4edda;
+
+    color:#155724;
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+}
+
+.part-status{
+
+    background:#fff3cd;
+
+    color:#856404;
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+}
