@@ -187,10 +187,167 @@ navItems.forEach(function (item) {
 
 });
 
+function showFeeStructure() {
 
-function showFeeStructure(){
+    contentArea.innerHTML = `
 
-    alert("Fee Structure Page");
+    <div class="page-content">
+
+        <div class="page-introduction">
+
+            <div>
+
+                <h2>Fee Structure</h2>
+
+                <p>Create and manage your school's fee structure.</p>
+
+            </div>
+
+            <button class="primary-button">
+
+                + Add Fee
+
+            </button>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <form class="fee-form">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Class</label>
+
+                        <select>
+
+                            <option>Primary 1</option>
+
+                            <option>Primary 2</option>
+
+                            <option>Primary 3</option>
+
+                            <option>JSS 1</option>
+
+                            <option>JSS 2</option>
+
+                            <option>SS 1</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Fee Name</label>
+
+                        <input type="text" placeholder="Tuition">
+
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Amount</label>
+
+                        <input type="number" placeholder="35000">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Category</label>
+
+                        <select>
+
+                            <option>Compulsory</option>
+
+                            <option>Optional</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <button class="primary-button">
+
+                    Save Fee
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h3>Existing Fee Structure</h3>
+
+            <table class="fee-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Class</th>
+
+                        <th>Fee</th>
+
+                        <th>Amount</th>
+
+                        <th>Category</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Primary 1</td>
+
+                        <td>Tuition</td>
+
+                        <td>₦35,000</td>
+
+                        <td>Compulsory</td>
+
+                        <td>✏️ 🗑️</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Primary 1</td>
+
+                        <td>ICT</td>
+
+                        <td>₦5,000</td>
+
+                        <td>Compulsory</td>
+
+                        <td>✏️ 🗑️</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    `;
 
 }
 
