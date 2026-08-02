@@ -188,7 +188,41 @@ navItems.forEach(function (item) {
 });
 
 
+function showFeeStructure(){
 
+    alert("Fee Structure Page");
+
+}
+
+function showCollectPayment(){
+
+    alert("Collect Payment Page");
+
+}
+
+function showPaymentHistory(){
+
+    alert("Payment History Page");
+
+}
+
+function showReceipts(){
+
+    alert("Receipts Page");
+
+}
+
+function showInstallments(){
+
+    alert("Installments Page");
+
+}
+
+function showOutstandingFees(){
+
+    alert("Outstanding Fees Page");
+
+}
 /* ================================
    REPORTS DROPDOWN
 ================================ */
@@ -3415,338 +3449,103 @@ function showParentPayments() {
 
 }
 
-function showFeeStructures() {
+function showSchoolFees() {
 
     contentArea.innerHTML = `
 
-        <div class="page-content">
+    <div class="page-content">
 
-            <div class="page-introduction">
+        <div class="page-introduction">
 
-                <div>
+            <div>
 
-                    <h2>
-                        Fee Structures
-                    </h2>
+                <h2>School Fees Management</h2>
 
-                    <p>
-                        Create and manage fees for different classes and academic terms.
-                    </p>
-
-                </div>
-
-                <button class="primary-button">
-
-                    + Create Fee Structure
-
-                </button>
+                <p>
+                    Manage fee structures, payments, receipts and outstanding balances.
+                </p>
 
             </div>
 
+            <button class="primary-button">
 
-            <div class="stats-grid">
+                + Create Fee
 
-                <div class="stat-card">
+            </button>
 
-                    <p>
-                        Active Structures
-                    </p>
+        </div>
 
-                    <h3>
-                        12
-                    </h3>
+        <div class="finance-grid">
 
-                    <small>
-                        Current academic session
-                    </small>
+            <div class="finance-card" onclick="showFeeStructure()">
 
-                </div>
+                <div class="finance-icon">📋</div>
 
+                <h3>Fee Structure</h3>
 
-                <div class="stat-card">
-
-                    <p>
-                        Primary Section
-                    </p>
-
-                    <h3>
-                        6
-                    </h3>
-
-                    <small>
-                        Active fee structures
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Secondary Section
-                    </p>
-
-                    <h3>
-                        6
-                    </h3>
-
-                    <small>
-                        Active fee structures
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Academic Session
-                    </p>
-
-                    <h3>
-                        2025/26
-                    </h3>
-
-                    <small>
-                        Current session
-                    </small>
-
-                </div>
+                <p>Create and manage school fees.</p>
 
             </div>
 
+            <div class="finance-card" onclick="showCollectPayment()">
 
-            <div class="dashboard-card">
+                <div class="finance-icon">💳</div>
 
-                <div class="card-header">
+                <h3>Collect Payment</h3>
 
-                    <div>
-
-                        <h3>
-                            Active Fee Structures
-                        </h3>
-
-                        <p>
-                            Fees currently assigned to school classes.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="table-container">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Structure Name
-                                </th>
-
-                                <th>
-                                    Class
-                                </th>
-
-                                <th>
-                                    Term
-                                </th>
-
-                                <th>
-                                    Total Amount
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            <tr>
-
-                                <td>
-                                    Primary Basic Fees
-                                </td>
-
-                                <td>
-                                    Primary 1 - 6
-                                </td>
-
-                                <td>
-                                    First Term
-                                </td>
-
-                                <td>
-                                    ₦180,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Junior Secondary Fees
-                                </td>
-
-                                <td>
-                                    JSS 1 - 3
-                                </td>
-
-                                <td>
-                                    First Term
-                                </td>
-
-                                <td>
-                                    ₦210,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Senior Secondary Fees
-                                </td>
-
-                                <td>
-                                    SS 1 - 3
-                                </td>
-
-                                <td>
-                                    First Term
-                                </td>
-
-                                <td>
-                                    ₦230,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
+                <p>Receive school fee payments.</p>
 
             </div>
 
+            <div class="finance-card" onclick="showPaymentHistory()">
 
-            <div class="dashboard-card">
+                <div class="finance-icon">🧾</div>
 
-                <div class="card-header">
+                <h3>Payment History</h3>
 
-                    <div>
+                <p>View all payment records.</p>
 
-                        <h3>
-                            Fee Breakdown
-                        </h3>
+            </div>
 
-                        <p>
-                            Example breakdown for Primary 1 - 6.
-                        </p>
+            <div class="finance-card" onclick="showReceipts()">
 
-                    </div>
+                <div class="finance-icon">📄</div>
 
-                </div>
+                <h3>Receipts</h3>
 
+                <p>Print and download receipts.</p>
 
-                <div class="school-details">
+            </div>
 
-                    <div class="detail-item">
+            <div class="finance-card" onclick="showInstallments()">
 
-                        <span>
-                            Tuition Fee
-                        </span>
+                <div class="finance-icon">💰</div>
 
-                        <strong>
-                            ₦150,000
-                        </strong>
+                <h3>Installments</h3>
 
-                    </div>
+                <p>Track installment payments.</p>
 
+            </div>
 
-                    <div class="detail-item">
+            <div class="finance-card" onclick="showOutstandingFees()">
 
-                        <span>
-                            Examination Fee
-                        </span>
+                <div class="finance-icon">⚠️</div>
 
-                        <strong>
-                            ₦10,000
-                        </strong>
+                <h3>Outstanding Fees</h3>
 
-                    </div>
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Development Fee
-                        </span>
-
-                        <strong>
-                            ₦20,000
-                        </strong>
-
-                    </div>
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Total
-                        </span>
-
-                        <strong>
-                            ₦180,000
-                        </strong>
-
-                    </div>
-
-                </div>
+                <p>Students with unpaid balances.</p>
 
             </div>
 
         </div>
 
+    </div>
+
     `;
 
 }
 
+                   
 function showOverview() {
 
     contentArea.innerHTML = `
