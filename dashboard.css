@@ -3694,36 +3694,66 @@ textarea{
 
     border-collapse:collapse;
 
-}@media (max-width:768px){
+}
+@media (max-width:768px){
 
-    .form-row{
+    .fee-table{
 
-        flex-direction:column;
-
-        gap:15px;
-
-    }
-
-    .page-introduction{
-
-        flex-direction:column;
-
-        align-items:flex-start;
-
-        gap:15px;
+        display:none;
 
     }
 
-    .primary-button{
+    .payment-history-mobile{
 
-        width:100%;
-
-    }
-
-    .dashboard-card{
-
-        padding:18px;
+        display:block;
 
     }
+
+}
+.payment-history-mobile{
+
+    display:none;
+
+}
+
+.payment-card{
+
+    background:#fff;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-bottom:18px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+
+}
+
+.payment-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:15px;
+
+}
+
+.payment-card p{
+
+    margin:8px 0;
+
+}
+
+.payment-actions{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:15px;
 
 }
