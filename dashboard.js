@@ -498,10 +498,126 @@ function showCollectPayment() {
     `;
 
 }
+function showPaymentHistory() {
 
-function showPaymentHistory(){
+    contentArea.innerHTML = `
 
-    alert("Payment History Page");
+    <div class="page-content">
+
+        <div class="page-introduction">
+
+            <div>
+
+                <h2>Payment History</h2>
+
+                <p>View all school fee payment records.</p>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <input type="text"
+                    placeholder="🔍 Search Student">
+
+                </div>
+
+                <div class="form-group">
+
+                    <input type="date">
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <table class="fee-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Receipt No.</th>
+
+                        <th>Student</th>
+
+                        <th>Amount</th>
+
+                        <th>Method</th>
+
+                        <th>Date</th>
+
+                        <th>Status</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>EDU0001</td>
+
+                        <td>Aisha Bello</td>
+
+                        <td>₦30,000</td>
+
+                        <td>Cash</td>
+
+                        <td>30/07/2026</td>
+
+                        <td><span class="paid-status">Paid</span></td>
+
+                        <td>
+
+                            👁️ 🖨️
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>EDU0002</td>
+
+                        <td>Aliyu Musa</td>
+
+                        <td>₦20,000</td>
+
+                        <td>Transfer</td>
+
+                        <td>30/07/2026</td>
+
+                        <td><span class="part-status">Part Payment</span></td>
+
+                        <td>
+
+                            👁️ 🖨️
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    `;
 
 }
 
