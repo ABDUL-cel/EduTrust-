@@ -537,7 +537,7 @@ function showPaymentHistory() {
 
         </div>
 
-        <div class="table-responsive">
+        <div class="dashboard-card">
 
             <table class="fee-table">
 
@@ -617,6 +617,85 @@ function showPaymentHistory() {
 
     </div>
 
+<div class="payment-history-mobile">
+
+    <div class="payment-card">
+
+        <div class="payment-top">
+
+            <strong>Aisha Bello</strong>
+
+            <span class="paid-status">Paid</span>
+
+        </div>
+
+        <p><strong>Receipt:</strong> EDU0001</p>
+
+        <p><strong>Amount:</strong> ₦30,000</p>
+
+        <p><strong>Method:</strong> Cash</p>
+
+        <p><strong>Date:</strong> 30/07/2026</p>
+
+        <div class="payment-actions">
+
+            <button class="primary-button">
+
+                👁 View
+
+            </button>
+
+            <button class="primary-button">
+
+                🖨 Print
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="payment-card">
+
+        <div class="payment-top">
+
+            <strong>Aliyu Musa</strong>
+
+            <span class="part-status">
+
+                Part Payment
+
+            </span>
+
+        </div>
+
+        <p><strong>Receipt:</strong> EDU0002</p>
+
+        <p><strong>Amount:</strong> ₦20,000</p>
+
+        <p><strong>Method:</strong> Transfer</p>
+
+        <p><strong>Date:</strong> 30/07/2026</p>
+
+        <div class="payment-actions">
+
+            <button class="primary-button">
+
+                👁 View
+
+            </button>
+
+            <button class="primary-button">
+
+                🖨 Print
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
     `;
 
 }
