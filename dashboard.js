@@ -350,10 +350,152 @@ function showFeeStructure() {
     `;
 
 }
+function showCollectPayment() {
 
-function showCollectPayment(){
+    contentArea.innerHTML = `
 
-    alert("Collect Payment Page");
+    <div class="page-content">
+
+        <div class="page-introduction">
+
+            <div>
+
+                <h2>Collect School Fees</h2>
+
+                <p>Search for a student and record fee payments.</p>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="form-group">
+
+                <label>Search Student</label>
+
+                <input
+                    type="text"
+                    placeholder="Enter Student Name or Admission Number">
+
+            </div>
+
+            <button class="primary-button">
+
+                🔍 Search
+
+            </button>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h3>Student Information</h3>
+
+            <br>
+
+            <div class="detail-item">
+
+                <span>Student Name</span>
+
+                <strong>Aisha Bello</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Admission No.</span>
+
+                <strong>PRY00125</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Class</span>
+
+                <strong>Primary 4</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Total Fee</span>
+
+                <strong>₦120,000</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Amount Paid</span>
+
+                <strong>₦70,000</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Outstanding Balance</span>
+
+                <strong style="color:red;">₦50,000</strong>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h3>Payment Details</h3>
+
+            <br>
+
+            <div class="form-group">
+
+                <label>Amount Paying</label>
+
+                <input
+                    type="number"
+                    placeholder="Enter Amount">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Payment Method</label>
+
+                <select>
+
+                    <option>Cash</option>
+
+                    <option>Bank Transfer</option>
+
+                    <option>POS</option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Remarks</label>
+
+                <textarea
+                    placeholder="Optional"></textarea>
+
+            </div>
+
+            <button class="primary-button">
+
+                Receive Payment
+
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
 
 }
 
