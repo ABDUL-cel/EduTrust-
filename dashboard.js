@@ -759,9 +759,165 @@ function showInstallments(){
 
 }
 
-function showOutstandingFees(){
+function showOutstandingFees() {
 
-    alert("Outstanding Fees Page");
+    contentArea.innerHTML = `
+
+    <div class="page-content">
+
+        <div class="page-introduction">
+
+            <div>
+
+                <h2>Outstanding Fees</h2>
+
+                <p>Monitor students with unpaid school fees.</p>
+
+            </div>
+
+        </div>
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <p>Total Students</p>
+
+                <h3>542</h3>
+
+            </div>
+
+            <div class="stat-card">
+
+                <p>Outstanding Amount</p>
+
+                <h3>₦4,250,000</h3>
+
+            </div>
+
+            <div class="stat-card">
+
+                <p>Fully Paid</p>
+
+                <h3>320</h3>
+
+            </div>
+
+            <div class="stat-card">
+
+                <p>Part Payment</p>
+
+                <h3>222</h3>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <input
+                        type="text"
+                        placeholder="🔍 Search Student">
+
+                </div>
+
+                <div class="form-group">
+
+                    <select>
+
+                        <option>All Classes</option>
+
+                        <option>Primary 1</option>
+
+                        <option>Primary 2</option>
+
+                        <option>JSS 1</option>
+
+                        <option>SS 1</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="table-responsive">
+
+                <table class="fee-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Student</th>
+
+                            <th>Class</th>
+
+                            <th>Total Fee</th>
+
+                            <th>Paid</th>
+
+                            <th>Balance</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>Aisha Bello</td>
+
+                            <td>Primary 4</td>
+
+                            <td>₦120,000</td>
+
+                            <td>₦90,000</td>
+
+                            <td>₦30,000</td>
+
+                            <td><span class="part-status">Part Payment</span></td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>Aliyu Musa</td>
+
+                            <td>JSS2</td>
+
+                            <td>₦80,000</td>
+
+                            <td>₦80,000</td>
+
+                            <td>₦0</td>
+
+                            <td><span class="paid-status">Paid</span></td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
 
 }
 /* ================================
