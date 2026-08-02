@@ -3697,63 +3697,34 @@ textarea{
 }
 @media (max-width:768px){
 
-    .fee-table{
+    .form-row{
 
-        display:none;
+        flex-direction:column;
 
-    }
-
-    .payment-history-mobile{
-
-        display:block;
+        gap:15px;
 
     }
 
-}
-.payment-history-mobile{
+    .page-introduction{
 
-    display:none;
+        flex-direction:column;
 
-}
+        align-items:flex-start;
 
-.payment-card{
+        gap:15px;
 
-    background:#fff;
+    }
 
-    border-radius:12px;
+    .primary-button{
 
-    padding:18px;
+        width:100%;
 
-    margin-bottom:18px;
+    }
 
-    box-shadow:0 4px 12px rgba(0,0,0,.08);
+    .dashboard-card{
 
-}
+        padding:18px;
 
-.payment-top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:15px;
-
-}
-
-.payment-card p{
-
-    margin:8px 0;
-
-}
-
-.payment-actions{
-
-    display:flex;
-
-    gap:10px;
-
-    margin-top:15px;
+    }
 
 }
