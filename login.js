@@ -1,62 +1,81 @@
 const loginForm = document.getElementById("loginForm");
-
 const message = document.getElementById("message");
 
-
-loginForm.addEventListener("submit", function (event) {
+loginForm.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-    const email =
-        document.getElementById("email").value.trim();
-
-    const password =
-        document.getElementById("password").value;
-
-
-    // Check if fields are empty
-
+    // Frontend Validation
     if (email === "" || password === "") {
 
-        message.textContent =
-            "Please enter your email and password.";
-
+        message.textContent = "Please enter your email and password.";
         message.style.color = "red";
-
         return;
 
     }
-
-
-    // Check password length
 
     if (password.length < 6) {
 
-        message.textContent =
-            "Password must be at least 6 characters.";
-
+        message.textContent = "Password must be at least 6 characters.";
         message.style.color = "red";
-
         return;
 
     }
 
+    try {
 
-    // Login successful
+        const response = await fetch("http://localhost:5000/api/auth/login", {
 
-    message.textContent =
-        "Login successful!";
+            method: "POST",
 
-    message.style.color = "green";
+            headers: {
+                "Content-Type": "application/json"
+            },
 
+            body: JSON.stringify({
 
-    // Go to dashboard
+                email,
+                password
 
-    setTimeout(function () {
+            })
 
-        window.location.href = "dashboard.html";
+        });
 
-    }, 1000);
+        const data = await response.json();
+
+        if (!data.success) {
+
+            message.textContent = data.message;
+            message.style.color = "red";
+            return;
+
+        }
+
+        // Save JWT Token
+        localStorage.setItem("token", data.token);
+
+        // Save School Details
+        localStorage.setItem("school", JSON.stringify(data.school));
+
+        message.textContent = "Login successful!";
+        message.style.color = "green";
+
+        setTimeout(() => {
+
+            window.location.href = "dashboard.html";
+
+        }, 1000);
+
+    } catch (error) {
+
+        message.textContent = "Unable to connect to server.";
+        message.style.color = "red";
+
+        console.error(error);
+
+    }
 
 });
