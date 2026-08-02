@@ -753,12 +753,199 @@ function showReceipts() {
 
 }
 
-function showInstallments(){
+function showInstallments() {
 
-    alert("Installments Page");
+    contentArea.innerHTML = `
+
+    <div class="page-content">
+
+        <div class="page-introduction">
+
+            <div>
+
+                <h2>Installment Payments</h2>
+
+                <p>View and record installment payments for students.</p>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="form-group">
+
+                <label>Search Student</label>
+
+                <input
+                    type="text"
+                    placeholder="Enter Student Name or Admission Number">
+
+            </div>
+
+            <button class="primary-button">
+
+                🔍 Search Student
+
+            </button>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h3>Student Fee Summary</h3>
+
+            <br>
+
+            <div class="detail-item">
+
+                <span>Student Name</span>
+
+                <strong>Aisha Bello</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Class</span>
+
+                <strong>Primary 4</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Total Fee</span>
+
+                <strong>₦120,000</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Total Paid</span>
+
+                <strong>₦70,000</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Outstanding Balance</span>
+
+                <strong style="color:red;">₦50,000</strong>
+
+            </div>
+
+            <div class="detail-item">
+
+                <span>Status</span>
+
+                <strong style="color:orange;">🟡 PART PAYMENT</strong>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h3>Installment History</h3>
+
+            <table class="fee-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>No.</th>
+
+                        <th>Amount</th>
+
+                        <th>Method</th>
+
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>1</td>
+
+                        <td>₦40,000</td>
+
+                        <td>Cash</td>
+
+                        <td>30 Jul 2026</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>2</td>
+
+                        <td>₦30,000</td>
+
+                        <td>Transfer</td>
+
+                        <td>02 Aug 2026</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h3>Record New Installment</h3>
+
+            <br>
+
+            <div class="form-group">
+
+                <label>Amount</label>
+
+                <input
+                    type="number"
+                    placeholder="Enter Amount">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Payment Method</label>
+
+                <select>
+
+                    <option>Cash</option>
+
+                    <option>Transfer</option>
+
+                    <option>POS</option>
+
+                </select>
+
+            </div>
+
+            <button class="primary-button">
+
+                Record Installment
+
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
 
 }
-
 function showOutstandingFees() {
 
     contentArea.innerHTML = `
