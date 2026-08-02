@@ -3619,3 +3619,31 @@ td {
     text-align:left;
 
 }
+
+textarea{
+
+    width:100%;
+
+    min-height:100px;
+
+    padding:12px;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    resize:vertical;
+
+}
+
+.detail-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:12px 0;
+
+    border-bottom:1px solid #eee;
+
+}
