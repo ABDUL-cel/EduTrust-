@@ -3553,3 +3553,69 @@ td {
     display: flex;
     justify-content: flex-end;
 }
+
+.fee-form{
+
+    margin-top:20px;
+
+}
+
+.form-row{
+
+    display:flex;
+
+    gap:20px;
+
+    margin-bottom:20px;
+
+}
+
+.form-group{
+
+    flex:1;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+.form-group input,
+.form-group select{
+
+    width:100%;
+
+    padding:12px;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+}
+
+.fee-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:20px;
+
+}
+
+.fee-table th,
+.fee-table td{
+
+    padding:15px;
+
+    border-bottom:1px solid #eee;
+
+    text-align:left;
+
+}
