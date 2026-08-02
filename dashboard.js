@@ -285,7 +285,7 @@ function showFeeStructure() {
 
         </div>
 
-        <div class="dashboard-card">
+        <div class="table-responsive">
 
             <h3>Existing Fee Structure</h3>
 
@@ -537,7 +537,7 @@ function showPaymentHistory() {
 
         </div>
 
-        <div class="dashboard-card">
+        <div class="table-responsive">
 
             <table class="fee-table">
 
