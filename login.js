@@ -27,7 +27,7 @@ loginForm.addEventListener("submit", async function (event) {
 
     try {
 
-        const response = await fetch("http://localhost:5000/api/auth/login", {
+        const response = await fetch("https://edutrust-15ii.onrender.com/api/auth/login", {
 
             method: "POST",
 
