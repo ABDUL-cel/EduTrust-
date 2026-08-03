@@ -137,7 +137,7 @@ const data = {
     password: password
 };
 
-fetch("http://localhost:5000/api/auth/register", {
+fetch("https://edutrust-15ii.onrender.com/api/auth/register", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
