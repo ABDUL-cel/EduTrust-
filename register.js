@@ -168,7 +168,7 @@ fetch("https://edutrust-15ii.onrender.com/api/auth/register", {
 
     console.error(error);
 
-    message.style.color = "red";
+    message.style.color = "yellow";
     message.textContent = "Unable to connect to the server.";
 
 });
