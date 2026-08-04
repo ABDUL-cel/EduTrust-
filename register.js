@@ -134,7 +134,7 @@ const data = {
     school_motto: schoolMotto,
     principal_name: ownerName,
     principal_email: email,
-    password: password
+    password: password,
 };
             fetch('https://edutrust-15ii.onrender.com/api/users/register', {
     method: "POST",
