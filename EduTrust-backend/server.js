@@ -11,9 +11,14 @@ connectDB();
 const app = express();
 
 const corsOptions = {
-    origin:'https://edutrust-15ii.onrender.com'
+    origin: [
+        'https://abdul-cel.github.io', // Your GitHub Pages Frontend
+        'http://localhost:3000',        // Optional: Local React app
+        'http://127.0.0.1:5500'         // Optional: VS Code Live Server
+    ],
     optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
 
 app.use(express.json());
