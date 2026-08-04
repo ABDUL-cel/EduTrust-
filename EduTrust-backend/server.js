@@ -1,7 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
-const userRoutes = require('./routes/userRoutes');
+const userRouters = require('./routes/userRoutes');
 const cors = require('cors');
 
 dotenv.config();
@@ -10,13 +10,18 @@ connectDB();
 
 const app = express();
 
-app.use(express.json());
-app.use(cors());
+const corsOptions = {
+    origin: 'https://edutrust-151i.onrender.com', 
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
-app.use('/api/users', userRoutes);
+app.use(express.json());
+
+app.use('/api/users', userRouters);
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
