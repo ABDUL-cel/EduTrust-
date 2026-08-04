@@ -11,7 +11,7 @@ connectDB();
 const app = express();
 
 const corsOptions = {
-    origin: 'https://edutrust-15ii.onrender.com', 
+    origin:'[https://abdul-cel.github.io](https://abdul-cel.github.io)', 
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
