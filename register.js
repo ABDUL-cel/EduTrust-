@@ -137,7 +137,7 @@ const data = {
     password: password
 };
 
-fetch("https://edutrust-15ii.onrender.com/api/auth/register", {
+fetch("'[https://abdul-cel.github.io](https://abdul-cel.github.io)'", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
