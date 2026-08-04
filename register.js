@@ -136,8 +136,7 @@ const data = {
     principal_email: email,
     password: password
 };
-
-fetch("'[https://edutrust-151i.onrender.com/api/users/register](https://edutrust-151i.onrender.com/api/users/register)'", {
+            fetch('https://edutrust-15ii.onrender.com/api/users/register', {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -177,3 +176,7 @@ fetch("'[https://edutrust-151i.onrender.com/api/users/register](https://edutrust
     );
 
 });
+
+
+
+
