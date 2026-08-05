@@ -6,49 +6,94 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_jwt_secret_key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
 /**
- * @desc    Register a new user / school admin
+ * @desc    Register a new school account
  * @route   POST /api/auth/register
  * @access  Public
  */
 exports.registerUser = async (req, res) => {
     try {
-        const { fullName, email, password, role, schoolName } = req.body;
+        const {
+            school_name,
+            school_email,
+            phone,
+            address,
+            school_type,
+            academic_session,
+            current_term,
+            school_motto,
+            website,
+            principal_name,
+            principal_email,
+            password
+        } = req.body;
 
-        if (!fullName || !email || !password) {
+        // 1. Validate required fields from register.html
+        if (
+            !school_name ||
+            !school_email ||
+            !phone ||
+            !address ||
+            !school_type ||
+            !academic_session ||
+            !current_term ||
+            !principal_name ||
+            !principal_email ||
+            !password
+        ) {
             return res.status(400).json({
                 success: false,
-                message: 'Please provide all required fields (fullName, email, password).'
+                message: 'Please fill out all required fields.'
             });
         }
 
-        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        // 2. Check if a school/principal with this email already exists
+        const existingUser = await User.findOne({
+            $or: [
+                { email: school_email.toLowerCase() },
+                { principalEmail: principal_email.toLowerCase() }
+            ]
+        });
+
         if (existingUser) {
             return res.status(400).json({
                 success: false,
-                message: 'User with this email already exists.'
+                message: 'An account with this email already exists.'
             });
         }
 
+        // 3. Hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // 4. Save full record to MongoDB
         const newUser = await User.create({
-            fullName,
-            email: email.toLowerCase(),
+            schoolName: school_name,
+            schoolEmail: school_email.toLowerCase(),
+            phone,
+            address,
+            schoolType: school_type,
+            academicSession: academic_session,
+            currentTerm: current_term,
+            schoolMotto: school_motto || '',
+            website: website || '',
+            fullName: principal_name,
+            principalEmail: principal_email.toLowerCase(),
+            email: school_email.toLowerCase(), // Main auth email
             password: hashedPassword,
-            role: role || 'Administrator',
-            schoolName: schoolName || 'My School'
+            role: 'Administrator'
         });
 
+        // 5. Generate JWT token
         const token = jwt.sign(
             { id: newUser._id, role: newUser.role },
             JWT_SECRET,
             { expiresIn: JWT_EXPIRES_IN }
         );
 
+        // 6. Return success response
         return res.status(201).json({
             success: true,
-            message: 'Registration successful.',
+            message: 'School account created successfully!',
             token,
             user: {
                 id: newUser._id,
@@ -84,7 +129,14 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-        const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+        const user = await User.findOne({
+            $or: [
+                { email: email.toLowerCase() },
+                { schoolEmail: email.toLowerCase() },
+                { principalEmail: email.toLowerCase() }
+            ]
+        }).select('+password');
+
         if (!user) {
             return res.status(401).json({
                 success: false,
@@ -115,7 +167,7 @@ exports.loginUser = async (req, res) => {
                 fullName: user.fullName,
                 email: user.email,
                 role: user.role,
-                schoolName: user.schoolName || 'Greenfield School'
+                schoolName: user.schoolName
             }
         });
     } catch (error) {
@@ -129,7 +181,7 @@ exports.loginUser = async (req, res) => {
 };
 
 /**
- * @desc    Get currently logged in user profile
+ * @desc    Get current user profile
  * @route   GET /api/auth/me
  * @access  Private
  */
