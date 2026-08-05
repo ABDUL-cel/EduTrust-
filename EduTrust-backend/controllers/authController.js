@@ -1,15 +1,10 @@
-const User = require('../models/user');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_jwt_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'edutrust_fallback_secret_key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
-/**
- * @desc    Register a new school account
- * @route   POST /api/auth/register
- * @access  Public
- */
 exports.registerUser = async (req, res) => {
     try {
         const {
@@ -27,84 +22,56 @@ exports.registerUser = async (req, res) => {
             password
         } = req.body;
 
-        // 1. Validate required fields from register.html
-        if (
-            !school_name ||
-            !school_email ||
-            !phone ||
-            !address ||
-            !school_type ||
-            !academic_session ||
-            !current_term ||
-            !principal_name ||
-            !principal_email ||
-            !password
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please fill out all required fields.'
-            });
-        }
-
-        // 2. Check if a school/principal with this email already exists
-        const existingUser = await User.findOne({
-            $or: [
-                { email: school_email.toLowerCase() },
-                { principalEmail: principal_email.toLowerCase() }
-            ]
-        });
-
+        // 1. Check existing user
+        const existingUser = await User.findOne({ email: school_email.toLowerCase() });
         if (existingUser) {
             return res.status(400).json({
                 success: false,
-                message: 'An account with this email already exists.'
+                message: 'A user with this school email already exists.'
             });
         }
 
-        // 3. Hash the password
+        // 2. Hash Password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 4. Save full record to MongoDB
+        // 3. Create User matching User.js Schema
         const newUser = await User.create({
-            schoolName: school_name,
-            schoolEmail: school_email.toLowerCase(),
+            full_name: principal_name,
+            email: school_email.toLowerCase(),
             phone,
-            address,
-            schoolType: school_type,
-            academicSession: academic_session,
-            currentTerm: current_term,
-            schoolMotto: school_motto || '',
-            website: website || '',
-            fullName: principal_name,
-            principalEmail: principal_email.toLowerCase(),
-            email: school_email.toLowerCase(), // Main auth email
             password: hashedPassword,
-            role: 'Administrator'
+            school_name,
+            school_type,
+            academic_session,
+            current_term,
+            address,
+            school_motto: school_motto || '',
+            website: website || '',
+            role: 'Principal' // Must match enum in User.js
         });
 
-        // 5. Generate JWT token
+        // 4. Generate JWT
         const token = jwt.sign(
             { id: newUser._id, role: newUser.role },
             JWT_SECRET,
             { expiresIn: JWT_EXPIRES_IN }
         );
 
-        // 6. Return success response
         return res.status(201).json({
             success: true,
             message: 'School account created successfully!',
             token,
             user: {
                 id: newUser._id,
-                fullName: newUser.fullName,
+                full_name: newUser.full_name,
                 email: newUser.email,
                 role: newUser.role,
-                schoolName: newUser.schoolName
+                school_name: newUser.school_name
             }
         });
     } catch (error) {
-        console.error('Error in registerUser:', error);
+        console.error('REGISTER ERROR:', error);
         return res.status(500).json({
             success: false,
             message: 'Server error during registration.',
@@ -113,11 +80,6 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-/**
- * @desc    Authenticate user & get token
- * @route   POST /api/auth/login
- * @access  Public
- */
 exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -125,12 +87,57 @@ exports.loginUser = async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'Please provide both email and password.'
+                message: 'Please provide email and password.'
             });
         }
 
-        const user = await User.findOne({
-            $or: [
+        const user = await User.findOne({ email: email.toLowerCase() });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials.'
+            });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials.'
+            });
+        }
+
+        user.last_login = new Date();
+        await user.save();
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            JWT_SECRET,
+            { expiresIn: JWT_EXPIRES_IN }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: 'Login successful.',
+            token,
+            user: {
+                id: user._id,
+                full_name: user.full_name,
+                email: user.email,
+                role: user.role,
+                school_name: user.school_name
+            }
+        });
+    } catch (error) {
+        console.error('LOGIN ERROR:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error during login.',
+            error: error.message
+        });
+    }
+};
                 { email: email.toLowerCase() },
                 { schoolEmail: email.toLowerCase() },
                 { principalEmail: email.toLowerCase() }
