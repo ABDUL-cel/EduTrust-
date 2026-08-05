@@ -32,7 +32,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
     try {
         // 3. Make POST request to Render backend API
-        const response = await fetch('https://edutrust-15ii.onrender.com/api/users/register', {
+        const response = await fetch('https://edutrust-15ii.onrender.com/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
