@@ -5,6 +5,11 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'edutrust_fallback_secret_key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
+/**
+ * @desc    Register a new school account
+ * @route   POST /api/auth/register
+ * @access  Public
+ */
 exports.registerUser = async (req, res) => {
     try {
         const {
@@ -22,7 +27,15 @@ exports.registerUser = async (req, res) => {
             password
         } = req.body;
 
-        // 1. Check existing user
+        // Validate required fields
+        if (!school_email || !password || !principal_name || !school_name) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please fill out all required fields.'
+            });
+        }
+
+        // Check if existing user exists
         const existingUser = await User.findOne({ email: school_email.toLowerCase() });
         if (existingUser) {
             return res.status(400).json({
@@ -31,11 +44,11 @@ exports.registerUser = async (req, res) => {
             });
         }
 
-        // 2. Hash Password
+        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 3. Create User matching User.js Schema
+        // Create new user
         const newUser = await User.create({
             full_name: principal_name,
             email: school_email.toLowerCase(),
@@ -48,10 +61,10 @@ exports.registerUser = async (req, res) => {
             address,
             school_motto: school_motto || '',
             website: website || '',
-            role: 'Principal' // Must match enum in User.js
+            role: 'Principal'
         });
 
-        // 4. Generate JWT
+        // Generate token
         const token = jwt.sign(
             { id: newUser._id, role: newUser.role },
             JWT_SECRET,
@@ -80,6 +93,11 @@ exports.registerUser = async (req, res) => {
     }
 };
 
+/**
+ * @desc    Login user
+ * @route   POST /api/auth/login
+ * @access  Public
+ */
 exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -138,57 +156,9 @@ exports.loginUser = async (req, res) => {
         });
     }
 };
-                { email: email.toLowerCase() },
-                { schoolEmail: email.toLowerCase() },
-                { principalEmail: email.toLowerCase() }
-            ]
-        }).select('+password');
-
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid credentials.'
-            });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid credentials.'
-            });
-        }
-
-        const token = jwt.sign(
-            { id: user._id, role: user.role },
-            JWT_SECRET,
-            { expiresIn: JWT_EXPIRES_IN }
-        );
-
-        return res.status(200).json({
-            success: true,
-            message: 'Login successful.',
-            token,
-            user: {
-                id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-                role: user.role,
-                schoolName: user.schoolName
-            }
-        });
-    } catch (error) {
-        console.error('Error in loginUser:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Server error during authentication.',
-            error: error.message
-        });
-    }
-};
 
 /**
- * @desc    Get current user profile
+ * @desc    Get current user
  * @route   GET /api/auth/me
  * @access  Private
  */
@@ -207,10 +177,10 @@ exports.getMe = async (req, res) => {
             user
         });
     } catch (error) {
-        console.error('Error in getMe:', error);
+        console.error('GET ME ERROR:', error);
         return res.status(500).json({
             success: false,
-            message: 'Server error retrieving user data.',
+            message: 'Server error retrieving user.',
             error: error.message
         });
     }
