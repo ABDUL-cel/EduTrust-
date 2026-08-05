@@ -15,22 +15,6 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-<<<<<<< HEAD
-const corsOptions = {
-    origin: [
-        'https://abdul-cel.github.io', // Your GitHub Pages Frontend
-        'http://localhost:3000',        // Optional: Local React app
-        'http://127.0.0.1:5500'         // Optional: VS Code Live Server
-    ],
-    optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
-=======
-// Connect Database
-connectDB();
->>>>>>> e6e125c (Restructure project into frontend and backendwith authentication)
-
 // Middleware
 app.use(express.json());
 
