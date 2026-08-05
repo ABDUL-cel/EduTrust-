@@ -11,7 +11,15 @@ const SchoolSchema = new mongoose.Schema({
     default: 'Secondary' 
   },
   academic_session: { type: String, required: true }, // e.g., "2025/2026"
-  current_term: { type: String, enum: ['1st Term', '2nd Term', '3rd Term'], required: true },
+  current_term: {
+    type: String,
+    enum: [
+        "First Term",
+        "Second Term",
+        "Third Term"
+    ],
+    required: true
+},
   school_motto: { type: String, default: '' },
   logo: { type: String, default: '' },
   website: { type: String, default: '' },
