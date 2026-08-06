@@ -3,28 +3,78 @@
 ================================ */
 document.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
 
     if (!token) {
-        // window.location.href = "login.html";
+        window.location.href = "login.html";
+        return;
     }
 
+    // Load cached profile while fetching fresh user data
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
         try {
             const user = JSON.parse(storedUser);
-            const userRoleElement = document.querySelector(".school-profile p");
-            if (userRoleElement && user.role) {
-                userRoleElement.textContent = user.role;
-            }
+            updateProfileUI(user);
         } catch (err) {
-            console.error("Error parsing stored user details:", err);
+            console.error("Error parsing cached user details:", err);
         }
     }
+
+    // Fetch fresh user profile from backend endpoint (/api/auth/profile)
+    fetch("/api/auth/profile", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+            return;
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.success && data.user) {
+            localStorage.setItem("user", JSON.stringify(data.user));
+            updateProfileUI(data.user);
+        }
+    })
+    .catch(err => {
+        console.error("Error fetching user profile:", err);
+    });
 
     showOverview();
 });
 
+// Helper function to pull the latest user data securely
+function getCurrentUser() {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+        try {
+            return JSON.parse(storedUser);
+        } catch (err) {
+            console.error("Error reading current user:", err);
+        }
+    }
+    return {};
+}
 
+function updateProfileUI(user) {
+    if (!user) return;
+
+    // Update Sidebar Profile Info
+    const userRoleElement = document.querySelector(".school-profile p");
+    if (userRoleElement) {
+        userRoleElement.textContent = user.role || "Administrator";
+    }
+
+    const userNameElement = document.querySelector(".school-profile h4");
+    if (userNameElement) {
+        userNameElement.textContent = user.school_name || user.full_name || "School Dashboard";
+    }
+}
 
 /* ================================
    DOM ELEMENTS & NAVIGATION
@@ -122,7 +172,7 @@ function showFeeStructure() {
         <div class="page-introduction">
             <div>
                 <h2>Fee Structure</h2>
-                <p>Create and manage your school's fee structure.</p>
+                <p>Create and manage fee structures for your school.</p>
             </div>
             <button class="primary-button">+ Add Fee</button>
         </div>
@@ -298,6 +348,8 @@ function showPaymentHistory() {
 }
 
 function showReceipts() {
+    const user = getCurrentUser();
+    
     contentArea.innerHTML = `
     <div class="page-content">
         <div class="page-introduction">
@@ -309,7 +361,8 @@ function showReceipts() {
         <div class="receipt-card">
             <div class="receipt-header">
                 <h2>EDUTRUST</h2>
-                <h3>Greenfield School</h3>
+                <h3>${user.school_name || "School Name"}</h3>
+                <p>${user.address || "School Address"}</p>
                 <p>Official School Fee Receipt</p>
             </div>
             <hr>
@@ -321,8 +374,8 @@ function showReceipts() {
                 <div class="detail-item"><span>Amount Paid</span><strong>₦30,000</strong></div>
                 <div class="detail-item"><span>Payment Method</span><strong>Cash</strong></div>
                 <div class="detail-item"><span>Outstanding Balance</span><strong style="color:red;">₦20,000</strong></div>
-                <div class="detail-item"><span>Received By</span><strong>Finance Officer</strong></div>
-                <div class="detail-item"><span>Date & Time</span><strong>02 Aug 2026 | 10:45 AM</strong></div>
+                <div class="detail-item"><span>Issued By</span><strong>${user.full_name || "Administrator"} (${user.role || "Admin"})</strong></div>
+                <div class="detail-item"><span>Contact Email</span><strong>${user.email || "N/A"}</strong></div>
             </div>
             <div class="receipt-buttons">
                 <button class="primary-button">🖨 Print Receipt</button>
@@ -511,12 +564,14 @@ function showSchoolFees() {
    CORE PAGES & VIEWS
 ================================ */
 function showOverview() {
+    const user = getCurrentUser();
+    
     contentArea.innerHTML = `
         <div class="page-content">
             <div class="page-introduction">
                 <div>
-                    <h2>School Overview</h2>
-                    <p>Here's what's happening in your school today.</p>
+                    <h2>Welcome, ${user.full_name || "Administrator"} 👋</h2>
+                    <p>Here is what is happening at <strong>${user.school_name || "your school"}</strong> today.</p>
                 </div>
                 <button class="primary-button">+ Add Student</button>
             </div>
@@ -530,12 +585,14 @@ function showOverview() {
 }
 
 function showSchoolManagement() {
+    const user = getCurrentUser();
+
     contentArea.innerHTML = `
         <div class="page-content">
             <div class="page-introduction">
                 <div>
                     <h2>School Management</h2>
-                    <p>Manage your school's basic information and details.</p>
+                    <p>Manage basic information for ${user.school_name || "your school"}.</p>
                 </div>
                 <button class="primary-button" id="openSchoolModalBtn">Edit School Information</button>
             </div>
@@ -544,23 +601,24 @@ function showSchoolManagement() {
                     <div class="card-header">
                         <div>
                             <h3>School Information</h3>
-                            <p>Your school's basic information</p>
+                            <p>Registered details for your institution</p>
                         </div>
                     </div>
                     <div class="school-details">
-                        <div class="detail-item"><span>School Name</span> <strong>${user.school_name}</strong></div>
-                        <div class="detail-item"><span>School Email</span><strong>${user.school_email}</strong></div>
-                        <div class="detail-item"><span>Phone Number</span><strong>${user.phone_number}</strong></div>
-                        <div class="detail-item"><span>School Address</span>${user.school_Address}<strong></strong></div>
-                        <div class="detail-item"><span>School Type</span><strong>Private School</strong></div>
-                        <div class="detail-item"><span>Established</span><strong>2010</strong></div>
+                        <div class="detail-item"><span>School Name</span><strong>${user.school_name || "N/A"}</strong></div>
+                        <div class="detail-item"><span>School Email</span><strong>${user.email || "N/A"}</strong></div>
+                        <div class="detail-item"><span>Phone Number</span><strong>${user.phone || "N/A"}</strong></div>
+                        <div class="detail-item"><span>School Address</span><strong>${user.address || "N/A"}</strong></div>
+                        <div class="detail-item"><span>School Type</span><strong>${user.school_type || "Private School"}</strong></div>
+                        <div class="detail-item"><span>Administrator / Principal</span><strong>${user.full_name || "N/A"}</strong></div>
+                        <div class="detail-item"><span>User Role</span><strong>${user.role || "Admin"}</strong></div>
                     </div>
                 </div>
                 <div class="dashboard-card school-status-card">
                     <div class="card-header">
                         <div>
                             <h3>School Status</h3>
-                            <p>Current school account status</p>
+                            <p>Current account status</p>
                         </div>
                     </div>
                     <div class="status-overview">
@@ -570,7 +628,7 @@ function showSchoolManagement() {
                     </div>
                     <div class="status-information">
                         <div><span>Account Created</span><strong>July 2026</strong></div>
-                        <div><span>Current Session</span><strong>2025/2026</strong></div>
+                        <div><span>Current Session</span><strong>${user.academic_session || "2025/2026"}</strong></div>
                     </div>
                 </div>
             </div>
@@ -585,7 +643,7 @@ function showClasses() {
         <div class="page-introduction">
             <div>
                 <h2>Classes</h2>
-                <p>Manage your school's classes and class information.</p>
+                <p>Manage classes and class streams.</p>
             </div>
             <button class="primary-button">+ Add New Class</button>
         </div>
@@ -695,7 +753,17 @@ function showParentPayments() {
    SETTINGS PAGES
 ================================ */
 function showSchoolProfile() {
-    contentArea.innerHTML = `<div class="page-content"><h2>School Profile Settings</h2></div>`;
+    const user = getCurrentUser();
+    contentArea.innerHTML = `
+    <div class="page-content">
+        <h2>School Profile Settings</h2>
+        <div class="dashboard-card" style="margin-top: 1rem;">
+            <div class="detail-item"><span>School Name</span><strong>${user.school_name || "N/A"}</strong></div>
+            <div class="detail-item"><span>Email Address</span><strong>${user.email || "N/A"}</strong></div>
+            <div class="detail-item"><span>Phone Number</span><strong>${user.phone || "N/A"}</strong></div>
+            <div class="detail-item"><span>Address</span><strong>${user.address || "N/A"}</strong></div>
+        </div>
+    </div>`;
 }
 
 function showUserRoles() {
@@ -711,7 +779,14 @@ function showSecurity() {
 }
 
 function showEmailSettings() {
-    contentArea.innerHTML = `<div class="page-content"><h2>Email Settings</h2></div>`;
+    const user = getCurrentUser();
+    contentArea.innerHTML = `
+    <div class="page-content">
+        <h2>Email Settings</h2>
+        <div class="dashboard-card" style="margin-top: 1rem;">
+            <p>Notification & communication email: <strong>${user.email || "N/A"}</strong></p>
+        </div>
+    </div>`;
 }
 
 function showBackup() {
