@@ -90,7 +90,55 @@ const StudentSchema = new mongoose.Schema({
         ],
         default: "Pending"
     }
+status: {
+    type: String,
+    enum: [
+        "Pending",
+        "Active",
+        "Suspended",
+        "Graduated",
+        "Archived"
+    ],
+    default: "Pending"
+},
 
+approved_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+},
+
+approved_at: {
+    type: Date,
+    default: null
+},
+
+suspended_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+},
+
+suspended_at: {
+    type: Date,
+    default: null
+},
+
+suspension_reason: {
+    type: String,
+    default: ""
+},
+
+archived_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+},
+
+archived_at: {
+    type: Date,
+    default: null
+}
 },
 {
     timestamps: {
@@ -98,5 +146,6 @@ const StudentSchema = new mongoose.Schema({
         updatedAt: "updated_at"
     }
 });
+
 
 module.exports = mongoose.model("Student", StudentSchema);
