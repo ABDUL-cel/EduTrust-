@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const StudentSchema = new mongoose.Schema({
-
+const StudentSchema = new mongoose.Schema(
+{
     school_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "School",
@@ -16,8 +16,8 @@ const StudentSchema = new mongoose.Schema({
 
     admission_number: {
         type: String,
-        unique: true,
         required: true,
+        unique: true,
         trim: true
     },
 
@@ -89,56 +89,46 @@ const StudentSchema = new mongoose.Schema({
             "Archived"
         ],
         default: "Pending"
+    },
+
+    approved_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    },
+
+    approved_at: {
+        type: Date,
+        default: null
+    },
+
+    suspended_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    },
+
+    suspended_at: {
+        type: Date,
+        default: null
+    },
+
+    suspension_reason: {
+        type: String,
+        default: ""
+    },
+
+    archived_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    },
+
+    archived_at: {
+        type: Date,
+        default: null
     }
-status: {
-    type: String,
-    enum: [
-        "Pending",
-        "Active",
-        "Suspended",
-        "Graduated",
-        "Archived"
-    ],
-    default: "Pending"
-},
 
-approved_by: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null
-},
-
-approved_at: {
-    type: Date,
-    default: null
-},
-
-suspended_by: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null
-},
-
-suspended_at: {
-    type: Date,
-    default: null
-},
-
-suspension_reason: {
-    type: String,
-    default: ""
-},
-
-archived_by: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null
-},
-
-archived_at: {
-    type: Date,
-    default: null
-}
 },
 {
     timestamps: {
@@ -146,6 +136,5 @@ archived_at: {
         updatedAt: "updated_at"
     }
 });
-
 
 module.exports = mongoose.model("Student", StudentSchema);
