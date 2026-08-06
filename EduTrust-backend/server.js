@@ -8,6 +8,7 @@ const connectDB = require("./config/db");
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 // Future routes
 // const studentRoutes = require("./routes/studentRoutes");
 // const paymentRoutes = require("./routes/paymentRoutes");
@@ -40,7 +41,7 @@ app.get("/", (req, res) => {
 
 // Authentication Routes
 app.use("/api/auth", authRoutes);
-
+app.use("/api/dashboard", dashboardRoutes);
 // Future Routes
 // app.use("/api/students", studentRoutes);
 // app.use("/api/payments", paymentRoutes);
