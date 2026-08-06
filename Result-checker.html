@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Exam Result | EduTrust</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .result-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .form-section, .payment-section, .report-card-section {
+            margin-top: 1.5rem;
+        }
+        .report-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .student-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+        .result-table th, .result-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .result-table th {
+            background-color: #f1f3f5;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        .badge-locked {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="result-container">
+        <!-- SEARCH FORM -->
+        <div id="searchView">
+            <h2>🔍 Check Exam Result</h2>
+            <p>Enter student details below to check your terminal examination results.</p>
+            
+            <form id="checkResultForm">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Student Admission Number / ID</label>
+                    <input type="text" id="studentId" placeholder="e.g., EDU/2026/001" required class="form-control">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Academic Session</label>
+                    <select id="academicSession" required class="form-control">
+                        <option value="">Select Session</option>
+                        <option value="2025/2026">2025/2026</option>
+                        <option value="2024/2025">2024/2025</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>Term</label>
+                    <select id="term" required class="form-control">
+                        <option value="">Select Term</option>
+                        <option value="First Term">First Term</option>
+                        <option value="Second Term">Second Term</option>
+                        <option value="Third Term">Third Term</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="primary-button" style="width: 100%;">Check Result</button>
+            </form>
+            <p id="searchErrorMessage" style="color: red; margin-top: 1rem; display: none;"></p>
+        </div>
+
+        <!-- PAYMENT REQUIRED GATE -->
+        <div id="paymentGateView" style="display: none; text-align: center;">
+            <div class="badge-locked">🔒 Result Locked - Payment Required</div>
+            <h3 id="payStudentName">--</h3>
+            <p>Access fee required to view the detailed report card for <strong id="paySessionTerm">--</strong>.</p>
+            
+            <div style="margin: 2rem 0;">
+                <p>Fee Amount:</p>
+                <h1 style="color: #2b8a3e;" id="payAmount">₦0.00</h1>
+            </div>
+
+            <button id="payNowBtn" class="primary-button">Pay Now to Unlock</button>
+            <button id="backToSearchBtn" style="background: transparent; border: none; text-decoration: underline; cursor: pointer; margin-left: 1rem;">Go Back</button>
+        </div>
+
+        <!-- FULL REPORT CARD DISPLAY -->
+        <div id="reportCardView" style="display: none;">
+            <div class="report-header">
+                <h1 id="rcSchoolName">EDUTRUST ACADEMY</h1>
+                <h3>STUDENT TERMINAL REPORT CARD</h3>
+            </div>
+
+            <div class="student-info-grid">
+                <div><strong>Student Name:</strong> <span id="rcName">--</span></div>
+                <div><strong>Admission ID:</strong> <span id="rcId">--</span></div>
+                <div><strong>Class:</strong> <span id="rcClass">--</span></div>
+                <div><strong>Session/Term:</strong> <span id="rcSessionTerm">--</span></div>
+            </div>
+
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>CA Score (40)</th>
+                        <th>Exam Score (60)</th>
+                        <th>Total Score (100)</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="rcSubjectsBody">
+                    <!-- Populated via JavaScript -->
+                </tbody>
+            </table>
+
+            <div class="student-info-grid">
+                <div><strong>Total Marks:</strong> <span id="rcTotalMarks">--</span></div>
+                <div><strong>Average Score:</strong> <span id="rcAverage">--</span>%</div>
+                <div><strong>Remarks:</strong> <span id="rcRemarks">--</span></div>
+            </div>
+
+            <div class="action-buttons">
+                <button onclick="window.print()" class="primary-button">🖨 Print / Download PDF</button>
+                <button onclick="resetView()" style="padding: 10px 15px; cursor: pointer;">Search Another</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="result-checker.js"></script>
+</body>
+</html>
+
