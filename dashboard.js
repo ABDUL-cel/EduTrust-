@@ -20,7 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Error parsing stored user details:", err);
         }
     }
+
+    showOverview();
 });
+
+
 
 /* ================================
    DOM ELEMENTS & NAVIGATION
@@ -544,10 +548,10 @@ function showSchoolManagement() {
                         </div>
                     </div>
                     <div class="school-details">
-                        <div class="detail-item"><span>School Name</span><strong>Greenfield School</strong></div>
-                        <div class="detail-item"><span>School Email</span><strong>info@greenfieldschool.com</strong></div>
-                        <div class="detail-item"><span>Phone Number</span><strong>+234 801 234 5678</strong></div>
-                        <div class="detail-item"><span>School Address</span><strong>Ilorin, Kwara State, Nigeria</strong></div>
+                        <div class="detail-item"><span>School Name</span> <strong>${user.school_name}</strong></div>
+                        <div class="detail-item"><span>School Email</span><strong>${user.school_email}</strong></div>
+                        <div class="detail-item"><span>Phone Number</span><strong>${user.phone_number}</strong></div>
+                        <div class="detail-item"><span>School Address</span>${user.school_Address}<strong></strong></div>
                         <div class="detail-item"><span>School Type</span><strong>Private School</strong></div>
                         <div class="detail-item"><span>Established</span><strong>2010</strong></div>
                     </div>
