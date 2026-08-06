@@ -13,6 +13,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 // const studentRoutes = require("./routes/studentRoutes");
 // const paymentRoutes = require("./routes/paymentRoutes");
 // const feeRoutes = require("./routes/feeRoutes");
+const resultRoutes = require('./routes/resultRoutes');
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use("/api/dashboard", dashboardRoutes);
 // app.use("/api/students", studentRoutes);
 // app.use("/api/payments", paymentRoutes);
 // app.use("/api/fees", feeRoutes);
+app.use('/api/results', resultRoutes);
 
 // 404 Handler
 app.use((req, res) => {
