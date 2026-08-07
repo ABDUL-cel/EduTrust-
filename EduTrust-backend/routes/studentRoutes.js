@@ -18,86 +18,78 @@ const {
 } = require("../controllers/studentController");
 
 // =======================================
-// All student routes require authentication
+// Authentication
+// All student routes require login
 // =======================================
-
 router.use(authMiddleware);
 
-// Register student
+// =======================================
+// Register Student
+// POST /api/students
+// =======================================
 router.post("/", registerStudent);
 
-// Get all students
+// =======================================
+// Get All Students
+// GET /api/students
+// =======================================
 router.get("/", getStudents);
 
-// Get pending students
+// =======================================
+// Get Pending Students
+// GET /api/students/pending
+// =======================================
 router.get("/pending", getPendingStudents);
 
-// Get active students
+// =======================================
+// Get Active Students
+// GET /api/students/active
+// =======================================
 router.get("/active", getActiveStudents);
 
-// Get suspended students
+// =======================================
+// Get Suspended Students
+// GET /api/students/suspended
+// =======================================
 router.get("/suspended", getSuspendedStudents);
 
-// Get single student
+// =======================================
+// Get Single Student
+// GET /api/students/:id
+// =======================================
 router.get("/:id", getStudent);
 
-// Approve student
+// =======================================
+// Approve Student
+// PATCH /api/students/:id/approve
+// =======================================
 router.patch("/:id/approve", approveStudent);
 
-// Suspend student
+// =======================================
+// Suspend Student
+// PATCH /api/students/:id/suspend
+// =======================================
 router.patch("/:id/suspend", suspendStudent);
 
-// Reinstate student
+// =======================================
+// Reinstate Student
+// PATCH /api/students/:id/reinstate
+// =======================================
 router.patch("/:id/reinstate", reinstateStudent);
-
-// Graduate student
-router.patch("/:id/graduate", graduateStudent);
-
-// Archive student
-router.patch("/:id/archive", archiveStudent);
-
-module.exports = router;        res.json({ success: true, message: "Student reinstated successfully.", student });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
 
 // =======================================
 // Graduate Student
+// PATCH /api/students/:id/graduate
 // =======================================
-exports.graduateStudent = async (req, res) => {
-    try {
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id: req.user.school_id },
-            { status: "Graduated" },
-            { new: true }
-        );
-
-        if (!student) {
-            return res.status(404).json({ success: false, message: "Student not found." });
-        }
-
-        res.json({ success: true, message: "Student graduated successfully.", student });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
+router.patch("/:id/graduate", graduateStudent);
 
 // =======================================
 // Archive Student
+// PATCH /api/students/:id/archive
 // =======================================
-exports.archiveStudent = async (req, res) => {
-    try {
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id: req.user.school_id },
-            { status: "Archived" },
-            { new: true }
-        );
+router.patch("/:id/archive", archiveStudent);
 
-        if (!student) {
-            return res.status(404).json({ success: false, message: "Student not found." });
-        }
-
+module.exports = router;
         res.json({ success: true, message: "Student archived successfully.", student });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
