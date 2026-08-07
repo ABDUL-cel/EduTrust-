@@ -1,44 +1,46 @@
 const Student = require("../models/student");
 
-// ======================================
+// =======================================
 // Dashboard Overview
-// ======================================
+// =======================================
 exports.getDashboardOverview = async (req, res) => {
     try {
-
-        // School owner is the logged-in user
+        // Each logged-in school owner is treated as the school owner.
+        // For the current User model, req.user.id is the logged-in user's ID.
         const school_id = req.user.id;
 
-        const totalStudents = await Student.countDocuments({
-            school_id
-        });
+        const [
+            totalStudents,
+            pendingStudents,
+            activeStudents,
+            suspendedStudents,
+            graduatedStudents,
+            archivedStudents
+        ] = await Promise.all([
+            Student.countDocuments({ school_id }),
+            Student.countDocuments({
+                school_id,
+                status: "Pending"
+            }),
+            Student.countDocuments({
+                school_id,
+                status: "Active"
+            }),
+            Student.countDocuments({
+                school_id,
+                status: "Suspended"
+            }),
+            Student.countDocuments({
+                school_id,
+                status: "Graduated"
+            }),
+            Student.countDocuments({
+                school_id,
+                status: "Archived"
+            })
+        ]);
 
-        const pendingStudents = await Student.countDocuments({
-            school_id,
-            status: "Pending"
-        });
-
-        const activeStudents = await Student.countDocuments({
-            school_id,
-            status: "Active"
-        });
-
-        const suspendedStudents = await Student.countDocuments({
-            school_id,
-            status: "Suspended"
-        });
-
-        const graduatedStudents = await Student.countDocuments({
-            school_id,
-            status: "Graduated"
-        });
-
-        const archivedStudents = await Student.countDocuments({
-            school_id,
-            status: "Archived"
-        });
-
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             dashboard: {
                 totalStudents,
@@ -50,14 +52,13 @@ exports.getDashboardOverview = async (req, res) => {
             }
         });
 
-    } catch (err) {
+    } catch (error) {
+        console.error("DASHBOARD OVERVIEW ERROR:", error);
 
-        console.error(err);
-
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Server error retrieving dashboard information.",
+            error: error.message
         });
-
     }
 };
