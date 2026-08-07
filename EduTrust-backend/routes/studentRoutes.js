@@ -5,8 +5,11 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const {
     registerStudent,
+    getStudents,
     getPendingStudents,
     getActiveStudents,
+    getSuspendedStudents,
+    getStudent,
     approveStudent,
     suspendStudent,
     reinstateStudent,
@@ -15,93 +18,45 @@ const {
 } = require("../controllers/studentController");
 
 // =======================================
-// STUDENT REGISTRATION
+// All student routes require authentication
 // =======================================
 
-// Register new student
-// POST /api/students
-router.post("/", authMiddleware, registerStudent);
+router.use(authMiddleware);
 
+// Register student
+router.post("/", registerStudent);
 
-// =======================================
-// STUDENT LISTS
-// =======================================
+// Get all students
+router.get("/", getStudents);
 
 // Get pending students
-// GET /api/students/pending
-router.get("/pending", authMiddleware, getPendingStudents);
+router.get("/pending", getPendingStudents);
 
 // Get active students
-// GET /api/students/active
-router.get("/active", authMiddleware, getActiveStudents);
+router.get("/active", getActiveStudents);
 
+// Get suspended students
+router.get("/suspended", getSuspendedStudents);
 
-// =======================================
-// STUDENT STATUS MANAGEMENT
-// =======================================
+// Get single student
+router.get("/:id", getStudent);
 
 // Approve student
-// PATCH /api/students/:id/approve
-router.patch("/:id/approve", authMiddleware, approveStudent);
+router.patch("/:id/approve", approveStudent);
 
 // Suspend student
-// PATCH /api/students/:id/suspend
-router.patch("/:id/suspend", authMiddleware, suspendStudent);
+router.patch("/:id/suspend", suspendStudent);
 
-// Reinstate suspended student
-// PATCH /api/students/:id/reinstate
-router.patch("/:id/reinstate", authMiddleware, reinstateStudent);
+// Reinstate student
+router.patch("/:id/reinstate", reinstateStudent);
 
 // Graduate student
-// PATCH /api/students/:id/graduate
-router.patch("/:id/graduate", authMiddleware, graduateStudent);
+router.patch("/:id/graduate", graduateStudent);
 
 // Archive student
-// PATCH /api/students/:id/archive
-router.patch("/:id/archive", authMiddleware, archiveStudent);
+router.patch("/:id/archive", archiveStudent);
 
-
-// =======================================
-// EXPORT ROUTER
-// =======================================
-
-module.exports = router;// =======================================
-// Suspend Student
-// =======================================
-exports.suspendStudent = async (req, res) => {
-    try {
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id: req.user.school_id },
-            { status: "Suspended" },
-            { new: true }
-        );
-
-        if (!student) {
-            return res.status(404).json({ success: false, message: "Student not found." });
-        }
-
-        res.json({ success: true, message: "Student suspended successfully.", student });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
-
-// =======================================
-// Reinstate Student
-// =======================================
-exports.reinstateStudent = async (req, res) => {
-    try {
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id: req.user.school_id },
-            { status: "Active" },
-            { new: true }
-        );
-
-        if (!student) {
-            return res.status(404).json({ success: false, message: "Student not found." });
-        }
-
-        res.json({ success: true, message: "Student reinstated successfully.", student });
+module.exports = router;        res.json({ success: true, message: "Student reinstated successfully.", student });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
