@@ -1,93 +1,69 @@
 const mongoose = require("mongoose");
 
-const SchoolSchema = new mongoose.Schema({
+const SchoolSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true
+        },
 
-    school_name: {
-        type: String,
-        required: true,
-        trim: true
+        email: {
+            type: String,
+            required: true,
+            lowercase: true,
+            trim: true
+        },
+
+        phone: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        address: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        school_type: {
+            type: String,
+            default: ""
+        },
+
+        academic_session: {
+            type: String,
+            default: ""
+        },
+
+        current_term: {
+            type: String,
+            default: ""
+        },
+
+        school_motto: {
+            type: String,
+            default ""
+        },
+
+        website: {
+            type: String,
+            default: ""
+        },
+
+        status: {
+            type: String,
+            enum: ["Active", "Inactive", "Suspended"],
+            default: "Active"
+        }
     },
-
-    school_email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true
-    },
-
-    phone: {
-        type: String,
-        required: true
-    },
-
-    address: {
-        type: String,
-        required: true
-    },
-
-    school_type: {
-        type: String,
-        enum: [
-            "Primary",
-            "Secondary",
-            "Tertiary",
-            "Combined"
-        ],
-        required: true
-    },
-
-    academic_session: {
-        type: String,
-        required: true
-    },
-
-    current_term: {
-        type: String,
-        enum: [
-            "First Term",
-            "Second Term",
-            "Third Term"
-        ],
-        required: true
-    },
-
-    school_motto: {
-        type: String,
-        default: ""
-    },
-
-    website: {
-        type: String,
-        default: ""
-    },
-
-    logo: {
-        type: String,
-        default: ""
-    },
-
-    principal: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        default: null
-    },
-
-    status: {
-        type: String,
-        enum: [
-            "Active",
-            "Inactive"
-        ],
-        default: "Active"
+    {
+        timestamps: {
+            createdAt: "created_at",
+            updatedAt: "updated_at"
+        }
     }
-
-},
-{
-    timestamps: {
-        createdAt: "created_at",
-        updatedAt: "updated_at"
-    }
-});
+);
 
 module.exports = mongoose.model("School", SchoolSchema);
