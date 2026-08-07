@@ -1,42 +1,186 @@
-const express = require("express");
-const router = express.Router();
+const Student = require("../models/student");
 
-const authMiddleware = require("../middleware/authMiddleware");
+// =======================================
+// Register Student (Pending Approval)
+// =======================================
+exports.registerStudent = async (req, res) => {
+    try {
+        const school_id = req.user.school_id;
 
-const {
-    registerStudent,
-    getPendingStudents,
-    getActiveStudents,
-    approveStudent,
-    suspendStudent,
-    reinstateStudent,
-    graduateStudent,
-    archiveStudent
-} = require("../controllers/studentController");
+        const student = await Student.create({
+            school_id,
+            admission_number: req.body.admission_number,
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            other_name: req.body.other_name,
+            gender: req.body.gender,
+            date_of_birth: req.body.date_of_birth,
+            class_name: req.body.class_name,
+            arm: req.body.arm,
+            home_address: req.body.home_address,
+            medical_information: req.body.medical_information,
+            passport: req.body.passport,
+            status: "Pending"
+        });
 
-// ==========================
-// Student Registration
-// ==========================
-router.post("/register", authMiddleware, registerStudent);
+        res.status(201).json({
+            success: true,
+            message: "Student registration submitted successfully.",
+            student
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
 
-// ==========================
-// Student Lists
-// ==========================
-router.get("/pending", authMiddleware, getPendingStudents);
+// =======================================
+// Pending Students
+// =======================================
+exports.getPendingStudents = async (req, res) => {
+    try {
+        const students = await Student.find({
+            school_id: req.user.school_id,
+            status: "Pending"
+        });
 
-router.get("/active", authMiddleware, getActiveStudents);
+        res.json({
+            success: true,
+            students
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
 
-// ==========================
-// Student Actions
-// ==========================
-router.put("/approve/:id", authMiddleware, approveStudent);
+// =======================================
+// Active Students
+// =======================================
+exports.getActiveStudents = async (req, res) => {
+    try {
+        const students = await Student.find({
+            school_id: req.user.school_id,
+            status: "Active"
+        });
 
-router.put("/suspend/:id", authMiddleware, suspendStudent);
+        res.json({
+            success: true,
+            students
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
 
-router.put("/reinstate/:id", authMiddleware, reinstateStudent);
+// =======================================
+// Approve Student
+// =======================================
+exports.approveStudent = async (req, res) => {
+    try {
+        const student = await Student.findOneAndUpdate(
+            { _id: req.params.id, school_id: req.user.school_id },
+            { status: "Active" },
+            { new: true }
+        );
 
-router.put("/graduate/:id", authMiddleware, graduateStudent);
+        if (!student) {
+            return res.status(404).json({ success: false, message: "Student not found." });
+        }
 
-router.put("/archive/:id", authMiddleware, archiveStudent);
+        res.json({ success: true, message: "Student approved successfully.", student });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
 
-module.exports = router;
+// =======================================
+// Suspend Student
+// =======================================
+exports.suspendStudent = async (req, res) => {
+    try {
+        const student = await Student.findOneAndUpdate(
+            { _id: req.params.id, school_id: req.user.school_id },
+            { status: "Suspended" },
+            { new: true }
+        );
+
+        if (!student) {
+            return res.status(404).json({ success: false, message: "Student not found." });
+        }
+
+        res.json({ success: true, message: "Student suspended successfully.", student });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// =======================================
+// Reinstate Student
+// =======================================
+exports.reinstateStudent = async (req, res) => {
+    try {
+        const student = await Student.findOneAndUpdate(
+            { _id: req.params.id, school_id: req.user.school_id },
+            { status: "Active" },
+            { new: true }
+        );
+
+        if (!student) {
+            return res.status(404).json({ success: false, message: "Student not found." });
+        }
+
+        res.json({ success: true, message: "Student reinstated successfully.", student });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// =======================================
+// Graduate Student
+// =======================================
+exports.graduateStudent = async (req, res) => {
+    try {
+        const student = await Student.findOneAndUpdate(
+            { _id: req.params.id, school_id: req.user.school_id },
+            { status: "Graduated" },
+            { new: true }
+        );
+
+        if (!student) {
+            return res.status(404).json({ success: false, message: "Student not found." });
+        }
+
+        res.json({ success: true, message: "Student graduated successfully.", student });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// =======================================
+// Archive Student
+// =======================================
+exports.archiveStudent = async (req, res) => {
+    try {
+        const student = await Student.findOneAndUpdate(
+            { _id: req.params.id, school_id: req.user.school_id },
+            { status: "Archived" },
+            { new: true }
+        );
+
+        if (!student) {
+            return res.status(404).json({ success: false, message: "Student not found." });
+        }
+
+        res.json({ success: true, message: "Student archived successfully.", student });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
