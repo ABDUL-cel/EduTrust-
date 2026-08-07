@@ -11,20 +11,19 @@ const SchoolSchema = new mongoose.Schema(
         email: {
             type: String,
             required: true,
+            unique: true,
             lowercase: true,
             trim: true
         },
 
         phone: {
             type: String,
-            required: true,
-            trim: true
+            default: ""
         },
 
         address: {
             type: String,
-            default: "",
-            trim: true
+            default: ""
         },
 
         school_type: {
@@ -44,12 +43,23 @@ const SchoolSchema = new mongoose.Schema(
 
         school_motto: {
             type: String,
-            default ""
+            default: ""
         },
 
         website: {
             type: String,
             default: ""
+        },
+
+        logo: {
+            type: String,
+            default: ""
+        },
+
+        principal: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
         },
 
         status: {
