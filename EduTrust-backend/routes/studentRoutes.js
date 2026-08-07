@@ -1,107 +1,71 @@
-const Student = require("../models/student");
+const express = require("express");
+const router = express.Router();
+
+const authMiddleware = require("../middleware/authMiddleware");
+
+const {
+    registerStudent,
+    getPendingStudents,
+    getActiveStudents,
+    approveStudent,
+    suspendStudent,
+    reinstateStudent,
+    graduateStudent,
+    archiveStudent
+} = require("../controllers/studentController");
 
 // =======================================
-// Register Student (Pending Approval)
+// STUDENT REGISTRATION
 // =======================================
-exports.registerStudent = async (req, res) => {
-    try {
-        const school_id = req.user.school_id;
 
-        const student = await Student.create({
-            school_id,
-            admission_number: req.body.admission_number,
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            other_name: req.body.other_name,
-            gender: req.body.gender,
-            date_of_birth: req.body.date_of_birth,
-            class_name: req.body.class_name,
-            arm: req.body.arm,
-            home_address: req.body.home_address,
-            medical_information: req.body.medical_information,
-            passport: req.body.passport,
-            status: "Pending"
-        });
+// Register new student
+// POST /api/students
+router.post("/", authMiddleware, registerStudent);
 
-        res.status(201).json({
-            success: true,
-            message: "Student registration submitted successfully.",
-            student
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-    }
-};
 
 // =======================================
-// Pending Students
+// STUDENT LISTS
 // =======================================
-exports.getPendingStudents = async (req, res) => {
-    try {
-        const students = await Student.find({
-            school_id: req.user.school_id,
-            status: "Pending"
-        });
 
-        res.json({
-            success: true,
-            students
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-    }
-};
+// Get pending students
+// GET /api/students/pending
+router.get("/pending", authMiddleware, getPendingStudents);
+
+// Get active students
+// GET /api/students/active
+router.get("/active", authMiddleware, getActiveStudents);
+
 
 // =======================================
-// Active Students
+// STUDENT STATUS MANAGEMENT
 // =======================================
-exports.getActiveStudents = async (req, res) => {
-    try {
-        const students = await Student.find({
-            school_id: req.user.school_id,
-            status: "Active"
-        });
 
-        res.json({
-            success: true,
-            students
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-    }
-};
+// Approve student
+// PATCH /api/students/:id/approve
+router.patch("/:id/approve", authMiddleware, approveStudent);
 
-// =======================================
-// Approve Student
-// =======================================
-exports.approveStudent = async (req, res) => {
-    try {
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id: req.user.school_id },
-            { status: "Active" },
-            { new: true }
-        );
+// Suspend student
+// PATCH /api/students/:id/suspend
+router.patch("/:id/suspend", authMiddleware, suspendStudent);
 
-        if (!student) {
-            return res.status(404).json({ success: false, message: "Student not found." });
-        }
+// Reinstate suspended student
+// PATCH /api/students/:id/reinstate
+router.patch("/:id/reinstate", authMiddleware, reinstateStudent);
 
-        res.json({ success: true, message: "Student approved successfully.", student });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
+// Graduate student
+// PATCH /api/students/:id/graduate
+router.patch("/:id/graduate", authMiddleware, graduateStudent);
+
+// Archive student
+// PATCH /api/students/:id/archive
+router.patch("/:id/archive", authMiddleware, archiveStudent);
+
 
 // =======================================
+// EXPORT ROUTER
+// =======================================
+
+module.exports = router;// =======================================
 // Suspend Student
 // =======================================
 exports.suspendStudent = async (req, res) => {
