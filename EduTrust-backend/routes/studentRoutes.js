@@ -17,81 +17,40 @@ const {
     archiveStudent
 } = require("../controllers/studentController");
 
-// =======================================
-// Authentication
-// All student routes require login
-// =======================================
+// All student routes require authentication
 router.use(authMiddleware);
 
-// =======================================
-// Register Student
-// POST /api/students
-// =======================================
+// Register student
 router.post("/", registerStudent);
 
-// =======================================
-// Get All Students
-// GET /api/students
-// =======================================
+// Get all students
 router.get("/", getStudents);
 
-// =======================================
-// Get Pending Students
-// GET /api/students/pending
-// =======================================
+// Get pending students
 router.get("/pending", getPendingStudents);
 
-// =======================================
-// Get Active Students
-// GET /api/students/active
-// =======================================
+// Get active students
 router.get("/active", getActiveStudents);
 
-// =======================================
-// Get Suspended Students
-// GET /api/students/suspended
-// =======================================
+// Get suspended students
 router.get("/suspended", getSuspendedStudents);
 
-// =======================================
-// Get Single Student
-// GET /api/students/:id
-// =======================================
+// Get one student
 router.get("/:id", getStudent);
 
-// =======================================
-// Approve Student
-// PATCH /api/students/:id/approve
-// =======================================
+// Approve student
 router.patch("/:id/approve", approveStudent);
 
-// =======================================
-// Suspend Student
-// PATCH /api/students/:id/suspend
-// =======================================
+// Suspend student
 router.patch("/:id/suspend", suspendStudent);
 
-// =======================================
-// Reinstate Student
-// PATCH /api/students/:id/reinstate
-// =======================================
+// Reinstate student
 router.patch("/:id/reinstate", reinstateStudent);
 
-// =======================================
-// Graduate Student
-// PATCH /api/students/:id/graduate
-// =======================================
+// Graduate student
 router.patch("/:id/graduate", graduateStudent);
 
-// =======================================
-// Archive Student
-// PATCH /api/students/:id/archive
-// =======================================
+// Archive student
 router.patch("/:id/archive", archiveStudent);
 
 module.exports = router;
-        res.json({ success: true, message: "Student archived successfully.", student });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
