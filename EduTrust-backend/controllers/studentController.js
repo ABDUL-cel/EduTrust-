@@ -1,29 +1,22 @@
 const Student = require("../models/student");
 
 // =======================================
-// Helper: Get School ID
+// Helper: Find student belonging to school
 // =======================================
-
-function getSchoolId(req) {
-    return req.user?.school_id || req.user?.id;
-}
-
+const findSchoolStudent = async (studentId, schoolId) => {
+    return await Student.findOne({
+        _id: studentId,
+        school_id: schoolId
+    });
+};
 
 // =======================================
 // Register Student
-// Status: Pending
+// Student starts as Pending
 // =======================================
-
 exports.registerStudent = async (req, res) => {
     try {
-        const school_id = getSchoolId(req);
-
-        if (!school_id) {
-            return res.status(401).json({
-                success: false,
-                message: "School account could not be identified."
-            });
-        }
+        const school_id = req.user.id;
 
         const {
             admission_number,
@@ -34,13 +27,14 @@ exports.registerStudent = async (req, res) => {
             date_of_birth,
             class_name,
             arm,
+            admission_date,
             home_address,
             medical_information,
             passport,
             parent_id
         } = req.body;
 
-        // Validate required fields
+        // Required fields
         if (
             !admission_number ||
             !first_name ||
@@ -78,6 +72,7 @@ exports.registerStudent = async (req, res) => {
             date_of_birth,
             class_name,
             arm: arm || "",
+            admission_date: admission_date || new Date(),
             home_address: home_address || "",
             medical_information: medical_information || "",
             passport: passport || "",
@@ -90,18 +85,424 @@ exports.registerStudent = async (req, res) => {
             student
         });
 
-    } catch (err) {
-        console.error("REGISTER STUDENT ERROR:", err);
+    } catch (error) {
+        console.error("REGISTER STUDENT ERROR:", error);
 
         return res.status(500).json({
             success: false,
             message: "Server error while registering student.",
-            error: err.message
+            error: error.message
         });
     }
 };
 
+// =======================================
+// Get All Students
+// =======================================
+exports.getStudents = async (req, res) => {
+    try {
+        const school_id = req.user.id;
 
+        const students = await Student.find({
+            school_id
+        }).sort({
+            created_at: -1
+        });
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            students
+        });
+
+    } catch (error) {
+        console.error("GET STUDENTS ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while retrieving students.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Get Pending Students
+// =======================================
+exports.getPendingStudents = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const students = await Student.find({
+            school_id,
+            status: "Pending"
+        }).sort({
+            created_at: -1
+        });
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            students
+        });
+
+    } catch (error) {
+        console.error("GET PENDING STUDENTS ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while retrieving pending students.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Get Active Students
+// =======================================
+exports.getActiveStudents = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const students = await Student.find({
+            school_id,
+            status: "Active"
+        }).sort({
+            first_name: 1,
+            last_name: 1
+        });
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            students
+        });
+
+    } catch (error) {
+        console.error("GET ACTIVE STUDENTS ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while retrieving active students.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Get Suspended Students
+// =======================================
+exports.getSuspendedStudents = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const students = await Student.find({
+            school_id,
+            status: "Suspended"
+        }).sort({
+            suspended_at: -1
+        });
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            students
+        });
+
+    } catch (error) {
+        console.error("GET SUSPENDED STUDENTS ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while retrieving suspended students.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Get Single Student
+// =======================================
+exports.getStudent = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const student = await findSchoolStudent(
+            req.params.id,
+            school_id
+        );
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            student
+        });
+
+    } catch (error) {
+        console.error("GET STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while retrieving student.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Approve Student
+// Pending → Active
+// =======================================
+exports.approveStudent = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const student = await findSchoolStudent(
+            req.params.id,
+            school_id
+        );
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        if (student.status === "Archived") {
+            return res.status(400).json({
+                success: false,
+                message: "Archived students cannot be approved."
+            });
+        }
+
+        student.status = "Active";
+        student.approved_by = req.user.id;
+        student.approved_at = new Date();
+
+        await student.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Student approved successfully.",
+            student
+        });
+
+    } catch (error) {
+        console.error("APPROVE STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while approving student.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Suspend Student
+// =======================================
+exports.suspendStudent = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const student = await findSchoolStudent(
+            req.params.id,
+            school_id
+        );
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        if (student.status === "Archived") {
+            return res.status(400).json({
+                success: false,
+                message: "Archived students cannot be suspended."
+            });
+        }
+
+        if (student.status === "Graduated") {
+            return res.status(400).json({
+                success: false,
+                message: "Graduated students cannot be suspended."
+            });
+        }
+
+        student.status = "Suspended";
+        student.suspended_by = req.user.id;
+        student.suspended_at = new Date();
+        student.suspension_reason = req.body.reason || "";
+
+        await student.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Student suspended successfully.",
+            student
+        });
+
+    } catch (error) {
+        console.error("SUSPEND STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while suspending student.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Reinstate Student
+// Suspended → Active
+// =======================================
+exports.reinstateStudent = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const student = await findSchoolStudent(
+            req.params.id,
+            school_id
+        );
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        if (student.status !== "Suspended") {
+            return res.status(400).json({
+                success: false,
+                message: "Only suspended students can be reinstated."
+            });
+        }
+
+        student.status = "Active";
+        student.suspended_by = null;
+        student.suspended_at = null;
+        student.suspension_reason = "";
+
+        await student.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Student reinstated successfully.",
+            student
+        });
+
+    } catch (error) {
+        console.error("REINSTATE STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while reinstating student.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Graduate Student
+// Active → Graduated
+// =======================================
+exports.graduateStudent = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const student = await findSchoolStudent(
+            req.params.id,
+            school_id
+        );
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        if (student.status === "Archived") {
+            return res.status(400).json({
+                success: false,
+                message: "Archived students cannot be graduated."
+            });
+        }
+
+        student.status = "Graduated";
+
+        await student.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Student graduated successfully.",
+            student
+        });
+
+    } catch (error) {
+        console.error("GRADUATE STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while graduating student.",
+            error: error.message
+        });
+    }
+};
+
+// =======================================
+// Archive Student
+// No Delete
+// =======================================
+exports.archiveStudent = async (req, res) => {
+    try {
+        const school_id = req.user.id;
+
+        const student = await findSchoolStudent(
+            req.params.id,
+            school_id
+        );
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        student.status = "Archived";
+        student.archived_by = req.user.id;
+        student.archived_at = new Date();
+
+        await student.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Student archived successfully.",
+            student
+        });
+
+    } catch (error) {
+        console.error("ARCHIVE STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while archiving student.",
+            error: error.message
+        });
+    }
+};
 // =======================================
 // Get Pending Students
 // =======================================
