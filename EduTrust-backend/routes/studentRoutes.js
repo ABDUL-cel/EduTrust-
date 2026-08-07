@@ -1,19 +1,14 @@
+
 const express = require("express");
 
 const router = express.Router();
 
-const authMiddleware =
-    require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const {
     registerStudent,
-    getAllStudents,
-    getStudentById,
-    getPendingStudents,
-    getActiveStudents,
-    getSuspendedStudents,
-    getGraduatedStudents,
-    getArchivedStudents,
+    getStudents,
+    getStudent,
     approveStudent,
     suspendStudent,
     reinstateStudent,
@@ -22,143 +17,98 @@ const {
 } = require("../controllers/studentController");
 
 
-// ======================================================
-// ALL STUDENT ROUTES REQUIRE LOGIN
-// ======================================================
-router.use(authMiddleware);
-
-
-// ======================================================
-// REGISTER STUDENT
-// POST /api/students/register
-// ======================================================
+// =======================================
+// Register student
+// POST /api/students
+// =======================================
 router.post(
-    "/register",
+    "/",
+    authMiddleware,
     registerStudent
 );
 
 
-// ======================================================
-// GET ALL STUDENTS
+// =======================================
+// Get students
 // GET /api/students
-// ======================================================
+//
+// Optional:
+// ?status=Pending
+// ?status=Active
+// ?class_name=JSS1
+// ?search=John
+// =======================================
 router.get(
     "/",
-    getAllStudents
+    authMiddleware,
+    getStudents
 );
 
 
-// ======================================================
-// GET PENDING STUDENTS
-// GET /api/students/pending
-// ======================================================
+// =======================================
+// Get single student
+// GET /api/students/:id
+// =======================================
 router.get(
-    "/pending",
-    getPendingStudents
+    "/:id",
+    authMiddleware,
+    getStudent
 );
 
 
-// ======================================================
-// GET ACTIVE STUDENTS
-// GET /api/students/active
-// ======================================================
-router.get(
-    "/active",
-    getActiveStudents
-);
-
-
-// ======================================================
-// GET SUSPENDED STUDENTS
-// GET /api/students/suspended
-// ======================================================
-router.get(
-    "/suspended",
-    getSuspendedStudents
-);
-
-
-// ======================================================
-// GET GRADUATED STUDENTS
-// GET /api/students/graduated
-// ======================================================
-router.get(
-    "/graduated",
-    getGraduatedStudents
-);
-
-
-// ======================================================
-// GET ARCHIVED STUDENTS
-// GET /api/students/archived
-// ======================================================
-router.get(
-    "/archived",
-    getArchivedStudents
-);
-
-
-// ======================================================
-// APPROVE STUDENT
+// =======================================
+// Approve student
 // PATCH /api/students/:id/approve
-// ======================================================
+// =======================================
 router.patch(
     "/:id/approve",
+    authMiddleware,
     approveStudent
 );
 
 
-// ======================================================
-// SUSPEND STUDENT
+// =======================================
+// Suspend student
 // PATCH /api/students/:id/suspend
-// ======================================================
+// =======================================
 router.patch(
     "/:id/suspend",
+    authMiddleware,
     suspendStudent
 );
 
 
-// ======================================================
-// REINSTATE STUDENT
+// =======================================
+// Reinstate student
 // PATCH /api/students/:id/reinstate
-// ======================================================
+// =======================================
 router.patch(
     "/:id/reinstate",
+    authMiddleware,
     reinstateStudent
 );
 
 
-// ======================================================
-// GRADUATE STUDENT
+// =======================================
+// Graduate student
 // PATCH /api/students/:id/graduate
-// ======================================================
+// =======================================
 router.patch(
     "/:id/graduate",
+    authMiddleware,
     graduateStudent
 );
 
 
-// ======================================================
-// ARCHIVE STUDENT
+// =======================================
+// Archive student
 // PATCH /api/students/:id/archive
-// ======================================================
+// =======================================
 router.patch(
     "/:id/archive",
+    authMiddleware,
     archiveStudent
 );
 
 
-// ======================================================
-// GET SINGLE STUDENT
-// GET /api/students/:id
-// ======================================================
-router.get(
-    "/:id",
-    getStudentById
-);
-
-
-// ======================================================
-// EXPORT
-// ======================================================
 module.exports = router;
