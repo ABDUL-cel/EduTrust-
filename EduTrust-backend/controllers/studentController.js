@@ -104,6 +104,7 @@ exports.getPendingStudents = async (req, res) => {
 // Active Students
 // =======================================
 exports.getActiveStudents = async (req, res) {
+  // your function cod
 
     try {
 
@@ -140,7 +141,8 @@ exports.getActiveStudents = async (req, res) {
 // =======================================
 // Approve Student
 // =======================================
-exports.approveStudent = async (req, res) => {
+exports.getActiveStudents = async (req, res) => {
+  // your function code
 
     try {
 
