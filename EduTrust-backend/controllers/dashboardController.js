@@ -1,8 +1,12 @@
 const Student = require("../models/student");
 
-exports.getDashboardStats = async (req, res) => {
+// ======================================
+// Dashboard Overview
+// ======================================
+exports.getDashboardOverview = async (req, res) => {
     try {
 
+        // School owner is the logged-in user
         const school_id = req.user.id;
 
         const totalStudents = await Student.countDocuments({
@@ -34,7 +38,7 @@ exports.getDashboardStats = async (req, res) => {
             status: "Archived"
         });
 
-        res.json({
+        res.status(200).json({
             success: true,
             dashboard: {
                 totalStudents,
@@ -47,6 +51,8 @@ exports.getDashboardStats = async (req, res) => {
         });
 
     } catch (err) {
+
+        console.error(err);
 
         res.status(500).json({
             success: false,
