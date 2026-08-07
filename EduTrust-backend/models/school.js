@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const SchoolSchema = new mongoose.Schema(
@@ -10,44 +11,49 @@ const SchoolSchema = new mongoose.Schema(
 
         email: {
             type: String,
-            required: true,
-            unique: true,
-            lowercase: true,
-            trim: true
+            trim: true,
+            lowercase: true
         },
 
         phone: {
             type: String,
+            trim: true,
             default: ""
         },
 
         address: {
             type: String,
+            trim: true,
             default: ""
         },
 
         school_type: {
             type: String,
+            trim: true,
             default: ""
         },
 
         academic_session: {
             type: String,
+            trim: true,
             default: ""
         },
 
         current_term: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        school_motto: {
+        motto: {
             type: String,
+            trim: true,
             default: ""
         },
 
         website: {
             type: String,
+            trim: true,
             default: ""
         },
 
@@ -56,10 +62,17 @@ const SchoolSchema = new mongoose.Schema(
             default: ""
         },
 
-        principal: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            default: null
+        principal_name: {
+            type: String,
+            trim: true,
+            default: ""
+        },
+
+        principal_email: {
+            type: String,
+            trim: true,
+            lowercase: true,
+            default: ""
         },
 
         status: {
