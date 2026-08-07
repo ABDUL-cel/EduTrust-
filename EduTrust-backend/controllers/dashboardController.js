@@ -1,74 +1,57 @@
 const Student = require("../models/student");
-const User = require("../models/user");
-const Parent = require("../models/parent");
-const Payment = require("../models/payment");
 
-exports.getDashboardOverview = async (req, res) => {
-
+exports.getDashboardStats = async (req, res) => {
     try {
 
-        const schoolId = req.user.school_id;
+        const school_id = req.user.id;
 
         const totalStudents = await Student.countDocuments({
-            school_id: schoolId,
-            status: "Active"
+            school_id
         });
 
         const pendingStudents = await Student.countDocuments({
-            school_id: schoolId,
+            school_id,
             status: "Pending"
         });
 
+        const activeStudents = await Student.countDocuments({
+            school_id,
+            status: "Active"
+        });
+
         const suspendedStudents = await Student.countDocuments({
-            school_id: schoolId,
+            school_id,
             status: "Suspended"
         });
 
-        const totalParents = await Parent.countDocuments({
-            school_id: schoolId
+        const graduatedStudents = await Student.countDocuments({
+            school_id,
+            status: "Graduated"
         });
 
-        const totalStaff = await User.countDocuments({
-            school_id: schoolId,
-            role: {
-                $ne: "Principal"
-            }
+        const archivedStudents = await Student.countDocuments({
+            school_id,
+            status: "Archived"
         });
 
         res.json({
-
             success: true,
-
-            overview: {
-
+            dashboard: {
                 totalStudents,
-
                 pendingStudents,
-
+                activeStudents,
                 suspendedStudents,
-
-                totalParents,
-
-                totalStaff,
-
-                feesCollected: 0,
-
-                outstandingFees: 0
-
+                graduatedStudents,
+                archivedStudents
             }
-
         });
 
     } catch (err) {
 
         res.status(500).json({
-
             success: false,
-
             message: err.message
-
         });
 
     }
-
 };
