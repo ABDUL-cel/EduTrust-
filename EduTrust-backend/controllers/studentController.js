@@ -103,8 +103,7 @@ exports.getPendingStudents = async (req, res) => {
 // =======================================
 // Active Students
 // =======================================
-exports.getActiveStudents = async (req, res) {
-  // your function cod
+exports.getActiveStudents = async (req, res) => {
 
     try {
 
@@ -137,36 +136,6 @@ exports.getActiveStudents = async (req, res) {
     }
 
 };
-
-// =======================================
-// Approve Student
-// =======================================
-exports.getActiveStudents = async (req, res) => {
-  // your function code
-
-    try {
-
-        const student = await Student.findById(req.params.id);
-
-        if (!student) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message: "Student not found."
-
-            });
-
-        }
-
-        student.status = "Active";
-
-        student.approved_by = req.user.id;
-
-        student.approved_at = new Date();
-
-        await student.save();
 
         res.json({
 
