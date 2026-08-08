@@ -11,13 +11,13 @@ school_id: {
 },
 
 
-        full_name: {
+        principal_name: {
             type: String,
             required: true,
             trim: true
         },
 
-        email: {
+        principal_email: {
             type: String,
             required: true,
             unique: true,
