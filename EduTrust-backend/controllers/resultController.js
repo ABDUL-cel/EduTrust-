@@ -507,3 +507,57 @@ exports.getSchoolResults = async (req, res) => {
         });
     }
 };
+// -----------------------------------
+// Verify student belongs to school
+// -----------------------------------
+const student = await Student.findOne({
+    _id: student_id,
+    school_id
+});
+
+if (!student) {
+    return res.status(404).json({
+        success: false,
+        message: "Student not found in your school."
+    });
+}
+
+
+// -----------------------------------
+// Teacher access restriction
+// -----------------------------------
+if (req.user.role === "Teacher") {
+
+    const Class = require("../models/class");
+
+    const teacherClass = await Class.findOne({
+        school_id,
+        class_teacher_id: req.user._id,
+        name: student.class_name,
+        arm: student.arm || "",
+        status: "Active"
+    });
+
+    if (!teacherClass) {
+        return res.status(403).json({
+            success: false,
+            message:
+                "You are not assigned to this student's class."
+        });
+    }
+
+    const subjectAssigned =
+        teacherClass.subjects.some(
+            subject =>
+                subject.toString() ===
+                subject_id.toString()
+        );
+
+    if (!subjectAssigned) {
+        return res.status(403).json({
+            success: false,
+            message:
+                "This subject is not assigned to your class."
+        });
+    }
+}
