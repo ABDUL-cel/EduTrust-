@@ -4,6 +4,7 @@
   "description": "Node.js Express API with MongoDB",
   "main": "server.js",
   "scripts": {
+    "migrate:schools": "node scripts/migrateSchools.js",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
