@@ -1,355 +1,260 @@
-const User = require("../models/user");
-const School = require("../models/school");
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
+const User = require("../models/user");
+const School = require("../models/school");
 
 const JWT_SECRET =
     process.env.JWT_SECRET || "edutrust_fallback_secret_key";
 
-const JWT_EXPIRES_IN =
-    process.env.JWT_EXPIRES_IN || "1d";
 
-/**
- * ==========================================
- * REGISTER SCHOOL ACCOUNT
- * POST /api/auth/register
- * Public
- * ==========================================
- */
+// =======================================
+// Generate JWT
+// =======================================
+const generateToken = (user) => {
+    return jwt.sign(
+        {
+            id: user._id,
+            role: user.role,
+            school_id: user.school_id || null
+        },
+        JWT_SECRET,
+        {
+            expiresIn: "7d"
+        }
+    );
+};
+
+
+// =======================================
+// Register User / School
+// =======================================
 exports.registerUser = async (req, res) => {
     try {
         const {
-            school_name,
-            school_email,
+            full_name,
+            email,
             phone,
-            address,
+            password,
+            school_name,
             school_type,
             academic_session,
             current_term,
+            address,
             school_motto,
-            website,
-            principal_name,
-            principal_email,
-            password
+            website
         } = req.body;
 
-        // ==========================================
-        // Validate required fields
-        // ==========================================
+        // -----------------------------------
+        // Required fields
+        // -----------------------------------
         if (
-            !school_name ||
-            !school_email ||
+            !full_name ||
+            !email ||
             !phone ||
-            !principal_name ||
-            !password
+            !password ||
+            !school_name
         ) {
             return res.status(400).json({
                 success: false,
-                message: "Please fill out all required fields."
+                message:
+                    "Full name, email, phone, password and school name are required."
             });
         }
 
-        const normalizedSchoolEmail = school_email
-            .toLowerCase()
-            .trim();
-
-        // ==========================================
-        // Check if school email already exists
-        // ==========================================
+        // -----------------------------------
+        // Check existing user
+        // -----------------------------------
         const existingUser = await User.findOne({
-            email: normalizedSchoolEmail
+            email: email.toLowerCase().trim()
         });
 
         if (existingUser) {
             return res.status(400).json({
                 success: false,
-                message:
-                    "A user with this school email already exists."
+                message: "An account with this email already exists."
             });
         }
 
-        // ==========================================
+        // -----------------------------------
+        // Hash password
+        // -----------------------------------
+        const hashedPassword = await bcrypt.hash(
+            password,
+            12
+        );
+
+        // -----------------------------------
+        // Create principal first
+        // -----------------------------------
+        const user = await User.create({
+            full_name,
+            email: email.toLowerCase().trim(),
+            phone,
+            password: hashedPassword,
+
+            // Principal owns the initial school account
+            role: "Principal",
+
+            school_name,
+            school_type: school_type || "",
+            academic_session: academic_session || "",
+            current_term: current_term || "",
+            address: address || "",
+            school_motto: school_motto || "",
+            website: website || "",
+
+            status: "Active"
+        });
+
+        // -----------------------------------
         // Create School
-        // ==========================================
+        // -----------------------------------
         const school = await School.create({
             name: school_name,
-            email: normalizedSchoolEmail,
+            email: email.toLowerCase().trim(),
             phone,
             address: address || "",
             school_type: school_type || "",
             academic_session: academic_session || "",
             current_term: current_term || "",
-            school_motto: school_motto || "",
+            motto: school_motto || "",
             website: website || "",
-            status: "Active"
-        });
 
-        // ==========================================
-        // Hash password
-        // ==========================================
-        const salt = await bcrypt.genSalt(10);
-
-        const hashedPassword = await bcrypt.hash(
-            password,
-            salt
-        );
-
-        // ==========================================
-        // Create Principal/User
-        // ==========================================
-        const newUser = await User.create({
-            school_id: school._id,
-
-            full_name: principal_name,
-
-            email: normalizedSchoolEmail,
-
-            phone,
-
-            password: hashedPassword,
-
-            school_name,
-
-            school_type: school_type || "",
-
-            academic_session:
-                academic_session || "",
-
-            current_term:
-                current_term || "",
-
-            address: address || "",
-
-            school_motto:
-                school_motto || "",
-
-            website:
-                website || "",
-
-            role: "Principal",
+            principal_id: user._id,
 
             status: "Active"
         });
 
-        // ==========================================
-        // Generate JWT
-        // ==========================================
-        const token = jwt.sign(
-            {
-                id: newUser._id,
-                school_id: school._id,
-                role: newUser.role
-            },
-            JWT_SECRET,
-            {
-                expiresIn: JWT_EXPIRES_IN
-            }
-        );
+        // -----------------------------------
+        // Link user to School
+        // -----------------------------------
+        user.school_id = school._id;
 
-        // ==========================================
-        // Response
-        // ==========================================
+        await user.save();
+
+        // -----------------------------------
+        // Generate token
+        // -----------------------------------
+        const token = generateToken(user);
+
         return res.status(201).json({
             success: true,
-
-            message:
-                "School account created successfully!",
+            message: "School account registered successfully.",
 
             token,
 
             user: {
-                id: newUser._id,
+                id: user._id,
+                full_name: user.full_name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                school_id: user.school_id
+            },
 
-                school_id: school._id,
-
-                full_name:
-                    newUser.full_name,
-
-                email:
-                    newUser.email,
-
-                role:
-                    newUser.role,
-
-                school_name:
-                    newUser.school_name,
-
-                phone:
-                    newUser.phone,
-
-                address:
-                    newUser.address,
-
-                school_type:
-                    newUser.school_type,
-
-                academic_session:
-                    newUser.academic_session,
-
-                current_term:
-                    newUser.current_term
+            school: {
+                id: school._id,
+                name: school.name,
+                status: school.status
             }
         });
 
     } catch (error) {
-
         console.error(
-            "REGISTER ERROR:",
+            "REGISTER USER ERROR:",
             error
         );
 
         return res.status(500).json({
             success: false,
-            message:
-                "Server error during registration.",
-            error: error.message
+            message: error.message
         });
     }
 };
 
 
-/**
- * ==========================================
- * LOGIN USER
- * POST /api/auth/login
- * Public
- * ==========================================
- */
+// =======================================
+// Login
+// =======================================
 exports.loginUser = async (req, res) => {
     try {
-
         const {
             email,
             password
         } = req.body;
 
-        // ==========================================
-        // Validate input
-        // ==========================================
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
                 message:
-                    "Please provide email and password."
+                    "Email and password are required."
             });
         }
 
-        const normalizedEmail =
-            email.toLowerCase().trim();
-
-        // ==========================================
-        // Find user
-        // ==========================================
         const user = await User.findOne({
-            email: normalizedEmail
+            email: email.toLowerCase().trim()
         });
 
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message:
-                    "Invalid credentials."
+                message: "Invalid email or password."
             });
         }
 
-        // ==========================================
-        // Check password
-        // ==========================================
-        const isMatch =
+        if (user.status !== "Active") {
+            return res.status(403).json({
+                success: false,
+                message:
+                    "Your account is not active."
+            });
+        }
+
+        const passwordMatch =
             await bcrypt.compare(
                 password,
                 user.password
             );
 
-        if (!isMatch) {
+        if (!passwordMatch) {
             return res.status(401).json({
                 success: false,
                 message:
-                    "Invalid credentials."
+                    "Invalid email or password."
             });
         }
 
-        // ==========================================
-        // Check account status
-        // ==========================================
-        if (user.status !== "Active") {
-            return res.status(403).json({
-                success: false,
-                message:
-                    `Your account is ${user.status.toLowerCase()}. Please contact the school administrator.`
-            });
-        }
-
-        // ==========================================
+        // -----------------------------------
         // Update last login
-        // ==========================================
+        // -----------------------------------
         user.last_login = new Date();
 
         await user.save();
 
-        // ==========================================
-        // Generate JWT
-        // ==========================================
-        const token = jwt.sign(
-            {
-                id: user._id,
-                school_id: user.school_id,
-                role: user.role
-            },
-            JWT_SECRET,
-            {
-                expiresIn: JWT_EXPIRES_IN
-            }
-        );
+        // -----------------------------------
+        // Generate token
+        // -----------------------------------
+        const token = generateToken(user);
 
-        // ==========================================
-        // Response
-        // ==========================================
         return res.status(200).json({
             success: true,
-
-            message:
-                "Login successful.",
+            message: "Login successful.",
 
             token,
 
             user: {
                 id: user._id,
-
-                school_id:
-                    user.school_id,
-
-                full_name:
-                    user.full_name,
-
-                email:
-                    user.email,
-
-                role:
-                    user.role,
-
-                school_name:
-                    user.school_name,
-
-                phone:
-                    user.phone,
-
-                address:
-                    user.address,
-
-                school_type:
-                    user.school_type,
-
-                academic_session:
-                    user.academic_session,
-
-                current_term:
-                    user.current_term
+                full_name: user.full_name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                school_id: user.school_id
             }
         });
 
     } catch (error) {
-
         console.error(
             "LOGIN ERROR:",
             error
@@ -357,44 +262,45 @@ exports.loginUser = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message:
-                "Server error during login.",
-            error: error.message
+            message: error.message
         });
     }
 };
 
 
-/**
- * ==========================================
- * GET CURRENT USER
- * GET /api/auth/profile
- * Private
- * ==========================================
- */
+// =======================================
+// Get Logged-in User
+// =======================================
 exports.getMe = async (req, res) => {
     try {
-
-        const user =
-            await User.findById(
-                req.user.id
-            ).select("-password");
+        const user = await User.findById(
+            req.user._id
+        ).select("-password");
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message:
-                    "User not found."
+                message: "User not found."
             });
+        }
+
+        let school = null;
+
+        if (user.school_id) {
+            school = await School.findById(
+                user.school_id
+            );
         }
 
         return res.status(200).json({
             success: true,
-            user
+
+            user,
+
+            school
         });
 
     } catch (error) {
-
         console.error(
             "GET ME ERROR:",
             error
@@ -402,9 +308,7 @@ exports.getMe = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message:
-                "Server error retrieving user.",
-            error: error.message
+            message: error.message
         });
     }
 };
