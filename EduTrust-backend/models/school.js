@@ -11,50 +11,51 @@ const SchoolSchema = new mongoose.Schema(
 
         email: {
             type: String,
-            trim: true,
-            lowercase: true
+            required: true,
+            lowercase: true,
+            trim: true
         },
 
         phone: {
             type: String,
-            trim: true,
-            default: ""
+            default: "",
+            trim: true
         },
 
         address: {
             type: String,
-            trim: true,
-            default: ""
+            default: "",
+            trim: true
         },
 
         school_type: {
             type: String,
-            trim: true,
-            default: ""
+            default: "",
+            trim: true
         },
 
         academic_session: {
             type: String,
-            trim: true,
-            default: ""
+            default: "",
+            trim: true
         },
 
         current_term: {
             type: String,
-            trim: true,
-            default: ""
+            default: "",
+            trim: true
         },
 
         motto: {
             type: String,
-            trim: true,
-            default: ""
+            default: "",
+            trim: true
         },
 
         website: {
             type: String,
-            trim: true,
-            default: ""
+            default: "",
+            trim: true
         },
 
         logo: {
@@ -62,22 +63,19 @@ const SchoolSchema = new mongoose.Schema(
             default: ""
         },
 
-        principal_name: {
-            type: String,
-            trim: true,
-            default: ""
-        },
-
-        principal_email: {
-            type: String,
-            trim: true,
-            lowercase: true,
-            default: ""
+        principal_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
         },
 
         status: {
             type: String,
-            enum: ["Active", "Inactive", "Suspended"],
+            enum: [
+                "Active",
+                "Inactive",
+                "Suspended"
+            ],
             default: "Active"
         }
     },
@@ -88,5 +86,9 @@ const SchoolSchema = new mongoose.Schema(
         }
     }
 );
+
+SchoolSchema.index({
+    email: 1
+});
 
 module.exports = mongoose.model("School", SchoolSchema);
