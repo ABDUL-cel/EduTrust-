@@ -1,18 +1,110 @@
-const express = require('express');
+
+const express = require("express");
+
 const router = express.Router();
-const { 
-    uploadResult, 
-    checkResultStatus, 
-    verifyResultPayment 
-} = require('../controllers/resultController');
 
-// Admin/Teacher route to post exam scores
-router.post('/upload', uploadResult);
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
-// Student search route
-router.post('/check-status', checkResultStatus);
+const {
+    createResult,
+    updateResult,
+    submitResult,
+    publishResult,
+    getStudentResults,
+    getSchoolResults
+} = require("../controllers/resultController");
 
-// Payment confirmation route
-router.post('/verify-payment', verifyResultPayment);
+
+// =======================================
+// Authentication
+// =======================================
+router.use(authMiddleware);
+
+
+// =======================================
+// Get School Results
+// Principal / Vice Principal / Teacher
+// =======================================
+router.get(
+    "/",
+    roleMiddleware(
+        "Principal",
+        "Vice Principal",
+        "Teacher"
+    ),
+    getSchoolResults
+);
+
+
+// =======================================
+// Get Student Results
+// =======================================
+router.get(
+    "/student/:studentId",
+    roleMiddleware(
+        "Principal",
+        "Vice Principal",
+        "Teacher"
+    ),
+    getStudentResults
+);
+
+
+// =======================================
+// Create Result
+// =======================================
+router.post(
+    "/",
+    roleMiddleware(
+        "Principal",
+        "Vice Principal",
+        "Teacher"
+    ),
+    createResult
+);
+
+
+// =======================================
+// Update Result
+// =======================================
+router.put(
+    "/:id",
+    roleMiddleware(
+        "Principal",
+        "Vice Principal",
+        "Teacher"
+    ),
+    updateResult
+);
+
+
+// =======================================
+// Submit Result
+// =======================================
+router.patch(
+    "/:id/submit",
+    roleMiddleware(
+        "Principal",
+        "Vice Principal",
+        "Teacher"
+    ),
+    submitResult
+);
+
+
+// =======================================
+// Publish Result
+// Principal / Vice Principal only
+// =======================================
+router.patch(
+    "/:id/publish",
+    roleMiddleware(
+        "Principal",
+        "Vice Principal"
+    ),
+    publishResult
+);
+
 
 module.exports = router;
