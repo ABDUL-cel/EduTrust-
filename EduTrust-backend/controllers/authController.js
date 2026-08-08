@@ -35,6 +35,7 @@ exports.registerUser = async (req, res) => {
         const {
             principal_name,
             principal_email,
+            school_email
             phone,
             password,
             school_name,
