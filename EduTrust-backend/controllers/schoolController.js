@@ -2,20 +2,17 @@
 const School = require("../models/school");
 
 // =======================================
-// Get My School Profile
+// Get Current School
 // =======================================
-exports.getMySchool = async (req, res) => {
+exports.getCurrentSchool = async (req, res) => {
     try {
-        const schoolId = req.user.school_id;
+        const school_id = req.user.school_id;
 
-        if (!schoolId) {
-            return res.status(400).json({
-                success: false,
-                message: "School account is not linked to a school."
-            });
-        }
-
-        const school = await School.findById(schoolId);
+        const school = await School.findById(school_id)
+            .populate(
+                "principal_id",
+                "full_name email phone role status"
+            );
 
         if (!school) {
             return res.status(404).json({
@@ -30,33 +27,23 @@ exports.getMySchool = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("GET SCHOOL ERROR:", error);
+        console.error("GET CURRENT SCHOOL ERROR:", error);
 
         return res.status(500).json({
             success: false,
-            message: "Server error retrieving school profile."
+            message: error.message
         });
     }
 };
 
 
 // =======================================
-// Update My School Profile
+// Update Current School
 // =======================================
-exports.updateMySchool = async (req, res) => {
+exports.updateCurrentSchool = async (req, res) => {
     try {
-        const schoolId = req.user.school_id;
-
-        if (!schoolId) {
-            return res.status(400).json({
-                success: false,
-                message: "School account is not linked to a school."
-            });
-        }
-
         const allowedFields = [
             "name",
-            "email",
             "phone",
             "address",
             "school_type",
@@ -64,9 +51,7 @@ exports.updateMySchool = async (req, res) => {
             "current_term",
             "motto",
             "website",
-            "logo",
-            "principal_name",
-            "principal_email"
+            "logo"
         ];
 
         const updates = {};
@@ -78,7 +63,7 @@ exports.updateMySchool = async (req, res) => {
         });
 
         const school = await School.findByIdAndUpdate(
-            schoolId,
+            req.user.school_id,
             updates,
             {
                 new: true,
@@ -95,7 +80,7 @@ exports.updateMySchool = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "School profile updated successfully.",
+            message: "School information updated successfully.",
             school
         });
 
@@ -104,7 +89,7 @@ exports.updateMySchool = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Server error updating school profile."
+            message: error.message
         });
     }
 };
