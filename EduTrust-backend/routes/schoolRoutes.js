@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
 const {
     getCurrentSchool,
@@ -12,21 +13,29 @@ const {
 
 
 // =======================================
-// All school routes require authentication
+// Authentication
 // =======================================
 router.use(authMiddleware);
 
 
 // =======================================
-// Current School
+// View School
 // =======================================
+router.get(
+    "/",
+    getCurrentSchool
+);
 
-// GET /api/school
-router.get("/", getCurrentSchool);
 
-
-// PUT /api/school
-router.put("/", updateCurrentSchool);
+// =======================================
+// Update School
+// Principal only
+// =======================================
+router.put(
+    "/",
+    roleMiddleware("Principal"),
+    updateCurrentSchool
+);
 
 
 module.exports = router;
