@@ -65,6 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
             message.textContent = "Password must be at least 6 characters.";
             return;
         }
+        
+        if (phone.length < 11) {
+            message.style.color = "red";
+            message.textContent = "Password must be at least 11 characters.";
+            return;
+        }
 
         if (password !== confirmPassword) {
             message.style.color = "red";
