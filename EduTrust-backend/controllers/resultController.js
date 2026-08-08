@@ -1,7 +1,7 @@
 
 const Result = require("../models/result");
 const Student = require("../models/student");
-
+const AssessmentStructure =require("../models/assessmentStructure");
 
 // =======================================
 // Calculate Grade
