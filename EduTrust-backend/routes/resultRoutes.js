@@ -140,7 +140,3 @@ ResultSchema.index(
 );
 
 
-module.exports = mongoose.model(
-    "Result",
-    ResultSchema
-);
