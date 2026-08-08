@@ -3,6 +3,7 @@ const Result = require("../models/result");
 const Student = require("../models/student");
 const AssessmentStructure =require("../models/assessmentStructure");
 
+
 // =======================================
 // Calculate Grade
 // =======================================
@@ -48,57 +49,70 @@ const calculateRemark = (grade) => {
 // =======================================
 exports.createResult = async (req, res) => {
     try {
-        const school_id = req.user.school_id;
+        const schoolId = req.user.school_id;
 
         const {
+            studentId,
             student_id,
+            studentName,
+            subjectName,
+            subject_name,
+            subjectId,
             subject_id,
+            academicSession,
             academic_session,
             term,
+            classLevel,
             class_name,
-            arm,
+            assessment_structure_id,
+            assessment_breakdown,
+            caScore,
             ca_score,
+            examScore,
             exam_score
         } = req.body;
 
 
+        // -----------------------------------
+        // Support both old and new request names
+        // -----------------------------------
+        const finalStudentId =
+            studentId || student_id;
+
+        const finalSubjectName =
+            subjectName || subject_name;
+
+        const finalAcademicSession =
+            academicSession || academic_session;
+
+        const finalClassLevel =
+            classLevel || class_name;
+
+
+        // -----------------------------------
+        // Basic validation
+        // -----------------------------------
         if (
-            !student_id ||
-            !subject_id ||
-            !academic_session ||
+            !finalStudentId ||
+            !finalSubjectName ||
+            !finalAcademicSession ||
             !term ||
-            !class_name
+            !finalClassLevel
         ) {
             return res.status(400).json({
                 success: false,
                 message:
                     "Student, subject, session, term and class are required."
             });
-            
         }
-const assessmentStructure =
-    await AssessmentStructure.findOne({
-        _id: req.body.assessment_structure_id,
-        school_id,
-        academic_session,
-        term,
-        status: "Active"
-    });
 
-if (!assessmentStructure) {
-    return res.status(404).json({
-        success: false,
-        message:
-            "Active assessment structure not found for this session and term."
-    });
-}
 
         // -----------------------------------
         // Verify student belongs to school
         // -----------------------------------
         const student = await Student.findOne({
-            _id: student_id,
-            school_id
+            _id: finalStudentId,
+            school_id: schoolId
         });
 
 
@@ -108,7 +122,6 @@ if (!assessmentStructure) {
                 message:
                     "Student not found in your school."
             });
-            
         }
 
 
@@ -116,15 +129,20 @@ if (!assessmentStructure) {
         // Teacher access restriction
         // -----------------------------------
         if (req.user.role === "Teacher") {
-            const Class = require("../models/class");
+            const Class =
+                require("../models/class");
 
-            const teacherClass = await Class.findOne({
-                school_id,
-                class_teacher_id: req.user._id,
-                name: student.class_name,
-                arm: student.arm || "",
-                status: "Active"
-            });
+            const teacherClass =
+                await Class.findOne({
+                    school_id: schoolId,
+                    class_teacher_id:
+                        req.user._id,
+                    name:
+                        student.class_name,
+                    arm:
+                        student.arm || "",
+                    status: "Active"
+                });
 
 
             if (!teacherClass) {
@@ -136,78 +154,439 @@ if (!assessmentStructure) {
             }
 
 
-            const subjectAssigned =
-                teacherClass.subjects.some(
-                    subject =>
-                        subject.toString() ===
-                        subject_id.toString()
-                );
+            // Only check subject assignment
+            // when the request supplied a subject ID
+            if (
+                subjectId ||
+                subject_id
+            ) {
+                const finalSubjectId =
+                    subjectId || subject_id;
+
+                const subjectAssigned =
+                    Array.isArray(
+                        teacherClass.subjects
+                    ) &&
+                    teacherClass.subjects.some(
+                        subject =>
+                            subject.toString() ===
+                            finalSubjectId.toString()
+                    );
 
 
-            if (!subjectAssigned) {
-                return res.status(403).json({
-                    success: false,
-                    message:
-                        "This subject is not assigned to your class."
-                });
+                if (!subjectAssigned) {
+                    return res.status(403).json({
+                        success: false,
+                        message:
+                            "This subject is not assigned to your class."
+                    });
+                }
             }
         }
 
 
-        // -----------------------------------
-        // Validate scores
-        // -----------------------------------
-        const ca = Number(ca_score || 0);
-        const exam = Number(exam_score || 0);
+        // ===================================
+        // Assessment Structure
+        // ===================================
+        let assessmentStructure = null;
+        let calculatedBreakdown = [];
+        let totalScore = 0;
 
 
-        if (
-            ca < 0 ||
-            ca > 40 ||
-            exam < 0 ||
-            exam > 60
-        ) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "CA must be between 0-40 and examination score between 0-60."
-            });
+        if (assessment_structure_id) {
+
+            assessmentStructure =
+                await AssessmentStructure.findOne({
+                    _id:
+                        assessment_structure_id,
+
+                    school_id:
+                        schoolId,
+
+                    academic_session:
+                        finalAcademicSession,
+
+                    term,
+
+                    status: "Active"
+                });
+
+
+            if (!assessmentStructure) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Active assessment structure not found for this session and term."
+                });
+            }
+
+
+            const submittedBreakdown =
+                Array.isArray(
+                    assessment_breakdown
+                )
+                    ? assessment_breakdown
+                    : [];
+
+
+            if (
+                submittedBreakdown.length !==
+                assessmentStructure.components.length
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Assessment breakdown does not match the selected assessment structure."
+                });
+            }
+
+
+            calculatedBreakdown =
+                assessmentStructure.components.map(
+                    component => {
+
+                        const submitted =
+                            submittedBreakdown.find(
+                                item =>
+                                    item.component_id &&
+                                    item.component_id.toString() ===
+                                    component._id.toString()
+                            );
+
+
+                        if (!submitted) {
+                            throw new Error(
+                                `Missing assessment component: ${component.name}`
+                            );
+                        }
+
+
+                        const rawScore =
+                            Number(
+                                submitted.raw_score
+                            );
+
+
+                        if (
+                            Number.isNaN(
+                                rawScore
+                            ) ||
+                            rawScore < 0 ||
+                            rawScore >
+                                component.max_score
+                        ) {
+                            throw new Error(
+                                `${component.name} score must be between 0 and ${component.max_score}.`
+                            );
+                        }
+
+
+                        const percentageScore =
+                            (
+                                rawScore /
+                                component.max_score
+                            ) * 100;
+
+
+                        const weightedScore =
+                            (
+                                percentageScore *
+                                component.percentage
+                            ) / 100;
+
+
+                        totalScore +=
+                            weightedScore;
+
+
+                        return {
+                            component_id:
+                                component._id,
+
+                            component_name:
+                                component.name,
+
+                            raw_score:
+                                rawScore,
+
+                            max_score:
+                                component.max_score,
+
+                            percentage:
+                                component.percentage,
+
+                            weighted_score:
+                                Number(
+                                    weightedScore.toFixed(
+                                        2
+                                    )
+                                )
+                        };
+                    }
+                );
+
+        } else {
+
+            // --------------------------------
+            // Backward-compatible CA + Exam
+            // --------------------------------
+            const ca =
+                Number(
+                    caScore !== undefined
+                        ? caScore
+                        : ca_score || 0
+                );
+
+
+            const exam =
+                Number(
+                    examScore !== undefined
+                        ? examScore
+                        : exam_score || 0
+                );
+
+
+            if (
+                ca < 0 ||
+                ca > 40 ||
+                exam < 0 ||
+                exam > 60
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "CA must be between 0-40 and examination score between 0-60."
+                });
+            }
+
+
+            totalScore =
+                ca + exam;
+
+
+            calculatedBreakdown = [
+                {
+                    component_id: null,
+                    component_name:
+                        "Continuous Assessment",
+                    raw_score: ca,
+                    max_score: 40,
+                    percentage: 40,
+                    weighted_score: ca
+                },
+                {
+                    component_id: null,
+                    component_name:
+                        "Examination",
+                    raw_score: exam,
+                    max_score: 60,
+                    percentage: 60,
+                    weighted_score: exam
+                }
+            ];
         }
 
 
-        // -----------------------------------
-        // Calculate result
-        // -----------------------------------
-        const total = ca + exam;
+        // ===================================
+        // Grade and Remark
+        // ===================================
+        const grade =
+            calculateGrade(
+                totalScore
+            );
 
-        const grade = calculateGrade(total);
+        const remark =
+            calculateRemark(
+                grade
+            );
 
-        const remark = calculateRemark(grade);
+
+        // ===================================
+        // Check existing result
+        // ===================================
+        let result =
+            await Result.findOne({
+                schoolId,
+                studentId:
+                    finalStudentId,
+                academicSession:
+                    finalAcademicSession,
+                term
+            });
 
 
-        // -----------------------------------
-        // Create result
-        // -----------------------------------
-        const result = await Result.create({
-            school_id,
-            student_id,
-            subject_id,
-            academic_session,
-            term,
-            class_name,
-            arm: arm || student.arm || "",
+        // ===================================
+        // Subject Entry
+        // ===================================
+        const newSubject = {
+            subjectName:
+                finalSubjectName,
 
-            ca_score: ca,
-            exam_score: exam,
-            total_score: total,
+            caScore:
+                Number(
+                    caScore !== undefined
+                        ? caScore
+                        : ca_score || 0
+                ),
 
-            grade,
-            remark,
+            examScore:
+                Number(
+                    examScore !== undefined
+                        ? examScore
+                        : exam_score || 0
+                ),
 
-            teacher_id: req.user._id,
+            totalScore:
+                Number(
+                    totalScore.toFixed(2)
+                ),
 
-            status: "Draft"
-        });
+            grade
+        };
+
+
+        if (result) {
+
+            // --------------------------------
+            // Prevent duplicate subject
+            // --------------------------------
+            const existingSubject =
+                result.subjects.find(
+                    subject =>
+                        subject.subjectName
+                            .toLowerCase() ===
+                        finalSubjectName
+                            .toLowerCase()
+                );
+
+
+            if (existingSubject) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "A result already exists for this subject."
+                });
+            }
+
+
+            result.subjects.push(
+                newSubject
+            );
+
+
+            // --------------------------------
+            // Update assessment information
+            // --------------------------------
+            if (
+                assessmentStructure
+            ) {
+                result.assessment_structure_id =
+                    assessmentStructure._id;
+
+                result.assessment_breakdown =
+                    calculatedBreakdown;
+            }
+
+
+        } else {
+
+            // --------------------------------
+            // Create first subject result
+            // --------------------------------
+            result =
+                new Result({
+                    studentId:
+                        finalStudentId,
+
+                    studentName:
+                        studentName ||
+                        `${student.first_name || ""} ${student.last_name || ""}`.trim(),
+
+                    schoolId,
+
+                    academicSession:
+                        finalAcademicSession,
+
+                    term,
+
+                    classLevel:
+                        finalClassLevel,
+
+                    assessment_structure_id:
+                        assessmentStructure
+                            ? assessmentStructure._id
+                            : null,
+
+                    assessment_breakdown:
+                        calculatedBreakdown,
+
+                    subjects: [
+                        newSubject
+                    ],
+
+                    totalMarksObtained:
+                        Number(
+                            totalScore.toFixed(2)
+                        ),
+
+                    averageScore:
+                        Number(
+                            totalScore.toFixed(2)
+                        ),
+
+                    remarks:
+                        remark,
+
+                    status:
+                        "Draft"
+                });
+        }
+
+
+        // ===================================
+        // Recalculate Overall Result
+        // ===================================
+        const totalMarks =
+            result.subjects.reduce(
+                (sum, subject) =>
+                    sum +
+                    Number(
+                        subject.totalScore || 0
+                    ),
+                0
+            );
+
+
+        const average =
+            result.subjects.length
+                ? totalMarks /
+                    result.subjects.length
+                : 0;
+
+
+        const overallGrade =
+            calculateGrade(
+                average
+            );
+
+
+        result.totalMarksObtained =
+            Number(
+                totalMarks.toFixed(2)
+            );
+
+        result.averageScore =
+            Number(
+                average.toFixed(2)
+            );
+
+        result.remarks =
+            calculateRemark(
+                overallGrade
+            );
+
+
+        await result.save();
 
 
         return res.status(201).json({
@@ -226,18 +605,10 @@ if (!assessmentStructure) {
         );
 
 
-        if (error.code === 11000) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "A result already exists for this student, subject, session and term."
-            });
-        }
-
-
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                error.message
         });
     }
 };
@@ -246,23 +617,35 @@ if (!assessmentStructure) {
 // =======================================
 // Update Result
 // =======================================
-exports.updateResult = async (req, res) => {
+exports.updateResult = async (
+    req,
+    res
+) => {
     try {
-        const result = await Result.findOne({
-            _id: req.params.id,
-            school_id: req.user.school_id
-        });
+
+        const result =
+            await Result.findOne({
+                _id:
+                    req.params.id,
+
+                schoolId:
+                    req.user.school_id
+            });
 
 
         if (!result) {
             return res.status(404).json({
                 success: false,
-                message: "Result not found."
+                message:
+                    "Result not found."
             });
         }
 
 
-        if (result.status === "Published") {
+        if (
+            result.status ===
+            "Published"
+        ) {
             return res.status(400).json({
                 success: false,
                 message:
@@ -271,52 +654,187 @@ exports.updateResult = async (req, res) => {
         }
 
 
-        const ca = Number(
-            req.body.ca_score !== undefined
-                ? req.body.ca_score
-                : result.ca_score
-        );
-
-
-        const exam = Number(
-            req.body.exam_score !== undefined
-                ? req.body.exam_score
-                : result.exam_score
-        );
-
-
         if (
-            ca < 0 ||
-            ca > 40 ||
-            exam < 0 ||
-            exam > 60
+            Array.isArray(
+                req.body.assessment_breakdown
+            ) &&
+            result.assessment_structure_id
         ) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "CA must be between 0-40 and examination score between 0-60."
-            });
+
+            const structure =
+                await AssessmentStructure.findOne({
+                    _id:
+                        result.assessment_structure_id,
+
+                    school_id:
+                        req.user.school_id,
+
+                    status: "Active"
+                });
+
+
+            if (!structure) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Assessment structure not found."
+                });
+            }
+
+
+            let totalScore = 0;
+
+
+            const breakdown =
+                structure.components.map(
+                    component => {
+
+                        const submitted =
+                            req.body.assessment_breakdown.find(
+                                item =>
+                                    item.component_id &&
+                                    item.component_id.toString() ===
+                                    component._id.toString()
+                            );
+
+
+                        if (!submitted) {
+                            throw new Error(
+                                `Missing assessment component: ${component.name}`
+                            );
+                        }
+
+
+                        const rawScore =
+                            Number(
+                                submitted.raw_score
+                            );
+
+
+                        if (
+                            rawScore < 0 ||
+                            rawScore >
+                                component.max_score
+                        ) {
+                            throw new Error(
+                                `${component.name} score is invalid.`
+                            );
+                        }
+
+
+                        const weighted =
+                            (
+                                rawScore /
+                                component.max_score
+                            ) *
+                                component.percentage;
+
+
+                        totalScore +=
+                            weighted;
+
+
+                        return {
+                            component_id:
+                                component._id,
+
+                            component_name:
+                                component.name,
+
+                            raw_score:
+                                rawScore,
+
+                            max_score:
+                                component.max_score,
+
+                            percentage:
+                                component.percentage,
+
+                            weighted_score:
+                                Number(
+                                    weighted.toFixed(
+                                        2
+                                    )
+                                )
+                        };
+                    }
+                );
+
+
+            result.assessment_breakdown =
+                breakdown;
+
+
+            const grade =
+                calculateGrade(
+                    totalScore
+                );
+
+
+            const subject =
+                result.subjects[0];
+
+
+            if (subject) {
+                subject.totalScore =
+                    Number(
+                        totalScore.toFixed(2)
+                    );
+
+                subject.grade =
+                    grade;
+            }
         }
 
 
-        const total = ca + exam;
+        if (
+            Array.isArray(
+                result.subjects
+            )
+        ) {
 
-        const grade = calculateGrade(total);
+            const totalMarks =
+                result.subjects.reduce(
+                    (sum, subject) =>
+                        sum +
+                        Number(
+                            subject.totalScore ||
+                            0
+                        ),
+                    0
+                );
 
-        const remark = calculateRemark(grade);
+
+            const average =
+                result.subjects.length
+                    ? totalMarks /
+                        result.subjects.length
+                    : 0;
 
 
-        result.ca_score = ca;
-        result.exam_score = exam;
-        result.total_score = total;
-        result.grade = grade;
-        result.remark = remark;
+            result.totalMarksObtained =
+                Number(
+                    totalMarks.toFixed(2)
+                );
+
+            result.averageScore =
+                Number(
+                    average.toFixed(2)
+                );
+
+            result.remarks =
+                calculateRemark(
+                    calculateGrade(
+                        average
+                    )
+                );
+        }
 
 
         await result.save();
 
 
-        return res.status(200).json({
+        return res.json({
             success: true,
             message:
                 "Result updated successfully.",
@@ -334,7 +852,8 @@ exports.updateResult = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                error.message
         });
     }
 };
@@ -343,23 +862,35 @@ exports.updateResult = async (req, res) => {
 // =======================================
 // Submit Result
 // =======================================
-exports.submitResult = async (req, res) => {
+exports.submitResult = async (
+    req,
+    res
+) => {
     try {
-        const result = await Result.findOne({
-            _id: req.params.id,
-            school_id: req.user.school_id
-        });
+
+        const result =
+            await Result.findOne({
+                _id:
+                    req.params.id,
+
+                schoolId:
+                    req.user.school_id
+            });
 
 
         if (!result) {
             return res.status(404).json({
                 success: false,
-                message: "Result not found."
+                message:
+                    "Result not found."
             });
         }
 
 
-        if (result.status === "Published") {
+        if (
+            result.status ===
+            "Published"
+        ) {
             return res.status(400).json({
                 success: false,
                 message:
@@ -368,14 +899,17 @@ exports.submitResult = async (req, res) => {
         }
 
 
-        result.status = "Submitted";
-        result.submitted_at = new Date();
+        result.status =
+            "Submitted";
+
+        result.submittedAt =
+            new Date();
 
 
         await result.save();
 
 
-        return res.status(200).json({
+        return res.json({
             success: true,
             message:
                 "Result submitted for approval.",
@@ -393,7 +927,8 @@ exports.submitResult = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                error.message
         });
     }
 };
@@ -402,23 +937,35 @@ exports.submitResult = async (req, res) => {
 // =======================================
 // Publish Result
 // =======================================
-exports.publishResult = async (req, res) => {
+exports.publishResult = async (
+    req,
+    res
+) => {
     try {
-        const result = await Result.findOne({
-            _id: req.params.id,
-            school_id: req.user.school_id
-        });
+
+        const result =
+            await Result.findOne({
+                _id:
+                    req.params.id,
+
+                schoolId:
+                    req.user.school_id
+            });
 
 
         if (!result) {
             return res.status(404).json({
                 success: false,
-                message: "Result not found."
+                message:
+                    "Result not found."
             });
         }
 
 
-        if (result.status === "Published") {
+        if (
+            result.status ===
+            "Published"
+        ) {
             return res.status(400).json({
                 success: false,
                 message:
@@ -427,15 +974,20 @@ exports.publishResult = async (req, res) => {
         }
 
 
-        result.status = "Published";
-        result.published_at = new Date();
-        result.published_by = req.user._id;
+        result.status =
+            "Published";
+
+        result.publishedAt =
+            new Date();
+
+        result.publishedBy =
+            req.user._id;
 
 
         await result.save();
 
 
-        return res.status(200).json({
+        return res.json({
             success: true,
             message:
                 "Result published successfully.",
@@ -453,7 +1005,8 @@ exports.publishResult = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                error.message
         });
     }
 };
@@ -462,117 +1015,128 @@ exports.publishResult = async (req, res) => {
 // =======================================
 // Get Student Results
 // =======================================
-exports.getStudentResults = async (req, res) => {
-    try {
-        const results = await Result.find({
-            school_id: req.user.school_id,
-            student_id: req.params.studentId,
-            status: "Published"
-        })
-            .populate(
-                "student_id",
-                "first_name last_name admission_number class_name arm"
-            )
-            .populate(
-                "subject_id",
-                "name code"
-            )
-            .populate(
-                "teacher_id",
-                "full_name"
-            )
-            .sort({
-                academic_session: -1,
-                term: 1
+exports.getStudentResults =
+    async (
+        req,
+        res
+    ) => {
+        try {
+
+            const results =
+                await Result.find({
+                    schoolId:
+                        req.user.school_id,
+
+                    studentId:
+                        req.params.studentId,
+
+                    status:
+                        "Published"
+                })
+                    .sort({
+                        academicSession:
+                            -1,
+
+                        createdAt:
+                            -1
+                    });
+
+
+            return res.json({
+                success: true,
+                count:
+                    results.length,
+                results
             });
 
 
-        return res.status(200).json({
-            success: true,
-            count: results.length,
-            results
-        });
+        } catch (error) {
+
+            console.error(
+                "GET STUDENT RESULTS ERROR:",
+                error
+            );
 
 
-    } catch (error) {
-
-        console.error(
-            "GET STUDENT RESULTS ERROR:",
-            error
-        );
-
-
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-};
+            return res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    };
 
 
 // =======================================
 // Get School Results
 // =======================================
-exports.getSchoolResults = async (req, res) => {
-    try {
-        const filter = {
-            school_id: req.user.school_id
-        };
+exports.getSchoolResults =
+    async (
+        req,
+        res
+    ) => {
+        try {
+
+            const filter = {
+                schoolId:
+                    req.user.school_id
+            };
 
 
-        if (req.query.session) {
-            filter.academic_session =
-                req.query.session;
-        }
+            if (
+                req.query.session
+            ) {
+                filter.academicSession =
+                    req.query.session;
+            }
 
 
-        if (req.query.term) {
-            filter.term = req.query.term;
-        }
+            if (
+                req.query.term
+            ) {
+                filter.term =
+                    req.query.term;
+            }
 
 
-        if (req.query.class_name) {
-            filter.class_name =
-                req.query.class_name;
-        }
+            if (
+                req.query.class_name
+            ) {
+                filter.classLevel =
+                    req.query.class_name;
+            }
 
 
-        const results = await Result.find(filter)
-            .populate(
-                "student_id",
-                "first_name last_name admission_number class_name arm"
-            )
-            .populate(
-                "subject_id",
-                "name code"
-            )
-            .populate(
-                "teacher_id",
-                "full_name"
-            )
-            .sort({
-                created_at: -1
+            const results =
+                await Result.find(
+                    filter
+                )
+                    .sort({
+                        createdAt:
+                            -1
+                    });
+
+
+            return res.json({
+                success: true,
+                count:
+                    results.length,
+                results
             });
 
 
-        return res.status(200).json({
-            success: true,
-            count: results.length,
-            results
-        });
+        } catch (error) {
+
+            console.error(
+                "GET SCHOOL RESULTS ERROR:",
+                error
+            );
 
 
-    } catch (error) {
-
-        console.error(
-            "GET SCHOOL RESULTS ERROR:",
-            error
-        );
-
-
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-};
+            return res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    };
