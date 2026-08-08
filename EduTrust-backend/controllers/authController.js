@@ -33,8 +33,8 @@ const generateToken = (user) => {
 exports.registerUser = async (req, res) => {
     try {
         const {
-            full_name,
-            email,
+            principal_name,
+            principal_email,
             phone,
             password,
             school_name,
@@ -43,6 +43,7 @@ exports.registerUser = async (req, res) => {
             current_term,
             address,
             school_motto,
+            logo,
             website
         } = req.body;
 
@@ -50,8 +51,8 @@ exports.registerUser = async (req, res) => {
         // Required fields
         // -----------------------------------
         if (
-            !full_name ||
-            !email ||
+            !principal_name ||
+            !principal_email ||
             !phone ||
             !password ||
             !school_name
@@ -59,7 +60,7 @@ exports.registerUser = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message:
-                    "Full name, email, phone, password and school name are required."
+                    "principal name, principal email, phone, password and school name are required."
             });
         }
 
@@ -67,7 +68,7 @@ exports.registerUser = async (req, res) => {
         // Check existing user
         // -----------------------------------
         const existingUser = await User.findOne({
-            email: email.toLowerCase().trim()
+            email: principal_email.toLowerCase().trim()
         });
 
         if (existingUser) {
@@ -89,8 +90,8 @@ exports.registerUser = async (req, res) => {
         // Create principal first
         // -----------------------------------
         const user = await User.create({
-            full_name,
-            email: email.toLowerCase().trim(),
+            principal_name,
+            principal_email: principal_email.toLowerCase().trim(),
             phone,
             password: hashedPassword,
 
@@ -104,6 +105,7 @@ exports.registerUser = async (req, res) => {
             address: address || "",
             school_motto: school_motto || "",
             website: website || "",
+            logo: logo || "",
 
             status: "Active"
         });
@@ -113,7 +115,7 @@ exports.registerUser = async (req, res) => {
         // -----------------------------------
         const school = await School.create({
             name: school_name,
-            email: email.toLowerCase().trim(),
+            email: school_email.toLowerCase().trim(),
             phone,
             address: address || "",
             school_type: school_type || "",
@@ -147,8 +149,8 @@ exports.registerUser = async (req, res) => {
 
             user: {
                 id: user._id,
-                full_name: user.full_name,
-                email: user.email,
+                principal_name: user.principal_name,
+                principal_email: user.principal_email,
                 phone: user.phone,
                 role: user.role,
                 school_id: user.school_id
@@ -181,11 +183,11 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
     try {
         const {
-            email,
+            principal_email,
             password
         } = req.body;
 
-        if (!email || !password) {
+        if (!principal_email || !password) {
             return res.status(400).json({
                 success: false,
                 message:
@@ -194,7 +196,7 @@ exports.loginUser = async (req, res) => {
         }
 
         const user = await User.findOne({
-            email: email.toLowerCase().trim()
+            email: principal_email.toLowerCase().trim()
         });
 
         if (!user) {
@@ -246,8 +248,8 @@ exports.loginUser = async (req, res) => {
 
             user: {
                 id: user._id,
-                full_name: user.full_name,
-                email: user.email,
+                principal_name: user.principal_name,
+                principal_email: user.principal_email,
                 phone: user.phone,
                 role: user.role,
                 school_id: user.school_id
