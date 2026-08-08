@@ -1,144 +1,85 @@
 
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-// ==========================================
-// JWT CONFIGURATION
-// ==========================================
 const JWT_SECRET =
-    process.env.JWT_SECRET ||
-    "edutrust_fallback_secret_key";
+    process.env.JWT_SECRET || "edutrust_fallback_secret_key";
 
-
-// ==========================================
-// AUTHENTICATION MIDDLEWARE
-// ==========================================
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
     try {
+        const authHeader = req.headers.authorization;
 
-        // ==========================================
-        // Get Authorization Header
-        // ==========================================
-        const authHeader =
-            req.headers.authorization;
-
-        if (!authHeader) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
                 success: false,
-                message:
-                    "Access denied. No token provided."
+                message: "Authentication required."
             });
         }
 
-
-        // ==========================================
-        // Extract Token
-        // ==========================================
-        const token =
-            authHeader.startsWith("Bearer ")
-                ? authHeader.split(" ")[1]
-                : authHeader;
-
+        const token = authHeader.split(" ")[1];
 
         if (!token) {
             return res.status(401).json({
                 success: false,
-                message:
-                    "Access denied. No authentication token."
+                message: "Authentication token is missing."
             });
         }
 
+        const decoded = jwt.verify(token, JWT_SECRET);
 
-        // ==========================================
-        // Verify JWT
-        // ==========================================
-        const decoded =
-            jwt.verify(
-                token,
-                JWT_SECRET
-            );
+        const user = await User.findById(decoded.id).select("-password");
 
-
-        // ==========================================
-        // Validate User ID
-        // ==========================================
-        if (!decoded.id) {
+        if (!user) {
             return res.status(401).json({
                 success: false,
-                message:
-                    "Invalid authentication token."
+                message: "User account no longer exists."
             });
         }
 
+        if (user.status !== "Active") {
+            return res.status(403).json({
+                success: false,
+                message: "This account is not active."
+            });
+        }
 
-        // ==========================================
-        // Save Logged-in User
-        // ==========================================
-        req.user = {
-            id: decoded.id,
+        /*
+         * Current EduTrust tenant structure:
+         * The school owner/principal account is the tenant owner.
+         *
+         * Until the dedicated School/User relationship is completed,
+         * we use the authenticated user's ID consistently as school_id.
+         */
+        const school_id = user.school_id || user._id;
 
-            school_id:
-                decoded.school_id || null,
+        req.user = user;
 
-            role:
-                decoded.role || null
-        };
+        req.user.school_id = school_id;
 
-
-        // ==========================================
-        // Continue
-        // ==========================================
         next();
 
     } catch (error) {
+        console.error("AUTH MIDDLEWARE ERROR:", error);
 
-        // ==========================================
-        // Token Expired
-        // ==========================================
-        if (
-            error.name ===
-            "TokenExpiredError"
-        ) {
+        if (error.name === "TokenExpiredError") {
             return res.status(401).json({
                 success: false,
-                message:
-                    "Session expired. Please login again."
+                message: "Authentication token has expired."
             });
         }
 
-
-        // ==========================================
-        // Invalid Token
-        // ==========================================
-        if (
-            error.name ===
-            "JsonWebTokenError"
-        ) {
+        if (error.name === "JsonWebTokenError") {
             return res.status(401).json({
                 success: false,
-                message:
-                    "Invalid authentication token."
+                message: "Invalid authentication token."
             });
         }
-
-
-        // ==========================================
-        // General Authentication Error
-        // ==========================================
-        console.error(
-            "AUTH MIDDLEWARE ERROR:",
-            error
-        );
 
         return res.status(500).json({
             success: false,
-            message:
-                "Authentication failed."
+            message: "Authentication error."
         });
     }
 };
 
-
-// ==========================================
-// EXPORT
-// ==========================================
 module.exports = authMiddleware;
