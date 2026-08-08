@@ -92,7 +92,7 @@ exports.registerUser = async (req, res) => {
         // -----------------------------------
         const user = await User.create({
             principal_name,
-            principal_email: principal_email.toLowerCase().trim(),
+            email: principal_email.toLowerCase().trim(),
             phone,
             password: hashedPassword,
 
