@@ -12,6 +12,8 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const schoolRoutes = require("./routes/schoolRoutes");
 const parentRoutes = require("./routes/parentRoutes");
 const staffRoutes = require("./routes/staffRoutes");
+const subjectRoutes = require("./routes/subjectRoutes");
+const classRoutes = require("./routes/classRoutes");
 // Future routes
 const studentRoutes = require("./routes/studentRoutes");
 // const paymentRoutes = require("./routes/paymentRoutes");
@@ -49,6 +51,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/school", schoolRoutes);
 app.use("/api/parents", parentRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api/subjects", subjectRoutes);
+app.use("/api/classes", classRoutes);
 // Future Routes
 app.use("/api/students", studentRoutes);
 // app.use("/api/payments", paymentRoutes);
