@@ -74,8 +74,24 @@ exports.createResult = async (req, res) => {
                 message:
                     "Student, subject, session, term and class are required."
             });
+            
         }
+const assessmentStructure =
+    await AssessmentStructure.findOne({
+        _id: req.body.assessment_structure_id,
+        school_id,
+        academic_session,
+        term,
+        status: "Active"
+    });
 
+if (!assessmentStructure) {
+    return res.status(404).json({
+        success: false,
+        message:
+            "Active assessment structure not found for this session and term."
+    });
+}
 
         // -----------------------------------
         // Verify student belongs to school
@@ -92,6 +108,7 @@ exports.createResult = async (req, res) => {
                 message:
                     "Student not found in your school."
             });
+            
         }
 
 
