@@ -216,3 +216,71 @@ exports.archiveClass = async (req, res) => {
         });
     }
 };
+// =======================================
+// Get Classes Assigned To Current Teacher
+// =======================================
+exports.getMyClasses = async (req, res) => {
+    try {
+        const classes = await Class.find({
+            school_id: req.user.school_id,
+            class_teacher_id: req.user._id,
+            status: "Active"
+        })
+            .populate("subjects", "name code")
+            .sort({
+                name: 1,
+                arm: 1
+            });
+
+        return res.json({
+            success: true,
+            count: classes.length,
+            classes
+        });
+
+    } catch (error) {
+        console.error("GET MY CLASSES ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// =======================================
+// Get One Teacher Class
+// =======================================
+exports.getMyClass = async (req, res) => {
+    try {
+        const classItem = await Class.findOne({
+            _id: req.params.id,
+            school_id: req.user.school_id,
+            class_teacher_id: req.user._id,
+            status: "Active"
+        })
+            .populate("subjects", "name code");
+
+        if (!classItem) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "Class not found or you are not assigned to this class."
+            });
+        }
+
+        return res.json({
+            success: true,
+            class: classItem
+        });
+
+    } catch (error) {
+        console.error("GET MY CLASS ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
