@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const ParentSchema = new mongoose.Schema(
@@ -10,44 +9,41 @@ const ParentSchema = new mongoose.Schema(
             index: true
         },
 
+        user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+            unique: true
+        },
+
         full_name: {
             type: String,
             required: true,
             trim: true
         },
 
-        email: {
-            type: String,
-            default: "",
-            lowercase: true,
-            trim: true
-        },
-
         phone: {
             type: String,
-            required: true,
-            trim: true
-        },
-
-        address: {
-            type: String,
             default: "",
             trim: true
         },
 
-        occupation: {
+        relationship: {
             type: String,
-            default: "",
+            default: "Parent",
             trim: true
         },
+
+        students: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Student"
+            }
+        ],
 
         status: {
             type: String,
-            enum: [
-                "Active",
-                "Inactive",
-                "Suspended"
-            ],
+            enum: ["Active", "Archived"],
             default: "Active"
         }
     },
@@ -59,11 +55,7 @@ const ParentSchema = new mongoose.Schema(
     }
 );
 
-// A phone number can exist in different schools,
-// but should not be duplicated within the same school.
-ParentSchema.index(
-    { school_id: 1, phone: 1 },
-    { unique: true }
+module.exports = mongoose.model(
+    "Parent",
+    ParentSchema
 );
-
-module.exports = mongoose.model("Parent", ParentSchema);
