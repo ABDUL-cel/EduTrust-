@@ -2,11 +2,14 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
     {
-        school_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "School",
-            default: null
-        },
+        
+school_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "School",
+    default: null,
+    index: true
+},
+
 
         full_name: {
             type: String,
