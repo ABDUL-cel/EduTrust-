@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
 const {
     createStaff,
@@ -21,23 +22,47 @@ router.use(authMiddleware);
 
 
 // =======================================
-// Staff
+// Staff Management
 // =======================================
 
-// Create staff
-router.post("/", createStaff);
+// Principal only
+router.post(
+    "/",
+    roleMiddleware("Principal"),
+    createStaff
+);
 
-// Get all staff
-router.get("/", getStaff);
 
-// Get one staff member
-router.get("/:id", getStaffMember);
+// Principal only
+router.get(
+    "/",
+    roleMiddleware("Principal"),
+    getStaff
+);
 
-// Suspend staff
-router.patch("/:id/suspend", suspendStaff);
 
-// Activate staff
-router.patch("/:id/activate", activateStaff);
+// Principal only
+router.get(
+    "/:id",
+    roleMiddleware("Principal"),
+    getStaffMember
+);
+
+
+// Principal only
+router.patch(
+    "/:id/suspend",
+    roleMiddleware("Principal"),
+    suspendStaff
+);
+
+
+// Principal only
+router.patch(
+    "/:id/activate",
+    roleMiddleware("Principal"),
+    activateStaff
+);
 
 
 module.exports = router;
