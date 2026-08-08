@@ -54,8 +54,9 @@ const resultSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-}, { timestamps: true });
-assessment_structure_id: {
+}, { timestamps: true }
+                                      
+   assessment_structure_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "AssessmentStructure",
     default: null
@@ -93,5 +94,6 @@ assessment_breakdown: [
             default: 0
         }
     }
-],
+],);
+
 module.exports = mongoose.models.Result || mongoose.model('Result', resultSchema)
