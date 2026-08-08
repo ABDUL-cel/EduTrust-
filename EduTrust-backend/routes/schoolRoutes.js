@@ -6,30 +6,27 @@ const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
 
 const {
-    getMySchool,
-    updateMySchool
+    getCurrentSchool,
+    updateCurrentSchool
 } = require("../controllers/schoolController");
 
+
 // =======================================
-// Get school profile
-// GET /api/school/profile
+// All school routes require authentication
 // =======================================
-router.get(
-    "/profile",
-    authMiddleware,
-    getMySchool
-);
+router.use(authMiddleware);
 
 
 // =======================================
-// Update school profile
-// PUT /api/school/profile
+// Current School
 // =======================================
-router.put(
-    "/profile",
-    authMiddleware,
-    updateMySchool
-);
+
+// GET /api/school
+router.get("/", getCurrentSchool);
+
+
+// PUT /api/school
+router.put("/", updateCurrentSchool);
+
 
 module.exports = router;
-
