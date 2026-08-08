@@ -1,99 +1,233 @@
-const mongoose = require('mongoose');
 
-const resultSchema = new mongoose.Schema({
-    studentId: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    studentName: {
-        type: String,
-        required: true
-    },
-    schoolId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    academicSession: {
-        type: String, // e.g., "2025/2026"
-        required: true
-    },
-    term: {
-        type: String, // e.g., "First Term", "Second Term", "Third Term"
-        required: true
-    },
-    classLevel: {
-        type: String, // e.g., "JSS 1", "SS 2"
-        required: true
-    },
-    subjects: [{
-        subjectName: { type: String, required: true },
-        caScore: { type: Number, default: 0 },   // Continuous Assessment
-        examScore: { type: Number, default: 0 }, // Exam Score
-        totalScore: { type: Number, required: true },
-        grade: { type: String, required: true }  // e.g., "A", "B", "C"
-    }],
-    totalMarksObtained: {
-        type: Number,
-        required: true
-    },
-    averageScore: {
-        type: Number,
-        required: true
-    },
-    remarks: {
-        type: String,
-        default: 'Passed'
-    },
-    accessFee: {
-        type: Number,
-        default: 1100 // Amount to check result in NGN
-    },
-    hasPaid: {
-        type: Boolean,
-        default: false
-    }
-}, { timestamps: true }
-                                      
-   assessment_structure_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "AssessmentStructure",
-    default: null
-},
+const mongoose = require("mongoose");
 
-assessment_breakdown: [
+const resultSchema = new mongoose.Schema(
     {
-        component_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            default: null
-        },
-
-        component_name: {
+        // =======================================
+        // Student Information
+        // =======================================
+        studentId: {
             type: String,
+            required: true,
             trim: true
         },
 
-        raw_score: {
-            type: Number,
-            default: 0
+        studentName: {
+            type: String,
+            required: true,
+            trim: true
         },
 
-        max_score: {
-            type: Number,
-            default: 0
+        // =======================================
+        // School
+        // =======================================
+        schoolId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
         },
 
-        percentage: {
-            type: Number,
-            default: 0
+        // =======================================
+        // Academic Information
+        // =======================================
+        academicSession: {
+            type: String,
+            required: true,
+            trim: true
         },
 
-        weighted_score: {
+        term: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        classLevel: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        // =======================================
+        // Assessment Structure
+        // =======================================
+        assessment_structure_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "AssessmentStructure",
+            default: null
+        },
+
+        // =======================================
+        // Assessment Breakdown
+        // =======================================
+        assessment_breakdown: [
+            {
+                component_id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    default: null
+                },
+
+                component_name: {
+                    type: String,
+                    trim: true
+                },
+
+                raw_score: {
+                    type: Number,
+                    default: 0,
+                    min: 0
+                },
+
+                max_score: {
+                    type: Number,
+                    default: 0,
+                    min: 0
+                },
+
+                percentage: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 100
+                },
+
+                weighted_score: {
+                    type: Number,
+                    default: 0,
+                    min: 0
+                }
+            }
+        ],
+
+        // =======================================
+        // Subjects
+        // =======================================
+        subjects: [
+            {
+                subjectName: {
+                    type: String,
+                    required: true,
+                    trim: true
+                },
+
+                caScore: {
+                    type: Number,
+                    default: 0,
+                    min: 0
+                },
+
+                examScore: {
+                    type: Number,
+                    default: 0,
+                    min: 0
+                },
+
+                totalScore: {
+                    type: Number,
+                    required: true,
+                    min: 0
+                },
+
+                grade: {
+                    type: String,
+                    required: true,
+                    trim: true
+                }
+            }
+        ],
+
+        // =======================================
+        // Overall Result
+        // =======================================
+        totalMarksObtained: {
             type: Number,
-            default: 0
+            required: true,
+            min: 0
+        },
+
+        averageScore: {
+            type: Number,
+            required: true,
+            min: 0,
+            max: 100
+        },
+
+        remarks: {
+            type: String,
+            default: "Passed",
+            trim: true
+        },
+
+        // =======================================
+        // Result Access
+        // =======================================
+        accessFee: {
+            type: Number,
+            default: 1100,
+            min: 0
+        },
+
+        hasPaid: {
+            type: Boolean,
+            default: false
+        },
+
+        // =======================================
+        // Result Status
+        // =======================================
+        status: {
+            type: String,
+            enum: [
+                "Draft",
+                "Submitted",
+                "Published"
+            ],
+            default: "Draft"
+        },
+
+        submittedAt: {
+            type: Date,
+            default: null
+        },
+
+        publishedAt: {
+            type: Date,
+            default: null
+        },
+
+        publishedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
         }
+    },
+    {
+        timestamps: true
     }
-],);
+);
 
-module.exports = mongoose.models.Result || mongoose.model('Result', resultSchema)
+
+// =======================================
+// Helpful Indexes
+// =======================================
+resultSchema.index({
+    schoolId: 1,
+    studentId: 1,
+    academicSession: 1,
+    term: 1
+});
+
+resultSchema.index({
+    schoolId: 1,
+    classLevel: 1,
+    academicSession: 1,
+    term: 1
+});
+
+
+// =======================================
+// Export
+// =======================================
+module.exports =
+    mongoose.models.Result ||
+    mongoose.model("Result", resultSchema);
