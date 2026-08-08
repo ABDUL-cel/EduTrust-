@@ -500,13 +500,6 @@ exports.getSchoolResults = async (req, res) => {
             error
         );
 
-
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-};
 // -----------------------------------
 // Verify student belongs to school
 // -----------------------------------
@@ -560,4 +553,12 @@ if (req.user.role === "Teacher") {
                 "This subject is not assigned to your class."
         });
     }
+
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
 }
