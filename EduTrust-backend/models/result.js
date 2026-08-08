@@ -48,12 +48,50 @@ const resultSchema = new mongoose.Schema({
     },
     accessFee: {
         type: Number,
-        default: 600 // Amount to check result in NGN
+        default: 1100 // Amount to check result in NGN
     },
     hasPaid: {
         type: Boolean,
         default: false
     }
 }, { timestamps: true });
+assessment_structure_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AssessmentStructure",
+    default: null
+},
 
+assessment_breakdown: [
+    {
+        component_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            default: null
+        },
+
+        component_name: {
+            type: String,
+            trim: true
+        },
+
+        raw_score: {
+            type: Number,
+            default: 0
+        },
+
+        max_score: {
+            type: Number,
+            default: 0
+        },
+
+        percentage: {
+            type: Number,
+            default: 0
+        },
+
+        weighted_score: {
+            type: Number,
+            default: 0
+        }
+    }
+],
 module.exports = mongoose.models.Result || mongoose.model('Result', resultSchema)
