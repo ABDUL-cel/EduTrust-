@@ -17,69 +17,78 @@ const {
 } = require("../controllers/parentController");
 
 
-// Register parent
-router.post(
-    "/",
-    authMiddleware,
-    registerParent
-);
+// =======================================
+// Authentication for ALL parent routes
+// =======================================
+router.use(authMiddleware);
 
 
-// Get all parents
-router.get(
-    "/",
-    authMiddleware,
-    getParents
-);
+// =======================================
+// Register Parent
+// POST /api/parents
+// =======================================
+router.post("/", registerParent);
 
 
-// Get single parent + children
-router.get(
-    "/:id",
-    authMiddleware,
-    getParent
-);
+// =======================================
+// Get Parents
+// GET /api/parents
+// =======================================
+router.get("/", getParents);
 
 
-// Update parent
-router.put(
-    "/:id",
-    authMiddleware,
-    updateParent
-);
+// =======================================
+// Get Single Parent + Children
+// GET /api/parents/:id
+// =======================================
+router.get("/:id", getParent);
 
 
-// Link parent to student
+// =======================================
+// Update Parent
+// PUT /api/parents/:id
+// =======================================
+router.put("/:id", updateParent);
+
+
+// =======================================
+// Link Parent To Student
+// PATCH /api/parents/:id/link-student
+// =======================================
 router.patch(
     "/:id/link-student",
-    authMiddleware,
     linkParentToStudent
 );
 
 
-// Unlink parent from student
+// =======================================
+// Unlink Parent From Student
+// PATCH /api/parents/:id/unlink-student/:studentId
+// =======================================
 router.patch(
     "/:id/unlink-student/:studentId",
-    authMiddleware,
     unlinkParentFromStudent
 );
 
 
-// Suspend parent
+// =======================================
+// Suspend Parent
+// PATCH /api/parents/:id/suspend
+// =======================================
 router.patch(
     "/:id/suspend",
-    authMiddleware,
     suspendParent
 );
 
 
-// Activate parent
+// =======================================
+// Activate Parent
+// PATCH /api/parents/:id/activate
+// =======================================
 router.patch(
     "/:id/activate",
-    authMiddleware,
     activateParent
 );
 
 
 module.exports = router;
-
