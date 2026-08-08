@@ -1,5 +1,6 @@
 
 const Student = require("../models/student");
+const Parent = require("../models/parent");
 
 // =======================================
 // Register Student
@@ -26,7 +27,8 @@ exports.registerStudent = async (req, res) => {
             arm,
             home_address,
             medical_information,
-            passport
+            passport,
+            parent_id
         } = req.body;
 
         if (
@@ -55,19 +57,37 @@ exports.registerStudent = async (req, res) => {
             });
         }
 
+        // If a parent was supplied, make sure that parent
+        // belongs to the same school.
+        if (parent_id) {
+            const parent = await Parent.findOne({
+                _id: parent_id,
+                school_id,
+                status: "Active"
+            });
+
+            if (!parent) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Selected parent was not found in this school."
+                });
+            }
+        }
+
         const student = await Student.create({
             school_id,
+            parent_id: parent_id || null,
             admission_number,
             first_name,
             last_name,
-            other_name,
+            other_name: other_name || "",
             gender,
             date_of_birth,
             class_name,
-            arm,
-            home_address,
-            medical_information,
-            passport,
+            arm: arm || "",
+            home_address: home_address || "",
+            medical_information: medical_information || "",
+            passport: passport || "",
             status: "Pending"
         });
 
@@ -133,7 +153,13 @@ exports.getStudents = async (req, res) => {
         }
 
         const students = await Student.find(filter)
-            .sort({ created_at: -1 });
+            .populate(
+                "parent_id",
+                "full_name email phone status"
+            )
+            .sort({
+                created_at: -1
+            });
 
         return res.status(200).json({
             success: true,
@@ -153,6 +179,108 @@ exports.getStudents = async (req, res) => {
 
 
 // =======================================
+// Get Pending Students
+// =======================================
+exports.getPendingStudents = async (req, res) => {
+    try {
+        const students = await Student.find({
+            school_id: req.user.school_id,
+            status: "Pending"
+        })
+            .populate(
+                "parent_id",
+                "full_name email phone status"
+            )
+            .sort({
+                created_at: -1
+            });
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            students
+        });
+
+    } catch (error) {
+        console.error("GET PENDING STUDENTS ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// =======================================
+// Get Active Students
+// =======================================
+exports.getActiveStudents = async (req, res) => {
+    try {
+        const students = await Student.find({
+            school_id: req.user.school_id,
+            status: "Active"
+        })
+            .populate(
+                "parent_id",
+                "full_name email phone status"
+            )
+            .sort({
+                created_at: -1
+            });
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            students
+        });
+
+    } catch (error) {
+        console.error("GET ACTIVE STUDENTS ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// =======================================
+// Get Suspended Students
+// =======================================
+exports.getSuspendedStudents = async (req, res) => {
+    try {
+        const students = await Student.find({
+            school_id: req.user.school_id,
+            status: "Suspended"
+        })
+            .populate(
+                "parent_id",
+                "full_name email phone status"
+            )
+            .sort({
+                suspended_at: -1
+            });
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            students
+        });
+
+    } catch (error) {
+        console.error("GET SUSPENDED STUDENTS ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// =======================================
 // Get Single Student
 // =======================================
 exports.getStudent = async (req, res) => {
@@ -160,7 +288,10 @@ exports.getStudent = async (req, res) => {
         const student = await Student.findOne({
             _id: req.params.id,
             school_id: req.user.school_id
-        });
+        }).populate(
+            "parent_id",
+            "full_name email phone address occupation status"
+        );
 
         if (!student) {
             return res.status(404).json({
@@ -199,6 +330,13 @@ exports.approveStudent = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Student not found."
+            });
+        }
+
+        if (student.status !== "Pending") {
+            return res.status(400).json({
+                success: false,
+                message: "Only pending students can be approved."
             });
         }
 
@@ -242,10 +380,12 @@ exports.suspendStudent = async (req, res) => {
             });
         }
 
+        const reason = req.body.reason || "";
+
         student.status = "Suspended";
         student.suspended_by = req.user.id;
         student.suspended_at = new Date();
-        student.suspension_reason = req.body.reason || "";
+        student.suspension_reason = reason;
 
         await student.save();
 
@@ -280,6 +420,13 @@ exports.reinstateStudent = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Student not found."
+            });
+        }
+
+        if (student.status !== "Suspended") {
+            return res.status(400).json({
+                success: false,
+                message: "Only suspended students can be reinstated."
             });
         }
 
@@ -376,6 +523,109 @@ exports.archiveStudent = async (req, res) => {
 
     } catch (error) {
         console.error("ARCHIVE STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// =======================================
+// Link Parent To Student
+// =======================================
+exports.linkParent = async (req, res) => {
+    try {
+        const { parent_id } = req.body;
+
+        if (!parent_id) {
+            return res.status(400).json({
+                success: false,
+                message: "Parent ID is required."
+            });
+        }
+
+        const student = await Student.findOne({
+            _id: req.params.id,
+            school_id: req.user.school_id
+        });
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        const parent = await Parent.findOne({
+            _id: parent_id,
+            school_id: req.user.school_id,
+            status: "Active"
+        });
+
+        if (!parent) {
+            return res.status(404).json({
+                success: false,
+                message: "Parent not found in this school."
+            });
+        }
+
+        student.parent_id = parent._id;
+
+        await student.save();
+
+        await student.populate(
+            "parent_id",
+            "full_name email phone status"
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Parent linked to student successfully.",
+            student
+        });
+
+    } catch (error) {
+        console.error("LINK PARENT TO STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// =======================================
+// Unlink Parent From Student
+// =======================================
+exports.unlinkParent = async (req, res) => {
+    try {
+        const student = await Student.findOne({
+            _id: req.params.id,
+            school_id: req.user.school_id
+        });
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        student.parent_id = null;
+
+        await student.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Parent unlinked from student successfully.",
+            student
+        });
+
+    } catch (error) {
+        console.error("UNLINK PARENT FROM STUDENT ERROR:", error);
 
         return res.status(500).json({
             success: false,
