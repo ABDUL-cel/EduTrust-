@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
             logo,
 
             principal_name,
-            principal_email,
+            email,
 
             password
 
