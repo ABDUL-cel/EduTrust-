@@ -10,6 +10,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const schoolRoutes = require("./routes/schoolRoutes");
+const parentRoutes = require("./routes/parentRoutes");
 // Future routes
 const studentRoutes = require("./routes/studentRoutes");
 // const paymentRoutes = require("./routes/paymentRoutes");
@@ -45,6 +46,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/school", schoolRoutes);
+app.use("/api/parents", parentRoutes);
 // Future Routes
 app.use("/api/students", studentRoutes);
 // app.use("/api/payments", paymentRoutes);
