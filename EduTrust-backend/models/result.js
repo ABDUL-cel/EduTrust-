@@ -56,4 +56,4 @@ const resultSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Result', resultSchema);
+module.exports = mongoose.models.Result || mongoose.model('Result', resultSchema)
