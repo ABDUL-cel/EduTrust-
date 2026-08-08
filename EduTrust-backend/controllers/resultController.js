@@ -95,6 +95,51 @@ exports.createResult = async (req, res) => {
         }
 
 
+        // -----------------------------------
+        // Teacher access restriction
+        // -----------------------------------
+        if (req.user.role === "Teacher") {
+            const Class = require("../models/class");
+
+            const teacherClass = await Class.findOne({
+                school_id,
+                class_teacher_id: req.user._id,
+                name: student.class_name,
+                arm: student.arm || "",
+                status: "Active"
+            });
+
+
+            if (!teacherClass) {
+                return res.status(403).json({
+                    success: false,
+                    message:
+                        "You are not assigned to this student's class."
+                });
+            }
+
+
+            const subjectAssigned =
+                teacherClass.subjects.some(
+                    subject =>
+                        subject.toString() ===
+                        subject_id.toString()
+                );
+
+
+            if (!subjectAssigned) {
+                return res.status(403).json({
+                    success: false,
+                    message:
+                        "This subject is not assigned to your class."
+                });
+            }
+        }
+
+
+        // -----------------------------------
+        // Validate scores
+        // -----------------------------------
         const ca = Number(ca_score || 0);
         const exam = Number(exam_score || 0);
 
@@ -113,6 +158,9 @@ exports.createResult = async (req, res) => {
         }
 
 
+        // -----------------------------------
+        // Calculate result
+        // -----------------------------------
         const total = ca + exam;
 
         const grade = calculateGrade(total);
@@ -120,6 +168,9 @@ exports.createResult = async (req, res) => {
         const remark = calculateRemark(grade);
 
 
+        // -----------------------------------
+        // Create result
+        // -----------------------------------
         const result = await Result.create({
             school_id,
             student_id,
@@ -144,7 +195,8 @@ exports.createResult = async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            message: "Result created successfully.",
+            message:
+                "Result created successfully.",
             result
         });
 
@@ -500,60 +552,6 @@ exports.getSchoolResults = async (req, res) => {
             error
         );
 
-// -----------------------------------
-// Verify student belongs to school
-// -----------------------------------
-const student = await Student.findOne({
-    _id: student_id,
-    school_id
-});
-
-if (!student) {
-    return res.status(404).json({
-        success: false,
-        message: "Student not found in your school."
-    });
-}
-
-
-// -----------------------------------
-// Teacher access restriction
-// -----------------------------------
-if (req.user.role === "Teacher") {
-
-    const Class = require("../models/class");
-
-    const teacherClass = await Class.findOne({
-        school_id,
-        class_teacher_id: req.user._id,
-        name: student.class_name,
-        arm: student.arm || "",
-        status: "Active"
-    });
-
-    if (!teacherClass) {
-        return res.status(403).json({
-            success: false,
-            message:
-                "You are not assigned to this student's class."
-        });
-    }
-
-    const subjectAssigned =
-        teacherClass.subjects.some(
-            subject =>
-                subject.toString() ===
-                subject_id.toString()
-        );
-
-    if (!subjectAssigned) {
-        return res.status(403).json({
-            success: false,
-            message:
-                "This subject is not assigned to your class."
-        });
-    }
-
 
         return res.status(500).json({
             success: false,
@@ -561,4 +559,3 @@ if (req.user.role === "Teacher") {
         });
     }
 };
-}
