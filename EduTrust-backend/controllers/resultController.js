@@ -1,5 +1,5 @@
 
-const Result = require("../models/Result");
+const Result = require("../models/result");
 const Student = require("../models/student");
 
 
