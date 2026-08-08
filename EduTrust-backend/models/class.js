@@ -1,15 +1,57 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const ClassSchema = new mongoose.Schema({
-  school_id: { type: mongoose.Schema.Types.ObjectId, ref: 'School', required: true },
-  class_name: { type: String, required: true }, // e.g., "JSS1", "Primary 5"
-  arm: { type: String, required: true }, // e.g., "A", "Science"
-  teacher: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  capacity: { type: Number, default: 0 }
-}, { timestamps: true });
+const ClassSchema = new mongoose.Schema(
+    {
+        school_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "School",
+            required: true,
+            index: true
+        },
 
-// Ensure uniqueness of class + arm per school
-ClassSchema.index({ school_id: 1, class_name: 1, arm: 1 }, { unique: true });
+        name: {
+            type: String,
+            required: true,
+            trim: true
+        },
 
-module.exports = mongoose.model('Class', ClassSchema);
+        arm: {
+            type: String,
+            default: "",
+            trim: true
+        },
 
+        class_teacher_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        },
+
+        subjects: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Subject"
+            }
+        ],
+
+        status: {
+            type: String,
+            enum: ["Active", "Archived"],
+            default: "Active"
+        }
+    },
+    {
+        timestamps: {
+            createdAt: "created_at",
+            updatedAt: "updated_at"
+        }
+    }
+);
+
+ClassSchema.index({
+    school_id: 1,
+    name: 1,
+    arm: 1
+});
+
+module.exports = mongoose.model("Class", ClassSchema);
