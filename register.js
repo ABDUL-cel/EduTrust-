@@ -1,148 +1,137 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     const registerForm = document.getElementById("registerForm");
     const message = document.getElementById("message");
 
     if (!registerForm) {
-        console.error("Registration form not found.");
+        console.error("registerForm not found");
         return;
     }
 
     registerForm.addEventListener("submit", async (event) => {
-
         event.preventDefault();
 
-        message.textContent = "Registering school...";
-        message.style.color = "#333";
+        if (message) {
+            message.textContent = "Registering...";
+            message.style.color = "#333";
+        }
 
-        // ==================================================
-        // GET FORM VALUES
-        // ==================================================
+        // Read fields directly from the form
+        const getValue = (id) => {
+            const element = document.getElementById(id);
+            return element ? element.value.trim() : "";
+        };
 
-        const schoolName =
-            document.getElementById("school-name")?.value.trim();
+        const schoolName = getValue("school-name");
+        const principalName = getValue("owner-name");
+        const phone = getValue("phone");
+        const schoolEmail = getValue("email");
+        const address = getValue("address");
 
-        const principalName =
-            document.getElementById("owner-name")?.value.trim();
+        const schoolType = getValue("school-type");
+        const academicSession = getValue("academic-session");
+        const currentTerm = getValue("current-term");
+        const schoolMotto = getValue("school-motto");
+        const website = getValue("website");
+        const logo = getValue("logo");
 
-        const phone =
-            document.getElementById("phone")?.value.trim();
+        const passwordElement =
+            document.getElementById("password");
 
-        const schoolEmail =
-            document.getElementById("email")?.value.trim();
-
-        const address =
-            document.getElementById("address")?.value.trim();
-
-        const schoolType =
-            document.getElementById("school-type")?.value.trim() || "";
-
-        const academicSession =
-            document.getElementById("academic-session")?.value.trim() || "";
-
-        const currentTerm =
-            document.getElementById("current-term")?.value.trim() || "";
-
-        const schoolMotto =
-            document.getElementById("school-motto")?.value.trim() || "";
-
-        const website =
-            document.getElementById("website")?.value.trim() || "";
-
-        const logo =
-            document.getElementById("logo")?.value.trim() || "";
+        const confirmPasswordElement =
+            document.getElementById("confirm-password");
 
         const password =
-            document.getElementById("password")?.value;
+            passwordElement ? passwordElement.value : "";
 
         const confirmPassword =
-            document.getElementById("confirm-password")?.value;
+            confirmPasswordElement
+                ? confirmPasswordElement.value
+                : "";
 
-        // ==================================================
-        // BASIC VALIDATION
-        // ==================================================
+        console.log("Registration fields:", {
+            schoolName,
+            principalName,
+            phone,
+            schoolEmail,
+            address,
+            schoolType,
+            academicSession,
+            currentTerm,
+            schoolMotto,
+            website,
+            logo,
+            hasPassword: !!password,
+            hasConfirmPassword: !!confirmPassword
+        });
 
+        // Only check the fields that MUST exist
+        // for the backend registration.
         if (
             !schoolName ||
             !principalName ||
-            !phone ||
             !schoolEmail ||
-            !address ||
             !password ||
             !confirmPassword
         ) {
-            message.textContent =
-                "Please fill in all required fields.";
+            if (message) {
+                message.textContent =
+                    "Please enter the school name, principal name, email and password.";
+                message.style.color = "red";
+            }
 
-            message.style.color = "red";
-            return;
-        }
-
-        // ==================================================
-        // PASSWORD CHECK
-        // ==================================================
-
-        if (password.length < 6) {
-            message.textContent =
-                "Password must be at least 6 characters.";
-
-            message.style.color = "red";
             return;
         }
 
         if (password !== confirmPassword) {
-            message.textContent =
-                "Passwords do not match.";
+            if (message) {
+                message.textContent =
+                    "Passwords do not match.";
+                message.style.color = "red";
+            }
 
-            message.style.color = "red";
             return;
         }
 
-        // ==================================================
-        // PRINCIPAL EMAIL
-        //
-        // For now the school email is used as the
-        // principal login email.
-        // ==================================================
+        if (password.length < 6) {
+            if (message) {
+                message.textContent =
+                    "Password must be at least 6 characters.";
+                message.style.color = "red";
+            }
 
-        const principalEmail = schoolEmail;
+            return;
+        }
 
-        // ==================================================
-        // REQUEST DATA
-        // ==================================================
-
-        const formData = {
+        // IMPORTANT:
+        // The principal login email is the same
+        // email entered in the registration form.
+        const payload = {
             school_name: schoolName,
             school_email: schoolEmail,
 
-            phone,
-            address,
+            phone: phone,
+            address: address,
 
             school_type: schoolType,
             academic_session: academicSession,
             current_term: currentTerm,
             school_motto: schoolMotto,
 
-            website,
-            logo,
+            website: website,
+            logo: logo,
 
             principal_name: principalName,
-            principal_email: principalEmail,
+            principal_email: schoolEmail,
 
-            password
+            password: password
         };
 
         console.log(
-            "EduTrust registration payload:",
-            formData
+            "Sending EduTrust registration:",
+            payload
         );
 
-        // ==================================================
-        // SEND TO BACKEND
-        // ==================================================
-
         try {
-
             const response = await fetch(
                 "https://edutrust-15ii.onrender.com/api/auth/register",
                 {
@@ -152,29 +141,25 @@ document.addEventListener("DOMContentLoaded", () => {
                         "Content-Type": "application/json"
                     },
 
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify(payload)
                 }
             );
 
             const data = await response.json();
 
             console.log(
-                "Registration response:",
+                "EduTrust server response:",
                 data
             );
 
-            // ==================================================
-            // SUCCESS
-            // ==================================================
-
             if (response.ok && data.success) {
 
-                message.textContent =
-                    "School registered successfully! Redirecting to login...";
+                if (message) {
+                    message.textContent =
+                        "Registration successful! Redirecting to login...";
+                    message.style.color = "green";
+                }
 
-                message.style.color = "green";
-
-                // Save returned school information temporarily
                 if (data.school) {
                     localStorage.setItem(
                         "school",
@@ -182,7 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
                 }
 
-                // Save returned user information temporarily
                 if (data.user) {
                     localStorage.setItem(
                         "user",
@@ -192,32 +176,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 setTimeout(() => {
                     window.location.href = "login.html";
-                }, 1500);
+                }, 1200);
 
                 return;
             }
 
-            // ==================================================
-            // BACKEND ERROR
-            // ==================================================
-
-            message.textContent =
-                data.message ||
-                "Registration failed. Please try again.";
-
-            message.style.color = "red";
+            // Show the REAL backend error
+            if (message) {
+                message.textContent =
+                    data.message ||
+                    "Registration failed.";
+                message.style.color = "red";
+            }
 
         } catch (error) {
 
             console.error(
-                "Registration error:",
+                "EduTrust registration error:",
                 error
             );
 
-            message.textContent =
-                "Unable to connect to EduTrust server. Please try again.";
-
-            message.style.color = "red";
+            if (message) {
+                message.textContent =
+                    "Unable to connect to EduTrust server.";
+                message.style.color = "red";
+            }
         }
     });
 });
