@@ -228,7 +228,7 @@ exports.login = async (req, res) => {
             .toLowerCase();
 
         const user = await User.findOne({
-            email: normalizedEmail
+            principal_email: normalizedEmail
         });
 
         if (!user) {
