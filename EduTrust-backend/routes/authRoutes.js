@@ -1,41 +1,31 @@
+
 const express = require("express");
 
 const router = express.Router();
 
 const {
-    registerSchool,
-    login,
-    getProfile
+    registerUser,
+    loginUser,
+    getMe
 } = require("../controllers/authController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 
 // ======================================================
-// REGISTER SCHOOL
-// POST /api/auth/register
+// AUTHENTICATION ROUTES
 // ======================================================
-router.post(
-    "/register",
-    registerSchool
-);
 
-// ======================================================
-// LOGIN
-// POST /api/auth/login
-// ======================================================
-router.post(
-    "/login",
-    login
-);
+// Register school + principal
+router.post("/register", registerUser);
 
-// ======================================================
-// CURRENT USER PROFILE
-// GET /api/auth/profile
-// ======================================================
+// Login
+router.post("/login", loginUser);
+
+// Logged-in user profile
 router.get(
     "/profile",
     authMiddleware,
-    getProfile
+    getMe
 );
 
 module.exports = router;
