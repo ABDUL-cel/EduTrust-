@@ -1,47 +1,59 @@
+
+/* =========================================================
+   EDUTRUST SCHOOL REGISTRATION
+   Complete registration frontend
+   ========================================================= */
+
 document.addEventListener("DOMContentLoaded", () => {
     const registerForm = document.getElementById("registerForm");
     const messageElement = document.getElementById("message");
 
     if (!registerForm) {
-        console.error("Registration form #registerForm was not found.");
+        console.error("EduTrust: registerForm was not found.");
         return;
+    }
+
+    function showMessage(message, color = "#333") {
+        if (!messageElement) return;
+
+        messageElement.textContent = message;
+        messageElement.style.color = color;
     }
 
     registerForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        const schoolName = document
-            .getElementById("school-name")
-            ?.value.trim();
+        /* =====================================================
+           GET FORM FIELDS
+           ===================================================== */
 
-        const ownerName = document
-            .getElementById("owner-name")
-            ?.value.trim();
+        const schoolName =
+            document.getElementById("school-name")?.value.trim() || "";
 
-        const phone = document
-            .getElementById("phone")
-            ?.value.trim();
+        const ownerName =
+            document.getElementById("owner-name")?.value.trim() || "";
 
-        const email = document
-            .getElementById("email")
-            ?.value.trim()
-            .toLowerCase();
+        const phone =
+            document.getElementById("phone")?.value.trim() || "";
 
-        const address = document
-            .getElementById("address")
-            ?.value.trim();
+        const email =
+            document.getElementById("email")?.value.trim().toLowerCase() || "";
 
-        const password = document
-            .getElementById("password")
-            ?.value;
+        const address =
+            document.getElementById("address")?.value.trim() || "";
 
-        const confirmPassword = document
-            .getElementById("confirm-password")
-            ?.value;
+        const password =
+            document.getElementById("password")?.value || "";
 
-        // =========================
-        // Basic validation
-        // =========================
+        const confirmPassword =
+            document.getElementById("confirm-password")?.value || "";
+
+        const termsCheckbox =
+            registerForm.querySelector('input[type="checkbox"]');
+
+        /* =====================================================
+           VALIDATE REQUIRED FIELDS
+           ===================================================== */
 
         if (
             !schoolName ||
@@ -59,6 +71,22 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        /* =====================================================
+           TERMS & CONDITIONS
+           ===================================================== */
+
+        if (termsCheckbox && !termsCheckbox.checked) {
+            showMessage(
+                "Please agree to the EduTrust Terms & Conditions.",
+                "red"
+            );
+            return;
+        }
+
+        /* =====================================================
+           PASSWORD VALIDATION
+           ===================================================== */
+
         if (password.length < 6) {
             showMessage(
                 "Password must be at least 6 characters.",
@@ -75,9 +103,24 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // =========================
-        // Disable button
-        // =========================
+        /* =====================================================
+           EMAIL VALIDATION
+           ===================================================== */
+
+        const emailPattern =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailPattern.test(email)) {
+            showMessage(
+                "Please enter a valid email address.",
+                "red"
+            );
+            return;
+        }
+
+        /* =====================================================
+           SUBMIT BUTTON
+           ===================================================== */
 
         const submitButton =
             registerForm.querySelector(
@@ -94,9 +137,9 @@ document.addEventListener("DOMContentLoaded", () => {
             "#333"
         );
 
-        // =========================
-        // Backend payload
-        // =========================
+        /* =====================================================
+           BACKEND DATA
+           ===================================================== */
 
         const formData = {
             school_name: schoolName,
@@ -104,43 +147,69 @@ document.addEventListener("DOMContentLoaded", () => {
             phone: phone,
             address: address,
 
-            // Optional school fields
+            /*
+             * These fields are optional in the current form.
+             * We send empty values so the backend receives
+             * a consistent structure.
+             */
             school_type: "",
             academic_session: "",
             current_term: "",
             school_motto: "",
 
-            // Principal account
+            /*
+             * Principal / administrator account
+             */
             principal_name: ownerName,
             principal_email: email,
             password: password
         };
+
+        console.log(
+            "EduTrust registration payload:",
+            {
+                ...formData,
+                password: "[HIDDEN]"
+            }
+        );
+
+        /* =====================================================
+           SEND TO BACKEND
+           ===================================================== */
 
         try {
             const response = await fetch(
                 "https://edutrust-15ii.onrender.com/api/auth/register",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type": "application/json"
                     },
+
                     body: JSON.stringify(formData)
                 }
             );
 
-            let data;
+            let data = {};
 
             try {
                 data = await response.json();
             } catch (jsonError) {
-                data = {
-                    success: false,
-                    message:
-                        "The server returned an invalid response."
-                };
+                console.error(
+                    "EduTrust: Invalid server response.",
+                    jsonError
+                );
             }
 
-            console.log("Registration response:", data);
+            console.log(
+                "EduTrust registration response:",
+                data
+            );
+
+            /* =================================================
+               SUCCESS
+               ================================================= */
 
             if (response.ok && data.success) {
                 showMessage(
@@ -148,7 +217,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     "green"
                 );
 
-                // Clear old authentication data
+                /*
+                 * Clear any old session
+                 */
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
 
@@ -159,22 +230,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            /* =================================================
+               BACKEND ERROR
+               ================================================= */
+
             showMessage(
                 data.message ||
-                    "Registration failed. Please try again.",
+                "Registration failed. Please try again.",
                 "red"
             );
 
         } catch (error) {
             console.error(
-                "Registration request failed:",
+                "EduTrust registration error:",
                 error
             );
 
             showMessage(
-                "Unable to connect to EduTrust server. Please try again.",
+                "Unable to connect to EduTrust. Please try again.",
                 "red"
             );
+
         } finally {
             if (submitButton) {
                 submitButton.disabled = false;
@@ -183,11 +259,4 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
-
-    function showMessage(message, color) {
-        if (!messageElement) return;
-
-        messageElement.textContent = message;
-        messageElement.style.color = color;
-    }
 });
