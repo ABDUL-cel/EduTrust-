@@ -165,7 +165,7 @@ if (!schoolEmail) {
 
         const payload = {
             school_name: name,
-            school_email: email,
+            school_email: schoolEmail,
             phone: phone,
             address: address,
 
