@@ -9,20 +9,19 @@ const ParentSchema = new mongoose.Schema(
             index: true
         },
 
-        user_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-            unique: true
-        },
-
-        full_name: {
+        first_name: {
             type: String,
             required: true,
             trim: true
         },
 
-        phone: {
+        last_name: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        other_name: {
             type: String,
             default: "",
             trim: true
@@ -30,21 +29,51 @@ const ParentSchema = new mongoose.Schema(
 
         relationship: {
             type: String,
-            default: "Parent",
+            required: true,
             trim: true
         },
 
-        students: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Student"
-            }
-        ],
+        email: {
+            type: String,
+            default: "",
+            lowercase: true,
+            trim: true
+        },
+
+        phone: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        alternate_phone: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        home_address: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        occupation: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        passport: {
+            type: String,
+            default: ""
+        },
 
         status: {
             type: String,
-            enum: ["Active", "Archived"],
-            default: "Active"
+            enum: ["Active", "Inactive"],
+            default: "Active",
+            index: true
         }
     },
     {
@@ -55,7 +84,14 @@ const ParentSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model(
-    "Parent",
-    ParentSchema
-);
+ParentSchema.index({
+    school_id: 1,
+    phone: 1
+});
+
+ParentSchema.index({
+    school_id: 1,
+    email: 1
+});
+
+module.exports = mongoose.model("Parent", ParentSchema);
