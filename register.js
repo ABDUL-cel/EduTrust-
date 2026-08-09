@@ -72,9 +72,6 @@ const schoolEmail = value("school-email").toLowerCase();
             missingFields.push("Phone Number");
         }
 
-        if (!email) {
-            missingFields.push("School Email");
-        }
 
         if (!address) {
             missingFields.push("School Address");
