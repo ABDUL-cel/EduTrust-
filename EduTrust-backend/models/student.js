@@ -148,4 +148,4 @@ StudentSchema.index(
     { unique: true }
 );
 
-module.exports = mongoose.model("Student", StudentSchema);
+module.exports = mongoose.model("student", StudentSchema);
