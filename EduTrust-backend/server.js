@@ -26,7 +26,7 @@ const resultRoutes = require('./routes/resultRoutes');
 const app = express();
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
 
 app.use(
     cors({
