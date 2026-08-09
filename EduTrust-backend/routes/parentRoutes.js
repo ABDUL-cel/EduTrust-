@@ -3,31 +3,43 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    createParent,
     getParents,
-    getParentById,
-    updateParent,
-    deleteParent,
-    linkStudentToParent
+    getParentById
 } = require("../controllers/parentController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 
-router.use(authMiddleware);
 
-router.post("/", createParent);
+/*
+==================================================
+PARENT MANAGEMENT ROUTES
+==================================================
+*/
 
-router.get("/", getParents);
+/*
+GET /api/parents
 
-router.get("/:id", getParentById);
-
-router.put("/:id", updateParent);
-
-router.delete("/:id", deleteParent);
-
-router.put(
-    "/:parentId/students/:studentId",
-    linkStudentToParent
+Returns parents belonging ONLY to the
+logged-in principal's school.
+*/
+router.get(
+    "/",
+    authMiddleware,
+    getParents
 );
+
+
+/*
+GET /api/parents/:id
+
+Returns one parent belonging ONLY to the
+logged-in principal's school.
+*/
+router.get(
+    "/:id",
+    authMiddleware,
+    getParentById
+);
+
 
 module.exports = router;
