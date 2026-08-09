@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 
 const User = require("../models/user");
 const School = require("../models/school");
-const Student = require("../models/student");
-const Parent = require("../models/parent");
+const Student = require("../models/Student");
+const Parent = require("../models/Parent");
 
 const MONGO_URI = process.env.MONGO_URI;
 
