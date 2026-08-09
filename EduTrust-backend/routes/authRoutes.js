@@ -3,21 +3,17 @@ const express = require("express");
 
 const router = express.Router();
 
-const {
-    registerSchool,
-    loginUser,
-    getMe
-} = require("../controllers/authController");
+const authController = require("../controllers/authController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 
 // ======================================================
-// SCHOOL / PRINCIPAL REGISTRATION
+// REGISTER SCHOOL + PRINCIPAL
 // ======================================================
 
 router.post(
     "/register",
-    registerSchool
+    authController.registerSchool
 );
 
 // ======================================================
@@ -26,17 +22,17 @@ router.post(
 
 router.post(
     "/login",
-    loginUser
+    authController.loginUser
 );
 
 // ======================================================
-// LOGGED-IN USER PROFILE
+// CURRENT USER PROFILE
 // ======================================================
 
 router.get(
     "/profile",
     authMiddleware,
-    getMe
+    authController.getMe
 );
 
 module.exports = router;
