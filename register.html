@@ -29,307 +29,433 @@
 
 <main class="register-page">
 
-    <section class="register-container">
+<section class="register-container">
 
-        <!-- =========================
-             INTRODUCTION
-        ========================== -->
 
-        <div class="register-intro">
+<!-- =====================================================
+     INTRO
+====================================================== -->
 
-            <a
-                href="index.html"
-                class="logo"
-            >
-                Edu<span>Trust</span>
-            </a>
+<div class="register-intro">
 
-            <h1>
-                Build Trust.
-                Manage Better.
-            </h1>
+    <a
+        href="index.html"
+        class="logo"
+    >
+        Edu<span>Trust</span>
+    </a>
 
-            <p>
-                Create your school's EduTrust account
-                and take the first step toward simpler,
-                clearer school fee management.
-            </p>
+    <h1>
+        Build Trust.
+        Manage Better.
+    </h1>
 
-            <div class="register-benefits">
+    <p>
+        Create your school's EduTrust account
+        and take the first step toward simpler,
+        clearer school fee management.
+    </p>
 
-                <p>✓ Manage school fee records</p>
+    <div class="register-benefits">
 
-                <p>✓ Improve parent transparency</p>
+        <p>✓ Manage school fee records</p>
 
-                <p>✓ Keep your school organized</p>
+        <p>✓ Improve parent transparency</p>
 
-            </div>
+        <p>✓ Keep your school organized</p>
 
-        </div>
+    </div>
 
+</div>
 
-        <!-- =========================
-             FORM
-        ========================== -->
 
-        <div class="register-form-container">
+<!-- =====================================================
+     FORM
+====================================================== -->
 
-            <div class="form-heading">
+<div class="register-form-container">
 
-                <h2>
-                    Create Your School Account
-                </h2>
+<div class="form-heading">
 
-                <p>
-                    Already have an account?
-                    <a href="login.html">
-                        Login
-                    </a>
-                </p>
+    <h2>
+        Create Your School Account
+    </h2>
 
-            </div>
+    <p>
+        Already have an account?
+        <a href="login.html">
+            Login
+        </a>
+    </p>
 
+</div>
 
-            <form
-                id="registerForm"
-                novalidate
-            >
 
-                <!-- SCHOOL NAME -->
+<form
+    id="registerForm"
+    novalidate
+>
 
-                <div class="form-group">
 
-                    <label for="school-name">
-                        School Name
-                    </label>
+<!-- SCHOOL NAME -->
 
-                    <input
-                        type="text"
-                        id="school-name"
-                        name="school-name"
-                        placeholder="Enter your school name"
-                        autocomplete="organization"
-                    >
+<div class="form-group">
 
-                </div>
+    <label for="school-name">
+        School Name
+    </label>
 
+    <input
+        type="text"
+        id="school-name"
+        name="school_name"
+        placeholder="Enter your school name"
+    >
 
-                <!-- OWNER + PHONE -->
+</div>
 
-                <div class="form-row">
 
-                    <div class="form-group">
+<!-- SCHOOL EMAIL -->
 
-                        <label for="owner-name">
-                            Owner / Admin Name
-                        </label>
+<div class="form-group">
 
-                        <input
-                            type="text"
-                            id="owner-name"
-                            name="owner-name"
-                            placeholder="Your full name"
-                            autocomplete="name"
-                        >
+    <label for="school-email">
+        School Email
+    </label>
 
-                    </div>
+    <input
+        type="email"
+        id="school-email"
+        name="school_email"
+        placeholder="school@example.com"
+    >
 
+</div>
 
-                    <div class="form-group">
 
-                        <label for="phone">
-                            Phone Number
-                        </label>
+<!-- PHONE -->
 
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            placeholder="08012345678"
-                            autocomplete="tel"
-                        >
+<div class="form-group">
 
-                    </div>
+    <label for="phone">
+        School Phone Number
+    </label>
 
-                </div>
+    <input
+        type="tel"
+        id="phone"
+        name="phone"
+        placeholder="08012345678"
+    >
 
+</div>
 
-                <!-- EMAIL -->
 
-                <div class="form-group">
+<!-- ADDRESS -->
 
-                    <label for="email">
-                        School Email
-                    </label>
+<div class="form-group">
 
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="school@example.com"
-                        autocomplete="email"
-                    >
+    <label for="address">
+        School Address
+    </label>
 
-                </div>
+    <input
+        type="text"
+        id="address"
+        name="address"
+        placeholder="Enter school address"
+    >
 
+</div>
 
-                <!-- ADDRESS -->
 
-                <div class="form-group">
+<!-- SCHOOL TYPE -->
 
-                    <label for="address">
-                        School Address
-                    </label>
+<div class="form-group">
 
-                    <input
-                        type="text"
-                        id="address"
-                        name="address"
-                        placeholder="Enter your school address"
-                        autocomplete="street-address"
-                    >
+    <label for="school-type">
+        School Type
+    </label>
 
-                </div>
+    <select
+        id="school-type"
+        name="school_type"
+    >
 
-   
-                <!-- LOGO -->
+        <option value="">
+            Select School Type
+        </option>
 
-                <div class="form-group">
+        <option value="Nursery">
+            Nursery
+        </option>
 
-                    <label for="school-logo">
-                        School Logo
-                    </label>
+        <option value="Primary">
+            Primary
+        </option>
 
-                    <input
-                        type="file"
-                        id="school-logo"
-                        name="school-logo"
-                        accept="image/png,image/jpeg,image/webp"
-                    >
+        <option value="Secondary">
+            Secondary
+        </option>
 
-                    <small>
-                        Optional — PNG, JPG or WEBP.
-                    </small>
+        <option value="Nursery & Primary">
+            Nursery & Primary
+        </option>
 
-                    <img
-                        id="logo-preview"
-                        src=""
-                        alt="School logo preview"
-                        style="
-                            display:none;
-                            width:100px;
-                            height:100px;
-                            object-fit:contain;
-                            margin-top:10px;
-                        "
-                    >
+        <option value="Primary & Secondary">
+            Primary & Secondary
+        </option>
 
-                </div>
+        <option value="Nursery, Primary & Secondary">
+            Nursery, Primary & Secondary
+        </option>
 
-                <div class="form-group">
-                    <label for="principal-name">Principal Name</label>
-                    <input type="text" id="principal-name" name="principal_name" placeholder="Enter principal's full name" required>
-                </div>
+    </select>
 
-                <div class="form-group">
-                    <label for="principal-email">Principal Email</label>
-                    <input type="email" id="principal-email" name="principal_email" placeholder="Enter principal's email" required>
-                </div>
+</div>
 
-                <!-- PASSWORDS -->
 
-                <div class="form-row">
+<!-- ACADEMIC SESSION -->
 
-                    <div class="form-group">
+<div class="form-group">
 
-                        <label for="password">
-                            Password
-                        </label>
+    <label for="academic-session">
+        Academic Session
+    </label>
 
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Create a password"
-                            autocomplete="new-password"
-                        >
+    <input
+        type="text"
+        id="academic-session"
+        name="academic_session"
+        placeholder="2026/2027"
+    >
 
-                    </div>
+</div>
 
 
-                    <div class="form-group">
+<!-- CURRENT TERM -->
 
-                        <label for="confirm-password">
-                            Confirm Password
-                        </label>
+<div class="form-group">
 
-                        <input
-                            type="password"
-                            id="confirm-password"
-                            name="confirm-password"
-                            placeholder="Confirm password"
-                            autocomplete="new-password"
-                        >
+    <label for="current-term">
+        Current Term
+    </label>
 
-                    </div>
+    <select
+        id="current-term"
+        name="current_term"
+    >
 
-                </div>
+        <option value="">
+            Select Term
+        </option>
 
+        <option value="First Term">
+            First Term
+        </option>
 
-                <!-- TERMS -->
+        <option value="Second Term">
+            Second Term
+        </option>
 
-                <label class="terms">
+        <option value="Third Term">
+            Third Term
+        </option>
 
-                    <input
-                        type="checkbox"
-                        id="terms"
-                    >
+    </select>
 
-                    <span>
+</div>
 
-                        I agree to the EduTrust
 
-                        <a href="#">
-                            Terms & Conditions
-                        </a>
+<!-- SCHOOL MOTTO -->
 
-                    </span>
+<div class="form-group">
 
-                </label>
+    <label for="school-motto">
+        School Motto
+    </label>
 
+    <input
+        type="text"
+        id="school-motto"
+        name="school_motto"
+        placeholder="Knowledge is Power"
+    >
 
-                <!-- MESSAGE -->
+</div>
 
-                <p id="message"></p>
 
+<!-- WEBSITE -->
 
-                <!-- SUBMIT -->
+<div class="form-group">
 
-                <button
-                    type="submit"
-                    class="register-button"
-                >
-                    Create School Account
-                </button>
+    <label for="website">
+        School Website
+    </label>
 
-            </form>
+    <input
+        type="url"
+        id="website"
+        name="website"
+        placeholder="https://www.yourschool.com"
+    >
 
-        </div>
+</div>
 
-    </section>
+
+<!-- LOGO -->
+
+<div class="form-group">
+
+    <label for="school-logo">
+        School Logo
+    </label>
+
+    <input
+        type="file"
+        id="school-logo"
+        accept="image/png,image/jpeg,image/webp"
+    >
+
+    <small>
+        Optional. PNG, JPG or WEBP.
+    </small>
+
+    <img
+        id="logo-preview"
+        alt="School logo preview"
+        style="
+            display:none;
+            width:100px;
+            height:100px;
+            object-fit:contain;
+            margin-top:10px;
+        "
+    >
+
+</div>
+
+
+<!-- PRINCIPAL NAME -->
+
+<div class="form-group">
+
+    <label for="principal-name">
+        Principal / Administrator Name
+    </label>
+
+    <input
+        type="text"
+        id="principal-name"
+        name="principal_name"
+        placeholder="Enter principal's full name"
+    >
+
+</div>
+
+
+<!-- PRINCIPAL EMAIL -->
+
+<div class="form-group">
+
+    <label for="principal-email">
+        Principal Login Email
+    </label>
+
+    <input
+        type="email"
+        id="principal-email"
+        name="principal_email"
+        placeholder="principal@example.com"
+    >
+
+</div>
+
+
+<!-- PASSWORD -->
+
+<div class="form-row">
+
+    <div class="form-group">
+
+        <label for="password">
+            Password
+        </label>
+
+        <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a password"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="confirm-password">
+            Confirm Password
+        </label>
+
+        <input
+            type="password"
+            id="confirm-password"
+            placeholder="Confirm password"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- TERMS -->
+
+<label class="terms">
+
+    <input
+        type="checkbox"
+        id="terms"
+    >
+
+    <span>
+
+        I agree to the EduTrust
+        <a href="#">
+            Terms & Conditions
+        </a>
+
+    </span>
+
+</label>
+
+
+<!-- MESSAGE -->
+
+<p id="message"></p>
+
+
+<!-- SUBMIT -->
+
+<button
+    type="submit"
+    class="register-button"
+>
+    Create School Account
+</button>
+
+
+</form>
+
+</div>
+
+</section>
 
 </main>
 
 
-<!-- IMPORTANT:
-     Cache-busting version number.
-     This forces the browser/GitHub Pages
-     to load the new register.js.
--->
-
-<script src="register.js?v=20260808"></script>
+<script src="register.js?v=20260809"></script>
 
 </body>
 
 </html>
-
