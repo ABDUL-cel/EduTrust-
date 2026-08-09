@@ -2972,216 +2972,760 @@ function showAcademicSessions() {
 /* =========================================================
    STUDENTS
    ========================================================= */
+async function showStudents() {
 
-function showStudents() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        window.location.href = "login.html";
+        return;
+    }
 
     contentArea.innerHTML = `
-        <div class="page-header">
+        <div class="page-content">
 
-            <div>
-                <h1>Students</h1>
-
-                <p>
-                    Manage all students registered
-                    in your school.
-                </p>
-            </div>
-
-            <button
-                class="primary-button"
-                id="add-student-button"
-            >
-                + Add Student
-            </button>
-
-        </div>
-
-        <div class="stats-grid">
-
-            <div class="stat-card">
-                <span class="stat-icon">👨‍🎓</span>
-
+            <div class="page-header">
                 <div>
-                    <p>Total Students</p>
-                    <h2>1,248</h2>
+                    <h1>Students</h1>
+                    <p>
+                        Manage all students registered in your school.
+                    </p>
                 </div>
+
+                <button
+                    class="primary-button"
+                    id="add-student-button"
+                    type="button"
+                >
+                    + Add Student
+                </button>
             </div>
 
-            <div class="stat-card">
-                <span class="stat-icon">🟢</span>
 
-                <div>
-                    <p>Active Students</p>
-                    <h2>1,180</h2>
-                </div>
-            </div>
+            <div class="stats-grid">
 
-            <div class="stat-card">
-                <span class="stat-icon">🔴</span>
-
-                <div>
-                    <p>Inactive Students</p>
-                    <h2>68</h2>
-                </div>
-            </div>
-
-        </div>
-
-        <div
-            class="student-modal"
-            id="student-modal"
-            style="display:none;"
-        >
-
-            <div class="student-modal-content">
-
-                <div class="modal-header">
-
-                    <h2>
-                        Add New Student
-                    </h2>
-
-                    <button
-                        type="button"
-                        class="close-modal"
-                        id="close-student-modal"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-                <form id="student-form">
-
-                    <div class="form-row">
-
-                        <div class="form-group">
-
-                            <label>
-                                First Name
-                            </label>
-
-                            <input
-                                type="text"
-                                required
-                            >
-
-                        </div>
-
-                        <div class="form-group">
-
-                            <label>
-                                Last Name
-                            </label>
-
-                            <input
-                                type="text"
-                                required
-                            >
-
-                        </div>
-
+                <div class="stat-card">
+                    <span class="stat-icon">👨‍🎓</span>
+                    <div>
+                        <p>Total Students</p>
+                        <h2 id="total-students">0</h2>
                     </div>
+                </div>
 
-                    <div class="modal-actions">
+                <div class="stat-card">
+                    <span class="stat-icon">🟢</span>
+                    <div>
+                        <p>Active Students</p>
+                        <h2 id="active-students">0</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-icon">🟡</span>
+                    <div>
+                        <p>Pending Students</p>
+                        <h2 id="pending-students">0</h2>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+                    <div>
+                        <h3>Student Directory</h3>
+                        <p>
+                            Students currently registered in your school.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Admission No.</th>
+                                <th>Student Name</th>
+                                <th>Gender</th>
+                                <th>Class</th>
+                                <th>Arm</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="students-table-body">
+
+                            <tr>
+                                <td colspan="6">
+                                    Loading students...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ADD STUDENT MODAL -->
+
+            <div
+                class="student-modal"
+                id="student-modal"
+                style="display:none;"
+            >
+
+                <div class="student-modal-content">
+
+                    <div class="modal-header">
+
+                        <h2>Add New Student</h2>
 
                         <button
                             type="button"
-                            class="cancel-button"
-                            id="cancel-student-modal"
+                            class="close-modal"
+                            id="close-student-modal"
                         >
-                            Cancel
-                        </button>
-
-                        <button
-                            type="submit"
-                            class="primary-button"
-                        >
-                            Add Student
+                            ×
                         </button>
 
                     </div>
 
-                </form>
+
+                    <form id="student-form">
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+                                <label for="student-admission">
+                                    Admission Number
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="student-admission"
+                                    required
+                                >
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="student-first-name">
+                                    First Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="student-first-name"
+                                    required
+                                >
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+                                <label for="student-last-name">
+                                    Last Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="student-last-name"
+                                    required
+                                >
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="student-other-name">
+                                    Other Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="student-other-name"
+                                >
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+
+                                <label for="student-gender">
+                                    Gender
+                                </label>
+
+                                <select
+                                    id="student-gender"
+                                    required
+                                >
+                                    <option value="">
+                                        Select Gender
+                                    </option>
+
+                                    <option value="Male">
+                                        Male
+                                    </option>
+
+                                    <option value="Female">
+                                        Female
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="student-dob">
+                                    Date of Birth
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="student-dob"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+
+                                <label for="student-class">
+                                    Class
+                                </label>
+
+                                <select
+                                    id="student-class"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select Class
+                                    </option>
+
+                                    <option value="Primary 1">
+                                        Primary 1
+                                    </option>
+
+                                    <option value="Primary 2">
+                                        Primary 2
+                                    </option>
+
+                                    <option value="Primary 3">
+                                        Primary 3
+                                    </option>
+
+                                    <option value="Primary 4">
+                                        Primary 4
+                                    </option>
+
+                                    <option value="Primary 5">
+                                        Primary 5
+                                    </option>
+
+                                    <option value="Primary 6">
+                                        Primary 6
+                                    </option>
+
+                                    <option value="JSS 1">
+                                        JSS 1
+                                    </option>
+
+                                    <option value="JSS 2">
+                                        JSS 2
+                                    </option>
+
+                                    <option value="JSS 3">
+                                        JSS 3
+                                    </option>
+
+                                    <option value="SS 1">
+                                        SS 1
+                                    </option>
+
+                                    <option value="SS 2">
+                                        SS 2
+                                    </option>
+
+                                    <option value="SS 3">
+                                        SS 3
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="student-arm">
+                                    Arm
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="student-arm"
+                                    placeholder="A"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="student-address">
+                                Home Address
+                            </label>
+
+                            <textarea
+                                id="student-address"
+                                rows="3"
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="modal-actions">
+
+                            <button
+                                type="button"
+                                class="cancel-button"
+                                id="cancel-student-modal"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                Add Student
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
 
             </div>
 
         </div>
     `;
 
-    const addStudentButton =
-        document.getElementById(
-            "add-student-button"
-        );
 
-    const studentModal =
-        document.getElementById(
-            "student-modal"
-        );
+    const modal =
+        document.getElementById("student-modal");
 
-    const closeStudentModal =
-        document.getElementById(
-            "close-student-modal"
-        );
+    const addButton =
+        document.getElementById("add-student-button");
 
-    const cancelStudentModal =
-        document.getElementById(
-            "cancel-student-modal"
-        );
+    const closeButton =
+        document.getElementById("close-student-modal");
 
-    const studentForm =
-        document.getElementById(
-            "student-form"
-        );
+    const cancelButton =
+        document.getElementById("cancel-student-modal");
 
-    if (
-        addStudentButton &&
-        studentModal
-    ) {
+    const form =
+        document.getElementById("student-form");
 
-        addStudentButton.addEventListener(
-            "click",
-            () => {
-                studentModal.style.display =
-                    "flex";
+
+    addButton?.addEventListener("click", () => {
+        modal.style.display = "flex";
+    });
+
+
+    closeButton?.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+
+    cancelButton?.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+
+    form?.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        const submitButton =
+            form.querySelector("button[type='submit']");
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Saving...";
+
+
+        const payload = {
+
+            admission_number:
+                document.getElementById(
+                    "student-admission"
+                ).value.trim(),
+
+            first_name:
+                document.getElementById(
+                    "student-first-name"
+                ).value.trim(),
+
+            last_name:
+                document.getElementById(
+                    "student-last-name"
+                ).value.trim(),
+
+            other_name:
+                document.getElementById(
+                    "student-other-name"
+                ).value.trim(),
+
+            gender:
+                document.getElementById(
+                    "student-gender"
+                ).value,
+
+            date_of_birth:
+                document.getElementById(
+                    "student-dob"
+                ).value || null,
+
+            class_name:
+                document.getElementById(
+                    "student-class"
+                ).value,
+
+            arm:
+                document.getElementById(
+                    "student-arm"
+                ).value.trim(),
+
+            home_address:
+                document.getElementById(
+                    "student-address"
+                ).value.trim()
+
+        };
+
+
+        try {
+
+            const response = await fetch(
+                "/api/students",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+                    },
+
+                    body:
+                        JSON.stringify(payload)
+                }
+            );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+
+                window.location.href =
+                    "login.html";
+
+                return;
             }
-        );
 
-        closeStudentModal?.addEventListener(
-            "click",
-            () => {
-                studentModal.style.display =
-                    "none";
-            }
-        );
 
-        cancelStudentModal?.addEventListener(
-            "click",
-            () => {
-                studentModal.style.display =
-                    "none";
-            }
-        );
+            if (!response.ok || !data.success) {
 
-        studentForm?.addEventListener(
-            "submit",
-            (e) => {
-
-                e.preventDefault();
-
-                alert(
-                    "Student added successfully!"
+                throw new Error(
+                    data.message ||
+                    "Unable to register student."
                 );
 
-                studentForm.reset();
-
-                studentModal.style.display =
-                    "none";
             }
-        );
-    }
-}
 
+
+            alert(
+                "Student registered successfully. Waiting for approval."
+            );
+
+
+            form.reset();
+
+            modal.style.display = "none";
+
+
+            await loadStudents();
+
+
+        } catch (error) {
+
+            console.error(
+                "STUDENT REGISTRATION ERROR:",
+                error
+            );
+
+            alert(error.message);
+
+        } finally {
+
+            submitButton.disabled = false;
+            submitButton.textContent =
+                "Add Student";
+
+        }
+
+    });
+
+
+    async function loadStudents() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/students",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization":
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+
+                window.location.href =
+                    "login.html";
+
+                return;
+            }
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "Unable to load students."
+                );
+
+            }
+
+
+            const students =
+                data.students || [];
+
+
+            const total =
+                students.length;
+
+
+            const active =
+                students.filter(
+                    student =>
+                        student.status === "Active"
+                ).length;
+
+
+            const pending =
+                students.filter(
+                    student =>
+                        student.status === "Pending"
+                ).length;
+
+
+            document.getElementById(
+                "total-students"
+            ).textContent = total;
+
+
+            document.getElementById(
+                "active-students"
+            ).textContent = active;
+
+
+            document.getElementById(
+                "pending-students"
+            ).textContent = pending;
+
+
+            const tableBody =
+                document.getElementById(
+                    "students-table-body"
+                );
+
+
+            if (!students.length) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            No students registered yet.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            tableBody.innerHTML =
+                students.map(student => {
+
+                    const fullName = [
+                        student.first_name,
+                        student.other_name,
+                        student.last_name
+                    ]
+                        .filter(Boolean)
+                        .join(" ");
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(
+                                    student.admission_number || "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    fullName || "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    student.gender || "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    student.class_name || "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    student.arm || "-"
+                                )}
+                            </td>
+
+                            <td>
+                                <span class="status ${getStudentStatusClass(student.status)}">
+                                    ${escapeHtml(
+                                        student.status || "Pending"
+                                    )}
+                                </span>
+                            </td>
+
+                        </tr>
+                    `;
+
+                }).join("");
+
+
+        } catch (error) {
+
+            console.error(
+                "LOAD STUDENTS ERROR:",
+                error
+            );
+
+            document.getElementById(
+                "students-table-body"
+            ).innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        Unable to load students.
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+
+    function getStudentStatusClass(status) {
+
+        if (status === "Active") {
+            return "paid";
+        }
+
+        if (status === "Pending") {
+            return "pending";
+        }
+
+        if (status === "Suspended") {
+            return "unpaid";
+        }
+
+        return "pending";
+    }
+
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    await loadStudents();
+                                }
+
+                
 
 /* =========================================================
    EXISTING PAGES
