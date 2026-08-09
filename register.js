@@ -1,292 +1,466 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const School = require("../models/school");
+const User = require("../models/user");
+
 /* =========================================================
-   EDUTRUST REGISTRATION
-   COMPLETE FRONTEND
-   ========================================================= */
+   HELPERS
+========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+function normalizeEmail(email) {
+    return String(email || "").trim().toLowerCase();
+}
 
-    const form = document.getElementById("registerForm");
-    const message = document.getElementById("message");
-    const submitButton =
-        form?.querySelector('button[type="submit"]');
-
-    if (!form) {
-        console.error("EduTrust: registerForm not found.");
-        return;
-    }
-
-    function showMessage(text, color = "#333") {
-        if (!message) return;
-
-        message.textContent = text;
-        message.style.color = color;
-    }
-
-    function value(id) {
-        const element = document.getElementById(id);
-
-        if (!element) {
-            return "";
+function createToken(user) {
+    return jwt.sign(
+        {
+            id: user._id.toString(),
+            school_id: user.school_id
+                ? user.school_id.toString()
+                : null,
+            role: user.role
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: "7d"
         }
+    );
+}
 
-        return String(element.value || "").trim();
-    }
+function safeUser(user) {
+    return {
+        id: user._id,
+        full_name: user.full_name,
+        email: user.email,
+        phone: user.phone || "",
+        role: user.role,
+        school_id: user.school_id
+    };
+}
 
-    form.addEventListener("submit", async (event) => {
+/* =========================================================
+   REGISTER USER / SCHOOL
+========================================================= */
 
-        event.preventDefault();
+exports.registerUser = async (req, res) => {
+    try {
+        const {
+            school_name,
+            school_email,
+            phone,
+            address,
+            school_type,
+            academic_session,
+            current_term,
+            school_motto,
+            website,
+            logo,
+            principal_name,
+            principal_email,
+            password
+        } = req.body;
 
-        /* =====================================================
-           READ ONLY THE FIELDS THAT ACTUALLY EXIST
-        ===================================================== */
+        const normalizedSchoolEmail =
+            normalizeEmail(school_email);
 
-        const schoolName = value("school-name");
-        const ownerName = value("owner-name");
-        const phone = value("phone");
-        const email = value("email").toLowerCase();
-        const address = value("address");
-        const password = value("password");
-        const confirmPassword = value("confirm-password");
-        const principalName = value("principal-name");
-        const principalEmail = value("principal-email").toLowerCase();
-        const schoolEmail = value("school-email").toLowerCase();
+        const normalizedPrincipalEmail =
+            normalizeEmail(principal_email);
 
-        const termsCheckbox =
-            form.querySelector('input[type="checkbox"]');
-
-        /* =====================================================
-           VALIDATION
-        ===================================================== */
-
-        const missingFields = [];
-
-        if (!schoolName) {
-            missingFields.push("School Name");
-        }
-
-        if (!ownerName) {
-            missingFields.push("Owner / Admin Name");
-        }
-
-        if (!phone) {
-            missingFields.push("Phone Number");
-        }
-
-        if (!address) {
-            missingFields.push("School Address");
-        }
-
-        if (!password) {
-            missingFields.push("Password");
-        }
-
-        if (!principalName) {
-            missingFields.push("Principal Name");
-        }
-
-        if (!principalEmail) {
-            missingFields.push("Principal Email");
-        }
-
-        if (!schoolEmail) {
-            missingFields.push("School Email");
-        }
-
-        if (!confirmPassword) {
-            missingFields.push("Confirm Password");
-        }
-
-        if (missingFields.length > 0) {
-            showMessage(
-                "Missing: " + missingFields.join(", "),
-                "red"
-            );
-            return;
-        }
+        /* -------------------------
+           Required fields
+        ------------------------- */
 
         if (
-            termsCheckbox &&
-            !termsCheckbox.checked
+            !school_name ||
+            !normalizedSchoolEmail ||
+            !principal_name ||
+            !normalizedPrincipalEmail ||
+            !password
         ) {
-            showMessage(
-                "Please agree to the EduTrust Terms & Conditions.",
-                "red"
-            );
-            return;
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Please provide all required registration fields."
+            });
         }
 
         if (password.length < 6) {
-            showMessage(
-                "Password must be at least 6 characters.",
-                "red"
-            );
-            return;
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Password must be at least 6 characters."
+            });
         }
 
-        if (password !== confirmPassword) {
-            showMessage(
-                "Passwords do not match.",
-                "red"
-            );
-            return;
+        /* -------------------------
+           Check duplicate school
+        ------------------------- */
+
+        const existingSchool =
+            await School.findOne({
+                email: normalizedSchoolEmail
+            });
+
+        if (existingSchool) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "A school with this email already exists."
+            });
         }
 
-        const emailPattern =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        /* -------------------------
+           Check duplicate user
+        ------------------------- */
 
-        if (!emailPattern.test(schoolEmail)) {
-            showMessage(
-                "Please enter a valid school email address.",
-                "red"
-            );
-            return;
+        const existingUser =
+            await User.findOne({
+                email: normalizedPrincipalEmail
+            });
+
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "An account with this email already exists."
+            });
         }
 
-        if (!emailPattern.test(principalEmail)) {
-            showMessage(
-                "Please enter a valid principal email address.",
-                "red"
-            );
-            return;
-        }
+        /* -------------------------
+           Hash password
+        ------------------------- */
 
-        /* =====================================================
-           BUTTON
-        ===================================================== */
+        const hashedPassword =
+            await bcrypt.hash(password, 10);
 
-        if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.textContent =
-                "Creating Account...";
-        }
+        /* -------------------------
+           Create school
+           MATCHES models/school.js
+        ------------------------- */
 
-        showMessage(
-            "Connecting to EduTrust...",
-            "#333"
-        );
+        const school =
+            await School.create({
+                name: school_name,
+                email: normalizedSchoolEmail,
+                phone: phone || "",
+                address: address || "",
+                school_type: school_type || "",
+                academic_session:
+                    academic_session || "",
+                current_term:
+                    current_term || "",
+                motto:
+                    school_motto || "",
+                website:
+                    website || "",
+                logo:
+                    logo || "",
+                status: "Active"
+            });
 
-        /* =====================================================
-           EXACT BACKEND PAYLOAD
-           MATCHES authController
-        ===================================================== */
+        /* -------------------------
+           Create principal account
+        ------------------------- */
 
-        const payload = {
-            school_name: schoolName,
-            school_email: schoolEmail,
-            phone: phone,
-            address: address,
-
-            school_type: "",
-            academic_session: "",
-            current_term: "",
-            school_motto: "",
-            website: "",
-            logo: "",
-
-            principal_name: principalName,
-            principal_email: principalEmail,
-            password: password
-        };
-
-        console.log(
-            "EduTrust registration payload:",
-            {
-                ...payload,
-                password: "[HIDDEN]"
-            }
-        );
-
-        /* =====================================================
-           SEND REQUEST
-        ===================================================== */
+        let user;
 
         try {
+            user = await User.create({
+                school_id: school._id,
+                full_name: principal_name.trim(),
+                email: normalizedPrincipalEmail,
+                phone: phone || "",
+                password: hashedPassword,
+                role: "Principal"
+            });
 
-            const response = await fetch(
-                "https://edutrust-15ii.onrender.com/api/auth/register",
-                {
-                    method: "POST",
+            /* -------------------------
+               Link principal to school
+            ------------------------- */
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+            school.principal_id = user._id;
 
-                    body:
-                        JSON.stringify(payload)
-                }
+            await school.save();
+
+        } catch (userError) {
+
+            /*
+             * If user creation fails after school creation,
+             * remove the school so we don't leave orphan data.
+             */
+
+            await School.findByIdAndDelete(
+                school._id
             );
 
-            let data = {};
-
-            try {
-                data = await response.json();
-            } catch (error) {
-                console.error(
-                    "EduTrust invalid JSON response:",
-                    error
-                );
-            }
-
-            console.log(
-                "EduTrust registration response:",
-                data
-            );
-
-            /* =================================================
-               SUCCESS
-            ================================================= */
-
-            if (
-                response.ok &&
-                data.success === true
-            ) {
-
-                showMessage(
-                    "Registration successful! Redirecting to login...",
-                    "green"
-                );
-
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-
-                setTimeout(() => {
-                    window.location.href =
-                        "login.html";
-                }, 1500);
-
-                return;
-            }
-
-            /* =================================================
-               BACKEND ERROR
-            ================================================= */
-
-            showMessage(
-                data.message ||
-                `Registration failed. Server returned ${response.status}.`,
-                "red"
-            );
-
-        } catch (error) {
-
-            console.error(
-                "EduTrust registration request failed:",
-                error
-            );
-
-            showMessage(
-                "Could not connect to EduTrust server. Please try again.",
-                "red"
-            );
-
-        } finally {
-
-            if (submitButton) {
-                submitButton.disabled = false;
-                submitButton.textContent =
-                    "Create School Account";
-            }
+            throw userError;
         }
-    });
-});
+
+        /* -------------------------
+           Return success
+        ------------------------- */
+
+        return res.status(201).json({
+            success: true,
+            message:
+                "School account created successfully.",
+            school: {
+                id: school._id,
+                name: school.name,
+                email: school.email,
+                phone: school.phone,
+                address: school.address,
+                school_type:
+                    school.school_type,
+                academic_session:
+                    school.academic_session,
+                current_term:
+                    school.current_term,
+                motto: school.motto,
+                website: school.website,
+                logo: school.logo,
+                principal_id:
+                    school.principal_id,
+                status: school.status
+            },
+            user: safeUser(user)
+        });
+
+    } catch (error) {
+
+        console.error(
+            "REGISTER USER ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                error.message ||
+                "Registration failed."
+        });
+    }
+};
+
+/* =========================================================
+   LOGIN USER
+========================================================= */
+
+exports.loginUser = async (req, res) => {
+    try {
+        const {
+            email,
+            password
+        } = req.body;
+
+        const normalizedEmail =
+            normalizeEmail(email);
+
+        if (
+            !normalizedEmail ||
+            !password
+        ) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Email and password are required."
+            });
+        }
+
+        const user =
+            await User.findOne({
+                email: normalizedEmail
+            });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Invalid email or password."
+            });
+        }
+
+        const passwordMatches =
+            await bcrypt.compare(
+                password,
+                user.password
+            );
+
+        if (!passwordMatches) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Invalid email or password."
+            });
+        }
+
+        if (!user.school_id) {
+            return res.status(403).json({
+                success: false,
+                message:
+                    "This account is not connected to a school."
+            });
+        }
+
+        const school =
+            await School.findById(
+                user.school_id
+            );
+
+        if (!school) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "School account could not be found."
+            });
+        }
+
+        if (school.status !== "Active") {
+            return res.status(403).json({
+                success: false,
+                message:
+                    "This school account is not active."
+            });
+        }
+
+        const token =
+            createToken(user);
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Login successful.",
+            token,
+            user: {
+                ...safeUser(user),
+                school_name:
+                    school.name,
+                school_email:
+                    school.email,
+                address:
+                    school.address,
+                school_type:
+                    school.school_type,
+                academic_session:
+                    school.academic_session,
+                current_term:
+                    school.current_term,
+                motto:
+                    school.motto,
+                website:
+                    school.website,
+                logo:
+                    school.logo
+            }
+        });
+
+    } catch (error) {
+
+        console.error(
+            "LOGIN USER ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                error.message ||
+                "Login failed."
+        });
+    }
+};
+
+/* =========================================================
+   GET LOGGED-IN USER
+========================================================= */
+
+exports.getMe = async (req, res) => {
+    try {
+        const userId =
+            req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Invalid authentication session."
+            });
+        }
+
+        const user =
+            await User.findById(
+                userId
+            ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "User account not found."
+            });
+        }
+
+        let school = null;
+
+        if (user.school_id) {
+            school =
+                await School.findById(
+                    user.school_id
+                );
+        }
+
+        return res.status(200).json({
+            success: true,
+            user: {
+                id: user._id,
+                full_name:
+                    user.full_name,
+                email:
+                    user.email,
+                phone:
+                    user.phone || "",
+                role:
+                    user.role,
+                school_id:
+                    user.school_id,
+
+                school_name:
+                    school?.name || "",
+                school_email:
+                    school?.email || "",
+                address:
+                    school?.address || "",
+                school_type:
+                    school?.school_type || "",
+                academic_session:
+                    school?.academic_session || "",
+                current_term:
+                    school?.current_term || "",
+                motto:
+                    school?.motto || "",
+                website:
+                    school?.website || "",
+                logo:
+                    school?.logo || "",
+                school_status:
+                    school?.status || ""
+            }
+        });
+
+    } catch (error) {
+
+        console.error(
+            "GET ME ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                error.message ||
+                "Unable to load profile."
+        });
+    }
+};
+
