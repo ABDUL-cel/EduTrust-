@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Parent = require("../models/Parent");
-const Student = require("../models/Student");
+const Student = require("../models/student");
 
 function getSchoolId(req) {
     return (
