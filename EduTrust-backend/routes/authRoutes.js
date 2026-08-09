@@ -1,41 +1,49 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
-    registerUser,
-    loginUser,
-    getMe
+    registerSchool,
+    login,
+    getProfile
 } = require("../controllers/authController");
 
 const authMiddleware =
     require("../middleware/authMiddleware");
 
-/* =========================
-   REGISTER
-========================= */
+
+// =========================================================
+// REGISTER SCHOOL
+// POST /api/auth/register
+// =========================================================
 
 router.post(
     "/register",
-    registerUser
+    registerSchool
 );
 
-/* =========================
-   LOGIN
-========================= */
+
+// =========================================================
+// LOGIN
+// POST /api/auth/login
+// =========================================================
 
 router.post(
     "/login",
-    loginUser
+    login
 );
 
-/* =========================
-   LOGGED-IN PROFILE
-========================= */
+
+// =========================================================
+// PROFILE
+// GET /api/auth/profile
+// =========================================================
 
 router.get(
     "/profile",
     authMiddleware,
-    getMe
+    getProfile
 );
+
 
 module.exports = router;
