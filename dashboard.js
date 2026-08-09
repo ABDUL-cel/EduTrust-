@@ -3730,7 +3730,6 @@ async function showStudents() {
 /* =========================================================
    EXISTING PAGES
    ========================================================= */
-
 function showParents() {
     const token = localStorage.getItem("token");
 
@@ -3745,10 +3744,10 @@ function showParents() {
             <div class="page-introduction">
                 <div>
                     <h2>Parents & Guardians</h2>
-                    <p>Manage parents, guardians and their connected students.</p>
+                    <p>Manage parents and guardians registered in your school.</p>
                 </div>
 
-                <button class="primary-button" id="open-parent-modal">
+                <button class="primary-button" id="add-parent-btn">
                     + Add Parent
                 </button>
             </div>
@@ -3756,17 +3755,20 @@ function showParents() {
             <div class="stats-grid">
                 <div class="stat-card">
                     <p>Total Parents</p>
-                    <h3 id="parent-total-count">0</h3>
+                    <h3 id="parent-total">0</h3>
+                    <small>Registered in your school</small>
                 </div>
 
                 <div class="stat-card">
-                    <p>Active Parents</p>
-                    <h3 id="parent-active-count">0</h3>
+                    <p>Parents With Children</p>
+                    <h3 id="parents-linked">0</h3>
+                    <small>Linked to students</small>
                 </div>
 
                 <div class="stat-card">
-                    <p>Parents With Students</p>
-                    <h3 id="parent-linked-count">0</h3>
+                    <p>Students Linked</p>
+                    <h3 id="students-linked">0</h3>
+                    <small>Across all parents</small>
                 </div>
             </div>
 
@@ -3774,50 +3776,65 @@ function showParents() {
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label>Search Parents</label>
                         <input
                             type="text"
                             id="parent-search"
-                            placeholder="🔍 Search parent..."
+                            placeholder="Search by name, phone or email"
                         >
                     </div>
                 </div>
 
+            </div>
+
+            <div class="dashboard-card">
+
                 <div class="table-responsive">
-                    <table>
+
+                    <table class="fee-table">
+
                         <thead>
                             <tr>
                                 <th>Parent</th>
                                 <th>Relationship</th>
                                 <th>Phone</th>
                                 <th>Email</th>
-                                <th>Students</th>
+                                <th>Children</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
                         <tbody id="parents-table-body">
+
                             <tr>
-                                <td colspan="7">
+                                <td colspan="7" style="text-align:center;">
                                     Loading parents...
                                 </td>
                             </tr>
+
                         </tbody>
+
                     </table>
+
                 </div>
 
             </div>
 
         </div>
 
+        <!-- ADD PARENT MODAL -->
+
         <div
-            id="parent-modal"
             class="student-modal"
+            id="parent-modal"
             style="display:none;"
         >
+
             <div class="student-modal-content">
 
                 <div class="modal-header">
+
                     <h2>Add Parent / Guardian</h2>
 
                     <button
@@ -3827,6 +3844,7 @@ function showParents() {
                     >
                         ×
                     </button>
+
                 </div>
 
                 <form id="parent-form">
@@ -3874,12 +3892,13 @@ function showParents() {
                                 <option value="Father">Father</option>
                                 <option value="Mother">Mother</option>
                                 <option value="Guardian">Guardian</option>
-                                <option value="Grandfather">Grandfather</option>
-                                <option value="Grandmother">Grandmother</option>
                                 <option value="Uncle">Uncle</option>
                                 <option value="Aunt">Aunt</option>
+                                <option value="Grandfather">Grandfather</option>
+                                <option value="Grandmother">Grandmother</option>
                                 <option value="Other">Other</option>
                             </select>
+
                         </div>
 
                     </div>
@@ -3926,12 +3945,20 @@ function showParents() {
                     </div>
 
                     <div class="form-group">
+
                         <label>Home Address</label>
+
                         <textarea
-                            id="parent-address"
+                            id="parent-home-address"
                             rows="3"
                         ></textarea>
+
                     </div>
+
+                    <div
+                        id="parent-form-message"
+                        style="margin-bottom:1rem;"
+                    ></div>
 
                     <div class="modal-actions">
 
@@ -3946,8 +3973,9 @@ function showParents() {
                         <button
                             type="submit"
                             class="primary-button"
+                            id="save-parent-btn"
                         >
-                            Save Parent
+                            Register Parent
                         </button>
 
                     </div>
@@ -3955,43 +3983,147 @@ function showParents() {
                 </form>
 
             </div>
+
         </div>
     `;
 
-    let allParents = [];
+    const parentModal = document.getElementById("parent-modal");
+    const addParentBtn = document.getElementById("add-parent-btn");
+    const closeParentModal = document.getElementById("close-parent-modal");
+    const cancelParentModal = document.getElementById("cancel-parent-modal");
+    const parentForm = document.getElementById("parent-form");
+    const parentSearch = document.getElementById("parent-search");
 
-    const modal = document.getElementById("parent-modal");
-    const form = document.getElementById("parent-form");
-    const openButton = document.getElementById("open-parent-modal");
-    const closeButton = document.getElementById("close-parent-modal");
-    const cancelButton = document.getElementById("cancel-parent-modal");
-    const searchInput = document.getElementById("parent-search");
-    const tableBody = document.getElementById("parents-table-body");
+    function openParentModal() {
+        parentModal.style.display = "flex";
+    }
 
-    openButton?.addEventListener("click", () => {
-        modal.style.display = "flex";
+    function closeParentModalWindow() {
+        parentModal.style.display = "none";
+        parentForm.reset();
+
+        const message = document.getElementById("parent-form-message");
+
+        if (message) {
+            message.innerHTML = "";
+        }
+    }
+
+    addParentBtn?.addEventListener("click", openParentModal);
+
+    closeParentModal?.addEventListener(
+        "click",
+        closeParentModalWindow
+    );
+
+    cancelParentModal?.addEventListener(
+        "click",
+        closeParentModalWindow
+    );
+
+    parentModal?.addEventListener("click", function (event) {
+        if (event.target === parentModal) {
+            closeParentModalWindow();
+        }
     });
 
-    closeButton?.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
+    async function loadParents() {
 
-    cancelButton?.addEventListener("click", () => {
-        modal.style.display = "none";
-        form.reset();
-    });
+        const tableBody =
+            document.getElementById("parents-table-body");
 
-    function renderParents(parents) {
-        if (!tableBody) return;
+        try {
 
-        if (!parents.length) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="7">
-                        No parents or guardians registered yet.
+                    <td colspan="7" style="text-align:center;">
+                        Loading parents...
                     </td>
                 </tr>
             `;
+
+            const response = await fetch("/api/parents", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.message || "Unable to load parents."
+                );
+            }
+
+            const parents = Array.isArray(data.parents)
+                ? data.parents
+                : [];
+
+            document.getElementById("parent-total").textContent =
+                parents.length;
+
+            const linkedParents = parents.filter(
+                parent =>
+                    Array.isArray(parent.students) &&
+                    parent.students.length > 0
+            );
+
+            const linkedStudents = parents.reduce(
+                (total, parent) =>
+                    total +
+                    (
+                        Array.isArray(parent.students)
+                            ? parent.students.length
+                            : 0
+                    ),
+                0
+            );
+
+            document.getElementById("parents-linked").textContent =
+                linkedParents.length;
+
+            document.getElementById("students-linked").textContent =
+                linkedStudents;
+
+            renderParents(parents);
+
+            parentSearch.dataset.parents =
+                JSON.stringify(parents);
+
+        } catch (error) {
+
+            console.error("LOAD PARENTS ERROR:", error);
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center;">
+                        Unable to load parents.
+                        <br>
+                        <small>${escapeParentHTML(error.message)}</small>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    function renderParents(parents) {
+
+        const tableBody =
+            document.getElementById("parents-table-body");
+
+        if (!parents.length) {
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center;">
+                        No parents have been registered yet.
+                    </td>
+                </tr>
+            `;
+
             return;
         }
 
@@ -4005,159 +4137,161 @@ function showParents() {
                 .filter(Boolean)
                 .join(" ");
 
-            const students = parent.students || [];
+            const students = Array.isArray(parent.students)
+                ? parent.students
+                : [];
 
-            const studentText = students.length
+            const childrenText = students.length
                 ? students
                     .map(student =>
-                        `${student.first_name} ${student.last_name}`
+                        `${student.first_name || ""} ${student.last_name || ""}`
                     )
                     .join(", ")
                 : "No student linked";
 
+            const status =
+                parent.status || "Active";
+
             return `
-                <tr>
+                <tr
+                    data-parent-name="${escapeParentHTML(
+                        fullName.toLowerCase()
+                    )}"
+                    data-parent-phone="${escapeParentHTML(
+                        parent.phone || ""
+                    )}"
+                    data-parent-email="${escapeParentHTML(
+                        parent.email || ""
+                    )}"
+                >
 
                     <td>
-                        <strong>${fullName}</strong>
+                        <strong>
+                            ${escapeParentHTML(fullName)}
+                        </strong>
                     </td>
 
                     <td>
-                        ${parent.relationship || "—"}
+                        ${escapeParentHTML(
+                            parent.relationship || "—"
+                        )}
                     </td>
 
                     <td>
-                        ${parent.phone || "—"}
+                        ${escapeParentHTML(
+                            parent.phone || "—"
+                        )}
                     </td>
 
                     <td>
-                        ${parent.email || "—"}
+                        ${escapeParentHTML(
+                            parent.email || "—"
+                        )}
                     </td>
 
                     <td>
-                        ${studentText}
+                        ${
+                            students.length
+                                ? `
+                                    <strong>
+                                        ${students.length}
+                                    </strong>
+                                    <br>
+                                    <small>
+                                        ${escapeParentHTML(
+                                            childrenText
+                                        )}
+                                    </small>
+                                  `
+                                : "0"
+                        }
                     </td>
 
                     <td>
                         <span class="status ${
-                            parent.status === "Active"
-                                ? "paid-status"
-                                : "pending"
+                            status.toLowerCase()
                         }">
-                            ${parent.status || "Active"}
+                            ${escapeParentHTML(status)}
                         </span>
                     </td>
 
                     <td>
+
                         <button
-                            class="primary-button"
                             type="button"
-                            onclick="viewParentDetails('${parent._id}')"
+                            class="secondary-button parent-view-btn"
+                            data-id="${parent._id}"
                         >
                             View
                         </button>
+
                     </td>
 
                 </tr>
             `;
+
         }).join("");
-    }
 
-    async function loadParents() {
-        try {
-            const response = await fetch("/api/parents", {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+        document
+            .querySelectorAll(".parent-view-btn")
+            .forEach(button => {
+
+                button.addEventListener("click", () => {
+
+                    showParentDetails(
+                        button.dataset.id
+                    );
+
+                });
+
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Unable to load parents."
-                );
-            }
-
-            allParents = data.parents || [];
-
-            document.getElementById(
-                "parent-total-count"
-            ).textContent = allParents.length;
-
-            document.getElementById(
-                "parent-active-count"
-            ).textContent = allParents.filter(
-                parent => parent.status === "Active"
-            ).length;
-
-            document.getElementById(
-                "parent-linked-count"
-            ).textContent = allParents.filter(
-                parent =>
-                    parent.students &&
-                    parent.students.length > 0
-            ).length;
-
-            renderParents(allParents);
-
-        } catch (error) {
-            console.error("LOAD PARENTS ERROR:", error);
-
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="7">
-                        Unable to load parents.
-                    </td>
-                </tr>
-            `;
-        }
     }
 
-    searchInput?.addEventListener("input", () => {
-        const search = searchInput.value
-            .trim()
-            .toLowerCase();
+    parentSearch?.addEventListener("input", function () {
 
-        const filtered = allParents.filter(parent => {
+        const searchValue =
+            this.value.trim().toLowerCase();
 
-            const fullName = [
-                parent.first_name,
-                parent.other_name,
-                parent.last_name
-            ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-
-            const phone = (
-                parent.phone || ""
-            ).toLowerCase();
-
-            const email = (
-                parent.email || ""
-            ).toLowerCase();
-
-            return (
-                fullName.includes(search) ||
-                phone.includes(search) ||
-                email.includes(search)
+        const rows =
+            document.querySelectorAll(
+                "#parents-table-body tr"
             );
-        });
 
-        renderParents(filtered);
+        rows.forEach(row => {
+
+            const name =
+                row.dataset.parentName || "";
+
+            const phone =
+                row.dataset.parentPhone || "";
+
+            const email =
+                row.dataset.parentEmail || "";
+
+            const matches =
+                !searchValue ||
+                name.includes(searchValue) ||
+                phone.includes(searchValue) ||
+                email.includes(searchValue);
+
+            row.style.display =
+                matches ? "" : "none";
+
+        });
     });
 
-    form?.addEventListener("submit", async event => {
+    parentForm?.addEventListener("submit", async function (event) {
+
         event.preventDefault();
 
-        const submitButton =
-            form.querySelector("button[type='submit']");
+        const saveButton =
+            document.getElementById("save-parent-btn");
 
-        submitButton.disabled = true;
-        submitButton.textContent = "Saving...";
+        const message =
+            document.getElementById("parent-form-message");
 
-        const parentData = {
+        const payload = {
+
             first_name:
                 document.getElementById(
                     "parent-first-name"
@@ -4200,234 +4334,325 @@ function showParents() {
 
             home_address:
                 document.getElementById(
-                    "parent-address"
+                    "parent-home-address"
                 ).value.trim()
+
         };
 
+        if (
+            !payload.first_name ||
+            !payload.last_name ||
+            !payload.relationship ||
+            !payload.phone
+        ) {
+
+            message.innerHTML = `
+                <span style="color:#dc2626;">
+                    Please fill in all required fields.
+                </span>
+            `;
+
+            return;
+        }
+
         try {
+
+            saveButton.disabled = true;
+            saveButton.textContent = "Registering...";
+
+            message.innerHTML = "";
+
             const response = await fetch(
                 "/api/parents",
                 {
                     method: "POST",
 
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     },
 
-                    body: JSON.stringify(parentData)
+                    body: JSON.stringify(payload)
                 }
             );
 
             const data = await response.json();
 
-            if (!response.ok) {
+            if (!response.ok || !data.success) {
                 throw new Error(
                     data.message ||
                     "Unable to register parent."
                 );
             }
 
-            alert("Parent registered successfully.");
+            message.innerHTML = `
+                <span style="color:#15803d;">
+                    Parent registered successfully.
+                </span>
+            `;
 
-            form.reset();
-            modal.style.display = "none";
+            parentForm.reset();
 
             await loadParents();
 
+            setTimeout(() => {
+                closeParentModalWindow();
+            }, 700);
+
         } catch (error) {
+
             console.error(
-                "REGISTER PARENT ERROR:",
+                "CREATE PARENT ERROR:",
                 error
             );
 
-            alert(error.message);
+            message.innerHTML = `
+                <span style="color:#dc2626;">
+                    ${escapeParentHTML(error.message)}
+                </span>
+            `;
+
         } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = "Save Parent";
+
+            saveButton.disabled = false;
+            saveButton.textContent = "Register Parent";
+
         }
+
     });
 
-    loadParents();
-}
+    async function showParentDetails(parentId) {
 
-/*
-========================================
-VIEW PARENT DETAILS
-========================================
-*/
+        try {
 
-async function viewParentDetails(parentId) {
-    const token = localStorage.getItem("token");
-
-    try {
-        const response = await fetch(
-            `/api/parents/${parentId}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
+            const response = await fetch(
+                `/api/parents/${parentId}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
                 }
-            }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                data.message ||
-                "Unable to load parent."
             );
-        }
 
-        const parent = data.parent;
+            const data = await response.json();
 
-        const fullName = [
-            parent.first_name,
-            parent.other_name,
-            parent.last_name
-        ]
-            .filter(Boolean)
-            .join(" ");
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.message ||
+                    "Unable to load parent."
+                );
+            }
 
-        const students = parent.students || [];
+            const parent = data.parent;
 
-        contentArea.innerHTML = `
-            <div class="page-content">
+            const fullName = [
+                parent.first_name,
+                parent.other_name,
+                parent.last_name
+            ]
+                .filter(Boolean)
+                .join(" ");
 
-                <div class="page-introduction">
+            const students =
+                Array.isArray(parent.students)
+                    ? parent.students
+                    : [];
 
-                    <div>
-                        <h2>${fullName}</h2>
-                        <p>
-                            ${parent.relationship || "Parent / Guardian"}
-                        </p>
+            contentArea.innerHTML = `
+
+                <div class="page-content">
+
+                    <div class="page-introduction">
+
+                        <div>
+                            <h2>
+                                ${escapeParentHTML(fullName)}
+                            </h2>
+
+                            <p>
+                                Parent / Guardian Profile
+                            </p>
+                        </div>
+
+                        <button
+                            class="secondary-button"
+                            id="back-to-parents"
+                        >
+                            ← Back to Parents
+                        </button>
+
                     </div>
 
-                    <button
-                        class="primary-button"
-                        onclick="showParents()"
-                    >
-                        ← Back to Parents
-                    </button>
-
-                </div>
-
-                <div class="dashboard-card">
-
-                    <h3>Parent Information</h3>
-
-                    <div class="school-details">
+                    <div class="dashboard-card">
 
                         <div class="detail-item">
                             <span>Full Name</span>
-                            <strong>${fullName}</strong>
+                            <strong>
+                                ${escapeParentHTML(fullName)}
+                            </strong>
                         </div>
 
                         <div class="detail-item">
                             <span>Relationship</span>
-                            <strong>${parent.relationship || "—"}</strong>
+                            <strong>
+                                ${escapeParentHTML(
+                                    parent.relationship || "—"
+                                )}
+                            </strong>
                         </div>
 
                         <div class="detail-item">
                             <span>Phone</span>
-                            <strong>${parent.phone || "—"}</strong>
+                            <strong>
+                                ${escapeParentHTML(
+                                    parent.phone || "—"
+                                )}
+                            </strong>
                         </div>
 
                         <div class="detail-item">
                             <span>Email</span>
-                            <strong>${parent.email || "—"}</strong>
+                            <strong>
+                                ${escapeParentHTML(
+                                    parent.email || "—"
+                                )}
+                            </strong>
                         </div>
 
                         <div class="detail-item">
                             <span>Occupation</span>
-                            <strong>${parent.occupation || "—"}</strong>
+                            <strong>
+                                ${escapeParentHTML(
+                                    parent.occupation || "—"
+                                )}
+                            </strong>
                         </div>
 
                         <div class="detail-item">
-                            <span>Address</span>
-                            <strong>${parent.home_address || "—"}</strong>
+                            <span>Home Address</span>
+                            <strong>
+                                ${escapeParentHTML(
+                                    parent.home_address || "—"
+                                )}
+                            </strong>
                         </div>
 
                     </div>
 
-                </div>
+                    <div class="dashboard-card">
 
-                <div class="dashboard-card">
+                        <h3>Linked Students</h3>
 
-                    <h3>Connected Students</h3>
+                        <br>
 
-                    <div class="table-responsive">
+                        ${
+                            students.length
+                                ? `
+                                    <div class="table-responsive">
+                                        <table class="fee-table">
 
-                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Student</th>
+                                                    <th>Admission No.</th>
+                                                    <th>Class</th>
+                                                    <th>Arm</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
 
-                            <thead>
-                                <tr>
-                                    <th>Student</th>
-                                    <th>Admission Number</th>
-                                    <th>Class</th>
-                                    <th>Arm</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
+                                            <tbody>
 
-                            <tbody>
+                                                ${students.map(
+                                                    student => `
+                                                        <tr>
 
-                                ${
-                                    students.length
-                                        ? students.map(student => `
-                                            <tr>
-                                                <td>
-                                                    ${student.first_name}
-                                                    ${student.last_name}
-                                                </td>
+                                                            <td>
+                                                                ${escapeParentHTML(
+                                                                    `${student.first_name || ""} ${student.last_name || ""}`
+                                                                )}
+                                                            </td>
 
-                                                <td>
-                                                    ${student.admission_number}
-                                                </td>
+                                                            <td>
+                                                                ${escapeParentHTML(
+                                                                    student.admission_number || "—"
+                                                                )}
+                                                            </td>
 
-                                                <td>
-                                                    ${student.class_name}
-                                                </td>
+                                                            <td>
+                                                                ${escapeParentHTML(
+                                                                    student.class_name || "—"
+                                                                )}
+                                                            </td>
 
-                                                <td>
-                                                    ${student.arm || "—"}
-                                                </td>
+                                                            <td>
+                                                                ${escapeParentHTML(
+                                                                    student.arm || "—"
+                                                                )}
+                                                            </td>
 
-                                                <td>
-                                                    ${student.status}
-                                                </td>
-                                            </tr>
-                                        `).join("")
-                                        : `
-                                            <tr>
-                                                <td colspan="5">
-                                                    No students linked to this parent yet.
-                                                </td>
-                                            </tr>
-                                        `
-                                }
+                                                            <td>
+                                                                ${escapeParentHTML(
+                                                                    student.status || "—"
+                                                                )}
+                                                            </td>
 
-                            </tbody>
+                                                        </tr>
+                                                    `
+                                                ).join("")}
 
-                        </table>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                  `
+                                : `
+                                    <p>
+                                        No students are linked
+                                        to this parent yet.
+                                    </p>
+                                  `
+                        }
 
                     </div>
 
                 </div>
+            `;
 
-            </div>
-        `;
+            document
+                .getElementById("back-to-parents")
+                ?.addEventListener(
+                    "click",
+                    showParents
+                );
 
-    } catch (error) {
-        console.error(
-            "VIEW PARENT ERROR:",
-            error
-        );
+        } catch (error) {
 
-        alert(error.message);
+            console.error(
+                "PARENT DETAILS ERROR:",
+                error
+            );
+
+            alert(error.message);
+
+        }
+
     }
-}
 
+    function escapeParentHTML(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+    loadParents();
+                   }
+                                
 function showStaff() {
     contentArea.innerHTML = `
         <div class="page-content">
