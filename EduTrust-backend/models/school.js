@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const SchoolSchema = new mongoose.Schema(
@@ -69,17 +68,16 @@ const SchoolSchema = new mongoose.Schema(
             default: null
         },
         principal_name: {
-  type: String,
-  required: true,
-  trim: true
-},
-principal_email: {
-  type: String,
-  required: true,
-  lowercase: true,
-  trim: true
-},
-
+            type: String,
+            required: true,
+            trim: true
+        },
+        principal_email: {
+            type: String,
+            required: true,
+            lowercase: true,
+            trim: true
+        },
 
         status: {
             type: String,
