@@ -1,170 +1,234 @@
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const User = require("../models/user");
 const School = require("../models/school");
+const User = require("../models/user");
 
-const JWT_SECRET =
-    process.env.JWT_SECRET || "edutrust_fallback_secret_key";
+/* =========================================================
+   HELPERS
+========================================================= */
 
+function normalizeEmail(email) {
+    return String(email || "").trim().toLowerCase();
+}
 
-// =======================================
-// Generate JWT
-// =======================================
-const generateToken = (user) => {
+function createToken(user) {
     return jwt.sign(
         {
-            id: user._id,
-            role: user.role,
-            school_id: user.school_id || null
+            id: user._id.toString(),
+            school_id: user.school_id
+                ? user.school_id.toString()
+                : null,
+            role: user.role
         },
-        JWT_SECRET,
+        process.env.JWT_SECRET,
         {
             expiresIn: "7d"
         }
     );
-};
+}
 
+function safeUser(user) {
+    return {
+        id: user._id,
+        full_name: user.full_name,
+        email: user.email,
+        phone: user.phone || "",
+        role: user.role,
+        school_id: user.school_id
+    };
+}
 
-// =======================================
-// Register User / School
-// =======================================
+/* =========================================================
+   REGISTER USER / SCHOOL
+========================================================= */
+
 exports.registerUser = async (req, res) => {
     try {
         const {
-            principal_name,
-            principal_email,
-            school_email, 
-            phone,
-            password,
             school_name,
+            school_email,
+            phone,
+            address,
             school_type,
             academic_session,
             current_term,
-            address,
             school_motto,
+            website,
             logo,
-            website
+            principal_name,
+            principal_email,
+            password
         } = req.body;
 
-        // -----------------------------------
-        // Required fields
-        // -----------------------------------
+        const normalizedSchoolEmail =
+            normalizeEmail(school_email);
+
+        const normalizedPrincipalEmail =
+            normalizeEmail(principal_email);
+
+        /* -------------------------
+           Required fields
+        ------------------------- */
+
         if (
+            !school_name ||
+            !normalizedSchoolEmail ||
             !principal_name ||
-            !principal_email ||
-            !phone ||
-            !password ||
-            !school_name
+            !normalizedPrincipalEmail ||
+            !password
         ) {
             return res.status(400).json({
                 success: false,
                 message:
-                    "principal name, principal email, phone, password and school name are required."
+                    "Please provide all required registration fields."
             });
         }
 
-        // -----------------------------------
-        // Check existing user
-        // -----------------------------------
-        const existingUser = await User.findOne({
-            email: principal_email.toLowerCase().trim()
-        });
-
-        if (existingUser) {
+        if (password.length < 6) {
             return res.status(400).json({
                 success: false,
-                message: "An account with this email already exists."
+                message:
+                    "Password must be at least 6 characters."
             });
         }
 
-        // -----------------------------------
-        // Hash password
-        // -----------------------------------
-        const hashedPassword = await bcrypt.hash(
-            password,
-            12
-        );
+        /* -------------------------
+           Check duplicate school
+        ------------------------- */
 
-        // -----------------------------------
-        // Create principal first
-        // -----------------------------------
-        const user = await User.create({
-            principal_name,
-            email: principal_email.toLowerCase().trim(),
-            phone,
-            password: hashedPassword,
+        const existingSchool =
+            await School.findOne({
+                email: normalizedSchoolEmail
+            });
 
-            // Principal owns the initial school account
-            role: "Principal",
+        if (existingSchool) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "A school with this email already exists."
+            });
+        }
 
-            school_name,
-            school_type: school_type || "",
-            academic_session: academic_session || "",
-            current_term: current_term || "",
-            address: address || "",
-            school_motto: school_motto || "",
-            website: website || "",
-            logo: logo || "",
+        /* -------------------------
+           Check duplicate user
+        ------------------------- */
 
-            status: "Active"
-        });
+        const existingUser =
+            await User.findOne({
+                email: normalizedPrincipalEmail
+            });
 
-        // -----------------------------------
-        // Create School
-        // -----------------------------------
-        const school = await School.create({
-            name: school_name,
-            email: school_email.toLowerCase().trim(),
-            phone,
-            address: address || "",
-            school_type: school_type || "",
-            academic_session: academic_session || "",
-            current_term: current_term || "",
-            motto: school_motto || "",
-            website: website || "",
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "An account with this email already exists."
+            });
+        }
 
-            principal_id: user._id,
+        /* -------------------------
+           Hash password
+        ------------------------- */
 
-            status: "Active"
-        });
+        const hashedPassword =
+            await bcrypt.hash(password, 10);
 
-        // -----------------------------------
-        // Link user to School
-        // -----------------------------------
-        user.school_id = school._id;
+        /* -------------------------
+           Create school
+           MATCHES models/school.js
+        ------------------------- */
 
-        await user.save();
+        const school =
+            await School.create({
+                name: school_name,
+                email: normalizedSchoolEmail,
+                phone: phone || "",
+                address: address || "",
+                school_type: school_type || "",
+                academic_session:
+                    academic_session || "",
+                current_term:
+                    current_term || "",
+                motto:
+                    school_motto || "",
+                website:
+                    website || "",
+                logo:
+                    logo || "",
+                status: "Active"
+            });
 
-        // -----------------------------------
-        // Generate token
-        // -----------------------------------
-        const token = generateToken(user);
+        /* -------------------------
+           Create principal account
+        ------------------------- */
+
+        let user;
+
+        try {
+            user = await User.create({
+                school_id: school._id,
+                full_name: principal_name.trim(),
+                email: normalizedPrincipalEmail,
+                phone: phone || "",
+                password: hashedPassword,
+                role: "Principal"
+            });
+
+            /* -------------------------
+               Link principal to school
+            ------------------------- */
+
+            school.principal_id = user._id;
+
+            await school.save();
+
+        } catch (userError) {
+
+            /*
+             * If user creation fails after school creation,
+             * remove the school so we don't leave orphan data.
+             */
+
+            await School.findByIdAndDelete(
+                school._id
+            );
+
+            throw userError;
+        }
+
+        /* -------------------------
+           Return success
+        ------------------------- */
 
         return res.status(201).json({
             success: true,
-            message: "School account registered successfully.",
-
-            token,
-
-            user: {
-                id: user._id,
-                principal_name: user.principal_name,
-                principal_email: user.principal_email,
-                phone: user.phone,
-                role: user.role,
-                school_id: user.school_id
-            },
-
+            message:
+                "School account created successfully.",
             school: {
                 id: school._id,
                 name: school.name,
+                email: school.email,
+                phone: school.phone,
+                address: school.address,
+                school_type:
+                    school.school_type,
+                academic_session:
+                    school.academic_session,
+                current_term:
+                    school.current_term,
+                motto: school.motto,
+                website: school.website,
+                logo: school.logo,
+                principal_id:
+                    school.principal_id,
                 status: school.status
-            }
+            },
+            user: safeUser(user)
         });
 
     } catch (error) {
+
         console.error(
             "REGISTER USER ERROR:",
             error
@@ -172,23 +236,31 @@ exports.registerUser = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                error.message ||
+                "Registration failed."
         });
     }
 };
 
+/* =========================================================
+   LOGIN USER
+========================================================= */
 
-// =======================================
-// Login
-// =======================================
 exports.loginUser = async (req, res) => {
     try {
         const {
-            principal_email,
+            email,
             password
         } = req.body;
 
-        if (!principal_email || !password) {
+        const normalizedEmail =
+            normalizeEmail(email);
+
+        if (
+            !normalizedEmail ||
+            !password
+        ) {
             return res.status(400).json({
                 success: false,
                 message:
@@ -196,32 +268,12 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-        const user = await User.findOne({
-            email: principal_email.toLowerCase().trim()
-        });
+        const user =
+            await User.findOne({
+                email: normalizedEmail
+            });
 
         if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid email or password."
-            });
-        }
-
-        if (user.status !== "Active") {
-            return res.status(403).json({
-                success: false,
-                message:
-                    "Your account is not active."
-            });
-        }
-
-        const passwordMatch =
-            await bcrypt.compare(
-                password,
-                user.password
-            );
-
-        if (!passwordMatch) {
             return res.status(401).json({
                 success: false,
                 message:
@@ -229,81 +281,175 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-        // -----------------------------------
-        // Update last login
-        // -----------------------------------
-        user.last_login = new Date();
+        const passwordMatches =
+            await bcrypt.compare(
+                password,
+                user.password
+            );
 
-        await user.save();
+        if (!passwordMatches) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Invalid email or password."
+            });
+        }
 
-        // -----------------------------------
-        // Generate token
-        // -----------------------------------
-        const token = generateToken(user);
+        if (!user.school_id) {
+            return res.status(403).json({
+                success: false,
+                message:
+                    "This account is not connected to a school."
+            });
+        }
+
+        const school =
+            await School.findById(
+                user.school_id
+            );
+
+        if (!school) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "School account could not be found."
+            });
+        }
+
+        if (school.status !== "Active") {
+            return res.status(403).json({
+                success: false,
+                message:
+                    "This school account is not active."
+            });
+        }
+
+        const token =
+            createToken(user);
 
         return res.status(200).json({
             success: true,
-            message: "Login successful.",
-
+            message:
+                "Login successful.",
             token,
-
             user: {
-                id: user._id,
-                principal_name: user.principal_name,
-                principal_email: user.principal_email,
-                phone: user.phone,
-                role: user.role,
-                school_id: user.school_id
+                ...safeUser(user),
+                school_name:
+                    school.name,
+                school_email:
+                    school.email,
+                address:
+                    school.address,
+                school_type:
+                    school.school_type,
+                academic_session:
+                    school.academic_session,
+                current_term:
+                    school.current_term,
+                motto:
+                    school.motto,
+                website:
+                    school.website,
+                logo:
+                    school.logo
             }
         });
 
     } catch (error) {
+
         console.error(
-            "LOGIN ERROR:",
+            "LOGIN USER ERROR:",
             error
         );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                error.message ||
+                "Login failed."
         });
     }
 };
 
+/* =========================================================
+   GET LOGGED-IN USER
+========================================================= */
 
-// =======================================
-// Get Logged-in User
-// =======================================
 exports.getMe = async (req, res) => {
     try {
-        const user = await User.findById(
-            req.user._id
-        ).select("-password");
+        const userId =
+            req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Invalid authentication session."
+            });
+        }
+
+        const user =
+            await User.findById(
+                userId
+            ).select("-password");
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: "User not found."
+                message:
+                    "User account not found."
             });
         }
 
         let school = null;
 
         if (user.school_id) {
-            school = await School.findById(
-                user.school_id
-            );
+            school =
+                await School.findById(
+                    user.school_id
+                );
         }
 
         return res.status(200).json({
             success: true,
+            user: {
+                id: user._id,
+                full_name:
+                    user.full_name,
+                email:
+                    user.email,
+                phone:
+                    user.phone || "",
+                role:
+                    user.role,
+                school_id:
+                    user.school_id,
 
-            user,
-
-            school
+                school_name:
+                    school?.name || "",
+                school_email:
+                    school?.email || "",
+                address:
+                    school?.address || "",
+                school_type:
+                    school?.school_type || "",
+                academic_session:
+                    school?.academic_session || "",
+                current_term:
+                    school?.current_term || "",
+                motto:
+                    school?.motto || "",
+                website:
+                    school?.website || "",
+                logo:
+                    school?.logo || "",
+                school_status:
+                    school?.status || ""
+            }
         });
 
     } catch (error) {
+
         console.error(
             "GET ME ERROR:",
             error
@@ -311,7 +457,9 @@ exports.getMe = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                error.message ||
+                "Unable to load profile."
         });
     }
 };
