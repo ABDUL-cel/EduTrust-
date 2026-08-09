@@ -48,8 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = value("password");
         const confirmPassword = value("confirm-password");
         const principalName = value("principal-name");
-const principalEmail = value("principal-email").toLowerCase();
-const schoolEmail = value("school-email").toLowerCase();
+        const principalEmail = value("principal-email").toLowerCase();
+        const schoolEmail = value("school-email").toLowerCase();
 
         const termsCheckbox =
             form.querySelector('input[type="checkbox"]');
@@ -72,7 +72,6 @@ const schoolEmail = value("school-email").toLowerCase();
             missingFields.push("Phone Number");
         }
 
-
         if (!address) {
             missingFields.push("School Address");
         }
@@ -80,18 +79,18 @@ const schoolEmail = value("school-email").toLowerCase();
         if (!password) {
             missingFields.push("Password");
         }
-       if (!principalName) {
-  missingFields.push("Principal Name");
-}
 
-if (!principalEmail) {
-  missingFields.push("Principal Email");
-}
+        if (!principalName) {
+            missingFields.push("Principal Name");
+        }
 
-if (!schoolEmail) {
-  missingFields.push("School Email");
-}
+        if (!principalEmail) {
+            missingFields.push("Principal Email");
+        }
 
+        if (!schoolEmail) {
+            missingFields.push("School Email");
+        }
 
         if (!confirmPassword) {
             missingFields.push("Confirm Password");
@@ -135,9 +134,17 @@ if (!schoolEmail) {
         const emailPattern =
             /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!emailPattern.test(email)) {
+        if (!emailPattern.test(schoolEmail)) {
             showMessage(
-                "Please enter a valid email address.",
+                "Please enter a valid school email address.",
+                "red"
+            );
+            return;
+        }
+
+        if (!emailPattern.test(principalEmail)) {
+            showMessage(
+                "Please enter a valid principal email address.",
                 "red"
             );
             return;
@@ -164,7 +171,7 @@ if (!schoolEmail) {
         ===================================================== */
 
         const payload = {
-            school_name: name,
+            school_name: schoolName,
             school_email: schoolEmail,
             phone: phone,
             address: address,
