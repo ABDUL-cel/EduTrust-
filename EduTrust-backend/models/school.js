@@ -78,7 +78,7 @@ principal_email: {
   required: true,
   lowercase: true,
   trim: true
-}
+},
 
 
         status: {
