@@ -2,49 +2,32 @@ const express = require("express");
 
 const router = express.Router();
 
-const authMiddleware =
-    require("../middleware/authMiddleware");
-
-const roleMiddleware =
-    require("../middleware/roleMiddleware");
-
 const {
-    getMyProfile,
-    getMyChildren,
-    getChildAttendance,
-    getChildResults
+    createParent,
+    getParents,
+    getParentById,
+    updateParent,
+    deleteParent,
+    linkStudentToParent
 } = require("../controllers/parentController");
 
+const authMiddleware = require("../middleware/authMiddleware");
 
 router.use(authMiddleware);
 
-router.use(
-    roleMiddleware("Parent")
+router.post("/", createParent);
+
+router.get("/", getParents);
+
+router.get("/:id", getParentById);
+
+router.put("/:id", updateParent);
+
+router.delete("/:id", deleteParent);
+
+router.put(
+    "/:parentId/students/:studentId",
+    linkStudentToParent
 );
-
-
-router.get(
-    "/me",
-    getMyProfile
-);
-
-
-router.get(
-    "/children",
-    getMyChildren
-);
-
-
-router.get(
-    "/children/:studentId/attendance",
-    getChildAttendance
-);
-
-
-router.get(
-    "/children/:studentId/results",
-    getChildResults
-);
-
 
 module.exports = router;
