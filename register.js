@@ -47,6 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const address = value("address");
         const password = value("password");
         const confirmPassword = value("confirm-password");
+        const principalName = value("principal-name");
+const principalEmail = value("principal-email").toLowerCase();
+const schoolEmail = value("school-email").toLowerCase();
 
         const termsCheckbox =
             form.querySelector('input[type="checkbox"]');
@@ -80,6 +83,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!password) {
             missingFields.push("Password");
         }
+       if (!principalName) {
+  missingFields.push("Principal Name");
+}
+
+if (!principalEmail) {
+  missingFields.push("Principal Email");
+}
+
+if (!schoolEmail) {
+  missingFields.push("School Email");
+}
+
 
         if (!confirmPassword) {
             missingFields.push("Confirm Password");
@@ -152,8 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ===================================================== */
 
         const payload = {
-            school_name: schoolName,
-            school_email: email,
+            school_name: school_name,
+            school_email: school_email,
             phone: phone,
             address: address,
 
@@ -164,8 +179,8 @@ document.addEventListener("DOMContentLoaded", () => {
             website: "",
             logo: "",
 
-            principal_name: ownerName,
-            principal_email: email,
+            principal_name: principal_name,
+            principal_email: principal_email,
             password: password
         };
 
