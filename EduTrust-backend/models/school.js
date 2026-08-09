@@ -59,24 +59,14 @@ const SchoolSchema = new mongoose.Schema(
 
         logo: {
             type: String,
-            default: ""
+            default: "",
+            trim: true
         },
 
         principal_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             default: null
-        },
-        principal_name: {
-            type: String,
-            required: true,
-            trim: true
-        },
-        principal_email: {
-            type: String,
-            required: true,
-            lowercase: true,
-            trim: true
         },
 
         status: {
