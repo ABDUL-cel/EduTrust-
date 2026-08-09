@@ -1,292 +1,655 @@
-/* =========================================================
-   EDUTRUST REGISTRATION
-   COMPLETE FRONTEND
-   ========================================================= */
-
 document.addEventListener("DOMContentLoaded", () => {
 
-    const form = document.getElementById("registerForm");
-    const message = document.getElementById("message");
-    const submitButton =
-        form?.querySelector('button[type="submit"]');
+    const form =
+        document.getElementById("registerForm");
+
+    const message =
+        document.getElementById("message");
+
+    const logoInput =
+        document.getElementById("school-logo");
+
+    const logoPreview =
+        document.getElementById("logo-preview");
 
     if (!form) {
-        console.error("EduTrust: registerForm not found.");
+        console.error(
+            "EduTrust: registerForm not found."
+        );
+
         return;
     }
 
-    function showMessage(text, color = "#333") {
+
+    // =====================================================
+    // MESSAGE
+    // =====================================================
+
+    function showMessage(
+        text,
+        color = "#333"
+    ) {
+
         if (!message) return;
 
         message.textContent = text;
+
         message.style.color = color;
     }
 
-    function value(id) {
-        const element = document.getElementById(id);
 
-        if (!element) {
-            return "";
-        }
+    // =====================================================
+    // VALUE HELPER
+    // =====================================================
 
-        return String(element.value || "").trim();
+    function getValue(id) {
+
+        const element =
+            document.getElementById(id);
+
+        return element
+            ? element.value.trim()
+            : "";
     }
 
-    form.addEventListener("submit", async (event) => {
 
-        event.preventDefault();
+    // =====================================================
+    // LOGO PREVIEW
+    // =====================================================
 
-        /* =====================================================
-           READ ONLY THE FIELDS THAT ACTUALLY EXIST
-        ===================================================== */
+    if (logoInput) {
 
-        const schoolName = value("school-name");
-        const ownerName = value("owner-name");
-        const phone = value("phone");
-        const address = value("address");
-        const password = value("password");
-        const confirmPassword = value("confirm-password");
-        const principalName = value("principal-name");
-        const principalEmail = value("principal-email").toLowerCase();
-        const schoolEmail = value("email").toLowerCase();
+        logoInput.addEventListener(
+            "change",
+            () => {
 
-        const termsCheckbox =
-            form.querySelector('input[type="checkbox"]');
+                const file =
+                    logoInput.files[0];
 
-        /* =====================================================
-           VALIDATION
-        ===================================================== */
+                if (!file) {
 
-        const missingFields = [];
+                    logoPreview.style.display =
+                        "none";
 
-        if (!schoolName) {
-            missingFields.push("School Name");
-        }
+                    logoPreview.src = "";
 
-        if (!ownerName) {
-            missingFields.push("Owner / Admin Name");
-        }
-
-        if (!phone) {
-            missingFields.push("Phone Number");
-        }
-
-        if (!address) {
-            missingFields.push("School Address");
-        }
-
-        if (!password) {
-            missingFields.push("Password");
-        }
-
-        if (!principalName) {
-            missingFields.push("Principal Name");
-        }
-
-        if (!principalEmail) {
-            missingFields.push("Principal Email");
-        }
-
-        if (!schoolEmail) {
-            missingFields.push("School Email");
-        }
-
-        if (!confirmPassword) {
-            missingFields.push("Confirm Password");
-        }
-
-        if (missingFields.length > 0) {
-            showMessage(
-                "Missing: " + missingFields.join(", "),
-                "red"
-            );
-            return;
-        }
-
-        if (
-            termsCheckbox &&
-            !termsCheckbox.checked
-        ) {
-            showMessage(
-                "Please agree to the EduTrust Terms & Conditions.",
-                "red"
-            );
-            return;
-        }
-
-        if (password.length < 6) {
-            showMessage(
-                "Password must be at least 6 characters.",
-                "red"
-            );
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            showMessage(
-                "Passwords do not match.",
-                "red"
-            );
-            return;
-        }
-
-        const emailPattern =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!emailPattern.test(schoolEmail)) {
-            showMessage(
-                "Please enter a valid school email address.",
-                "red"
-            );
-            return;
-        }
-
-        if (!emailPattern.test(principalEmail)) {
-            showMessage(
-                "Please enter a valid principal email address.",
-                "red"
-            );
-            return;
-        }
-
-        /* =====================================================
-           BUTTON
-        ===================================================== */
-
-        if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.textContent =
-                "Creating Account...";
-        }
-
-        showMessage(
-            "Connecting to EduTrust...",
-            "#333"
-        );
-
-        /* =====================================================
-           EXACT BACKEND PAYLOAD
-           MATCHES authController
-        ===================================================== */
-
-        const payload = {
-            school_name: schoolName,
-            school_email: schoolEmail,
-            phone: phone,
-            address: address,
-
-            school_type: "",
-            academic_session: "",
-            current_term: "",
-            school_motto: "",
-            website: "",
-            logo: "",
-
-            principal_name: principalName,
-            principal_email: principalEmail,
-            password: password
-        };
-
-        console.log(
-            "EduTrust registration payload:",
-            {
-                ...payload,
-                password: "[HIDDEN]"
-            }
-        );
-
-        /* =====================================================
-           SEND REQUEST
-        ===================================================== */
-
-        try {
-
-            const response = await fetch(
-                "https://edutrust-15ii.onrender.com/api/auth/register",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify(payload)
+                    return;
                 }
-            );
 
-            let data = {};
+                if (
+                    !file.type.startsWith(
+                        "image/"
+                    )
+                ) {
 
-            try {
-                data = await response.json();
-            } catch (error) {
-                console.error(
-                    "EduTrust invalid JSON response:",
-                    error
-                );
+                    showMessage(
+                        "Please select a valid image logo.",
+                        "red"
+                    );
+
+                    logoInput.value = "";
+
+                    return;
+                }
+
+                const reader =
+                    new FileReader();
+
+                reader.onload = (event) => {
+
+                    logoPreview.src =
+                        event.target.result;
+
+                    logoPreview.style.display =
+                        "block";
+                };
+
+                reader.readAsDataURL(file);
             }
+        );
+    }
 
-            console.log(
-                "EduTrust registration response:",
-                data
-            );
 
-            /* =================================================
-               SUCCESS
-            ================================================= */
+    // =====================================================
+    // FILE → BASE64
+    // =====================================================
 
-            if (
-                response.ok &&
-                data.success === true
-            ) {
+    function fileToBase64(file) {
+
+        return new Promise(
+            (resolve, reject) => {
+
+                const reader =
+                    new FileReader();
+
+                reader.onload = () =>
+                    resolve(
+                        reader.result
+                    );
+
+                reader.onerror =
+                    reject;
+
+                reader.readAsDataURL(file);
+            }
+        );
+    }
+
+
+    // =====================================================
+    // SUBMIT
+    // =====================================================
+
+    form.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            // ------------------------------------------------
+            // READ FORM
+            // ------------------------------------------------
+
+            const schoolName =
+                getValue("school-name");
+
+            const schoolEmail =
+                getValue("school-email")
+                    .toLowerCase();
+
+            const phone =
+                getValue("phone");
+
+            const address =
+                getValue("address");
+
+            const schoolType =
+                getValue("school-type");
+
+            const academicSession =
+                getValue("academic-session");
+
+            const currentTerm =
+                getValue("current-term");
+
+            const schoolMotto =
+                getValue("school-motto");
+
+            const website =
+                getValue("website");
+
+            const principalName =
+                getValue("principal-name");
+
+            const principalEmail =
+                getValue("principal-email")
+                    .toLowerCase();
+
+            const password =
+                getValue("password");
+
+            const confirmPassword =
+                getValue("confirm-password");
+
+            const terms =
+                document.getElementById(
+                    "terms"
+                );
+
+
+            // ------------------------------------------------
+            // REQUIRED VALIDATION
+            // ------------------------------------------------
+
+            const missing = [];
+
+            if (!schoolName)
+                missing.push("School Name");
+
+            if (!schoolEmail)
+                missing.push("School Email");
+
+            if (!phone)
+                missing.push("Phone Number");
+
+            if (!address)
+                missing.push("School Address");
+
+            if (!schoolType)
+                missing.push("School Type");
+
+            if (!academicSession)
+                missing.push("Academic Session");
+
+            if (!currentTerm)
+                missing.push("Current Term");
+
+            if (!principalName)
+                missing.push(
+                    "Principal Name"
+                );
+
+            if (!principalEmail)
+                missing.push(
+                    "Principal Email"
+                );
+
+            if (!password)
+                missing.push("Password");
+
+            if (!confirmPassword)
+                missing.push(
+                    "Confirm Password"
+                );
+
+
+            if (missing.length > 0) {
 
                 showMessage(
-                    "Registration successful! Redirecting to login...",
-                    "green"
+                    "Please fill: " +
+                    missing.join(", "),
+                    "red"
                 );
-
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-
-                setTimeout(() => {
-                    window.location.href =
-                        "login.html";
-                }, 1500);
 
                 return;
             }
 
-            /* =================================================
-               BACKEND ERROR
-            ================================================= */
+
+            // ------------------------------------------------
+            // TERMS
+            // ------------------------------------------------
+
+            if (
+                terms &&
+                !terms.checked
+            ) {
+
+                showMessage(
+                    "Please agree to the EduTrust Terms & Conditions.",
+                    "red"
+                );
+
+                return;
+            }
+
+
+            // ------------------------------------------------
+            // PASSWORD
+            // ------------------------------------------------
+
+            if (password.length < 6) {
+
+                showMessage(
+                    "Password must be at least 6 characters.",
+                    "red"
+                );
+
+                return;
+            }
+
+
+            if (
+                password !==
+                confirmPassword
+            ) {
+
+                showMessage(
+                    "Passwords do not match.",
+                    "red"
+                );
+
+                return;
+            }
+
+
+            // ------------------------------------------------
+            // EMAIL VALIDATION
+            // ------------------------------------------------
+
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+            if (
+                !emailPattern.test(
+                    schoolEmail
+                )
+            ) {
+
+                showMessage(
+                    "Please enter a valid school email.",
+                    "red"
+                );
+
+                return;
+            }
+
+
+            if (
+                !emailPattern.test(
+                    principalEmail
+                )
+            ) {
+
+                showMessage(
+                    "Please enter a valid principal email.",
+                    "red"
+                );
+
+                return;
+            }
+
+
+            // ------------------------------------------------
+            // WEBSITE VALIDATION
+            // ------------------------------------------------
+
+            let normalizedWebsite = "";
+
+            if (website) {
+
+                try {
+
+                    let websiteValue =
+                        website;
+
+                    if (
+                        !websiteValue.startsWith(
+                            "http://"
+                        ) &&
+                        !websiteValue.startsWith(
+                            "https://"
+                        )
+                    ) {
+
+                        websiteValue =
+                            "https://" +
+                            websiteValue;
+                    }
+
+                    const websiteURL =
+                        new URL(
+                            websiteValue
+                        );
+
+                    normalizedWebsite =
+                        websiteURL.href;
+
+                } catch (error) {
+
+                    showMessage(
+                        "Please enter a valid website address.",
+                        "red"
+                    );
+
+                    return;
+                }
+            }
+
+
+            // ------------------------------------------------
+            // BUTTON
+            // ------------------------------------------------
+
+            const button =
+                form.querySelector(
+                    'button[type="submit"]'
+                );
+
+            if (button) {
+
+                button.disabled = true;
+
+                button.textContent =
+                    "Creating Account...";
+            }
 
             showMessage(
-                data.message ||
-                `Registration failed. Server returned ${response.status}.`,
-                "red"
+                "Registering school...",
+                "#333"
             );
 
-        } catch (error) {
 
-            console.error(
-                "EduTrust registration request failed:",
-                error
-            );
+            try {
 
-            showMessage(
-                "Could not connect to EduTrust server. Please try again.",
-                "red"
-            );
+                // ------------------------------------------------
+                // LOGO
+                // ------------------------------------------------
 
-        } finally {
+                let logo = "";
 
-            if (submitButton) {
-                submitButton.disabled = false;
-                submitButton.textContent =
-                    "Create School Account";
+                if (
+                    logoInput &&
+                    logoInput.files &&
+                    logoInput.files.length > 0
+                ) {
+
+                    const file =
+                        logoInput.files[0];
+
+                    // Prevent enormous MongoDB documents
+                    if (
+                        file.size >
+                        1024 * 1024
+                    ) {
+
+                        showMessage(
+                            "School logo must be smaller than 1MB.",
+                            "red"
+                        );
+
+                        return;
+                    }
+
+                    logo =
+                        await fileToBase64(
+                            file
+                        );
+                }
+
+
+                // ------------------------------------------------
+                // EXACT AUTH CONTROLLER PAYLOAD
+                // ------------------------------------------------
+
+                const payload = {
+
+                    school_name:
+                        schoolName,
+
+                    school_email:
+                        schoolEmail,
+
+                    phone:
+                        phone,
+
+                    address:
+                        address,
+
+                    school_type:
+                        schoolType,
+
+                    academic_session:
+                        academicSession,
+
+                    current_term:
+                        currentTerm,
+
+                    school_motto:
+                        schoolMotto,
+
+                    website:
+                        normalizedWebsite,
+
+                    logo:
+                        logo,
+
+                    principal_name:
+                        principalName,
+
+                    principal_email:
+                        principalEmail,
+
+                    password:
+                        password
+                };
+
+
+                console.log(
+                    "EduTrust registration payload:",
+                    {
+                        ...payload,
+                        password:
+                            "[HIDDEN]"
+                    }
+                );
+
+
+                // ------------------------------------------------
+                // SEND TO RENDER
+                // ------------------------------------------------
+
+                const response =
+                    await fetch(
+                        "https://edutrust-15ii.onrender.com/api/auth/register",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    payload
+                                )
+                        }
+                    );
+
+
+                // ------------------------------------------------
+                // READ RESPONSE
+                // ------------------------------------------------
+
+                let data = {};
+
+                try {
+
+                    data =
+                        await response.json();
+
+                } catch (error) {
+
+                    console.error(
+                        "Invalid backend response:",
+                        error
+                    );
+                }
+
+
+                console.log(
+                    "EduTrust registration response:",
+                    data
+                );
+
+
+                // ------------------------------------------------
+                // SUCCESS
+                // ------------------------------------------------
+
+                if (
+                    response.ok &&
+                    data.success
+                ) {
+
+                    showMessage(
+                        "School registered successfully! Redirecting to login...",
+                        "green"
+                    );
+
+
+                    // Save returned information
+                    // but DO NOT save password
+
+                    if (data.user) {
+
+                        localStorage.setItem(
+                            "user",
+                            JSON.stringify(
+                                data.user
+                            )
+                        );
+                    }
+
+
+                    setTimeout(
+                        () => {
+
+                            window.location.href =
+                                "login.html";
+
+                        },
+                        1500
+                    );
+
+                    return;
+                }
+
+
+                // ------------------------------------------------
+                // BACKEND ERROR
+                // ------------------------------------------------
+
+                let errorMessage =
+                    data.message ||
+                    "Registration failed.";
+
+
+                if (
+                    data.missingFields &&
+                    Array.isArray(
+                        data.missingFields
+                    )
+                ) {
+
+                    errorMessage +=
+                        " Missing: " +
+                        data.missingFields.join(
+                            ", "
+                        );
+                }
+
+
+                showMessage(
+                    errorMessage,
+                    "red"
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "EduTrust registration error:",
+                    error
+                );
+
+                showMessage(
+                    "Unable to connect to EduTrust server. Render may be waking up. Please try again.",
+                    "red"
+                );
+
+            } finally {
+
+                if (button) {
+
+                    button.disabled =
+                        false;
+
+                    button.textContent =
+                        "Create School Account";
+                }
             }
         }
-    });
+    );
 });
-
