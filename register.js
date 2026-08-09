@@ -179,8 +179,8 @@ if (!schoolEmail) {
             website: "",
             logo: "",
 
-            principal_name: principal_name,
-            principal_email: principal_email,
+            principal_name: principalName,
+            principal_email: principalEmail,
             password: password
         };
 
