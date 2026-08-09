@@ -7,15 +7,35 @@ const {
     getMe
 } = require("../controllers/authController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware =
+    require("../middleware/authMiddleware");
 
-// Register
-router.post("/register", registerUser);
+/* =========================
+   REGISTER
+========================= */
 
-// Login
-router.post("/login", loginUser);
+router.post(
+    "/register",
+    registerUser
+);
 
-// Get Logged-in User
-router.get("/profile", authMiddleware, getMe);
+/* =========================
+   LOGIN
+========================= */
+
+router.post(
+    "/login",
+    loginUser
+);
+
+/* =========================
+   LOGGED-IN PROFILE
+========================= */
+
+router.get(
+    "/profile",
+    authMiddleware,
+    getMe
+);
 
 module.exports = router;
