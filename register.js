@@ -1,112 +1,122 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     const registerForm = document.getElementById("registerForm");
-    const message = document.getElementById("message");
+    const messageElement = document.getElementById("message");
 
-    registerForm.addEventListener("submit", async (e) => {
+    if (!registerForm) {
+        console.error("Registration form #registerForm was not found.");
+        return;
+    }
 
-        e.preventDefault();
+    registerForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-        // ===========================
-        // School Information
-        // ===========================
+        const schoolName = document
+            .getElementById("school-name")
+            ?.value.trim();
 
-        const school_name = document.getElementById("school-name").value.trim();
-        const school_email = document.getElementById("school-email").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const address = document.getElementById("address").value.trim();
-        const school_type = document.getElementById("school-type").value;
-        const academic_session = document.getElementById("academic-session").value.trim();
-        const current_term = document.getElementById("current-term").value;
-        const school_motto = document.getElementById("school-motto").value.trim();
-        const website = document.getElementById("school-website").value.trim();
+        const ownerName = document
+            .getElementById("owner-name")
+            ?.value.trim();
 
-        // Logo (We'll upload later)
-        const logo = "";
+        const phone = document
+            .getElementById("phone")
+            ?.value.trim();
 
-        // ===========================
-        // Principal Information
-        // ===========================
+        const email = document
+            .getElementById("email")
+            ?.value.trim()
+            .toLowerCase();
 
-        const principal_name = document.getElementById("principal-name").value.trim();
-        const principal_email = document.getElementById("principal-email").value.trim();
+        const address = document
+            .getElementById("address")
+            ?.value.trim();
 
-        // ===========================
-        // Password
-        // ===========================
+        const password = document
+            .getElementById("password")
+            ?.value;
 
-        const password = document.getElementById("password").value;
-        const confirmPassword = document.getElementById("confirm-password").value;
+        const confirmPassword = document
+            .getElementById("confirm-password")
+            ?.value;
 
-        // ===========================
-        // Validation
-        // ===========================
+        // =========================
+        // Basic validation
+        // =========================
 
         if (
-            !school_name ||
-            !school_email ||
+            !schoolName ||
+            !ownerName ||
             !phone ||
+            !email ||
             !address ||
-            !school_type ||
-            !academic_session ||
-            !current_term ||
-            !principal_name ||
-            !principal_email ||
             !password ||
             !confirmPassword
         ) {
-            message.style.color = "red";
-            message.textContent = "Please fill all required fields.";
+            showMessage(
+                "Please fill in all required fields.",
+                "red"
+            );
             return;
         }
 
         if (password.length < 6) {
-            message.style.color = "red";
-            message.textContent = "Password must be at least 6 characters.";
-            return;
-        }
-        
-        if (phone.length < 11) {
-            message.style.color = "red";
-            message.textContent = "Password must be at least 11 characters.";
+            showMessage(
+                "Password must be at least 6 characters.",
+                "red"
+            );
             return;
         }
 
         if (password !== confirmPassword) {
-            message.style.color = "red";
-            message.textContent = "Passwords do not match.";
+            showMessage(
+                "Passwords do not match.",
+                "red"
+            );
             return;
         }
 
-        // ===========================
-        // Data
-        // ===========================
+        // =========================
+        // Disable button
+        // =========================
 
-        const data = {
+        const submitButton =
+            registerForm.querySelector(
+                'button[type="submit"]'
+            );
 
-            school_name,
-            school_email,
-            phone,
-            address,
-            school_type,
-            academic_session,
-            current_term,
-            school_motto,
-            website,
-            logo,
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = "Creating Account...";
+        }
 
-            principal_name,
-            email,
+        showMessage(
+            "Creating your EduTrust school account...",
+            "#333"
+        );
 
-            password
+        // =========================
+        // Backend payload
+        // =========================
 
+        const formData = {
+            school_name: schoolName,
+            school_email: email,
+            phone: phone,
+            address: address,
+
+            // Optional school fields
+            school_type: "",
+            academic_session: "",
+            current_term: "",
+            school_motto: "",
+
+            // Principal account
+            principal_name: ownerName,
+            principal_email: email,
+            password: password
         };
 
         try {
-
-            message.style.color = "blue";
-            message.textContent = "Creating school account...";
-
             const response = await fetch(
                 "https://edutrust-15ii.onrender.com/api/auth/register",
                 {
@@ -114,40 +124,70 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(formData)
                 }
             );
 
-            const result = await response.json();
+            let data;
 
-            if (result.success) {
-
-                message.style.color = "green";
-                message.textContent = result.message;
-
-                setTimeout(() => {
-
-                    window.location.href = "login.html";
-
-                }, 1500);
-
-            } else {
-
-                message.style.color = "red";
-                message.textContent = result.message;
-
+            try {
+                data = await response.json();
+            } catch (jsonError) {
+                data = {
+                    success: false,
+                    message:
+                        "The server returned an invalid response."
+                };
             }
 
-        } catch (err) {
+            console.log("Registration response:", data);
 
-            console.error(err);
+            if (response.ok && data.success) {
+                showMessage(
+                    "School registered successfully! Redirecting to login...",
+                    "green"
+                );
 
-            message.style.color = "red";
-            message.textContent =
-                "Unable to connect to the server.";
+                // Clear old authentication data
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
 
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1500);
+
+                return;
+            }
+
+            showMessage(
+                data.message ||
+                    "Registration failed. Please try again.",
+                "red"
+            );
+
+        } catch (error) {
+            console.error(
+                "Registration request failed:",
+                error
+            );
+
+            showMessage(
+                "Unable to connect to EduTrust server. Please try again.",
+                "red"
+            );
+        } finally {
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent =
+                    "Create School Account";
+            }
         }
-
     });
 
+    function showMessage(message, color) {
+        if (!messageElement) return;
+
+        messageElement.textContent = message;
+        messageElement.style.color = color;
+    }
 });
