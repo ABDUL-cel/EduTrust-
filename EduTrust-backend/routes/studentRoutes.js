@@ -16,7 +16,8 @@ const {
     archiveStudent,
     deleteStudent,
     getStudentProfile,
-    getStudentDashboardData
+    getStudentDashboardData,
+    searchSchools
 } = require("../controllers/studentController");
 
 const authMiddleware = require("../middleware/authMiddleware");
