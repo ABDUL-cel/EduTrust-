@@ -278,8 +278,8 @@ navItems.forEach((item) => {
                 break;
 
             case "parents":
-                showParents();
-                break;
+    showParentsFromBackend();
+    break;
 
             case "staff":
                 showStaff();
