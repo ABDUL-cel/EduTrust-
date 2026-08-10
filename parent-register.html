@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+    name="description"
+    content="Create your EduTrust parent account."
+>
+
+<title>EduTrust | Parent Registration</title>
+<link rel="icon" type="image/png" href="logo-icon.png">
+<link rel="stylesheet" href="auth.css">
+```
+
+</head>
+
+<body>
+
+```
+<main class="auth-page">
+
+    <section class="auth-card">
+
+        <div class="auth-header">
+
+            <div class="auth-logo">
+                Edu<span>Trust</span>
+            </div>
+
+            <h1>Create Parent Account</h1>
+
+            <p>
+                Register as a parent or guardian and connect
+                with your child's school on EduTrust.
+            </p>
+
+        </div>
+
+
+        <div
+            id="form-message"
+            class="form-message"
+            style="display:none;"
+        ></div>
+
+
+        <form
+            id="parent-register-form"
+            novalidate
+        >
+
+            <!-- SCHOOL INFORMATION -->
+
+            <div class="form-section">
+
+                <h3>School Information</h3>
+
+                <p>
+                    Enter the school email used by your child's school
+                    on EduTrust.
+                </p>
+
+                <div class="form-group">
+
+                    <label for="school_email">
+                        School Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="school_email"
+                        name="school_email"
+                        placeholder="school@example.com"
+                        autocomplete="organization"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- PERSONAL INFORMATION -->
+
+            <div class="form-section">
+
+                <h3>Personal Information</h3>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="first_name">
+                            First Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="first_name"
+                            name="first_name"
+                            placeholder="First name"
+                            autocomplete="given-name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="last_name">
+                            Last Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="last_name"
+                            name="last_name"
+                            placeholder="Last name"
+                            autocomplete="family-name"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="other_name">
+                        Other Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="other_name"
+                        name="other_name"
+                        placeholder="Optional"
+                    >
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="relationship">
+                            Relationship
+                        </label>
+
+                        <select
+                            id="relationship"
+                            name="relationship"
+                            required
+                        >
+
+                            <option value="">
+                                Select relationship
+                            </option>
+
+                            <option value="Father">
+                                Father
+                            </option>
+
+                            <option value="Mother">
+                                Mother
+                            </option>
+
+                            <option value="Guardian">
+                                Guardian
+                            </option>
+
+                            <option value="Uncle">
+                                Uncle
+                            </option>
+
+                            <option value="Aunt">
+                                Aunt
+                            </option>
+
+                            <option value="Grandparent">
+                                Grandparent
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="08012345678"
+                            autocomplete="tel"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="parent@example.com"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="alternate_phone">
+                        Alternate Phone
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="alternate_phone"
+                        name="alternate_phone"
+                        placeholder="Optional"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="home_address">
+                        Home Address
+                    </label>
+
+                    <textarea
+                        id="home_address"
+                        name="home_address"
+                        rows="3"
+                        placeholder="Enter your home address"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="occupation">
+                        Occupation
+                    </label>
+
+                    <input
+                        type="text"
+                        id="occupation"
+                        name="occupation"
+                        placeholder="Optional"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCOUNT SECURITY -->
+
+            <div class="form-section">
+
+                <h3>Account Security</h3>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="confirm_password">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="primary-button"
+                id="register-parent-button"
+            >
+                Create Parent Account
+            </button>
+
+
+            <p class="auth-footer">
+
+                Already have an account?
+
+                <a href="login.html">
+                    Login
+                </a>
+
+            </p>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<script src="parent-register.js"></script>
+```
+
+</body>
+
+</html>
+
