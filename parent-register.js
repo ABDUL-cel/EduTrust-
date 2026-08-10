@@ -1,97 +1,310 @@
 document.addEventListener("DOMContentLoaded", () => {
+
     const form = document.getElementById("parentRegistrationForm");
-    const message = document.getElementById("registerMessage");
+
+    const button =
+        document.getElementById("registerParentButton");
+
+    const message =
+        document.getElementById("parentMessage");
+
 
     if (!form) {
-        console.error("Parent registration form not found.");
+        console.error(
+            "Parent registration form was not found."
+        );
+
         return;
     }
 
+
+    function showMessage(text, type = "error") {
+
+        if (!message) return;
+
+        message.style.display = "block";
+
+        message.textContent = text;
+
+        if (type === "success") {
+
+            message.style.background =
+                "#e8f7ee";
+
+            message.style.color =
+                "#16743a";
+
+        } else {
+
+            message.style.background =
+                "#fdecec";
+
+            message.style.color =
+                "#b42318";
+        }
+    }
+
+
     form.addEventListener("submit", async (event) => {
+
         event.preventDefault();
 
-        const formData = new FormData(form);
 
-        const parentData = {
-            full_name: formData.get("full_name")?.trim(),
-            email: formData.get("email")?.trim(),
-            phone: formData.get("phone")?.trim(),
-            password: formData.get("password"),
-            student_admission_number:
-                formData.get("student_admission_number")?.trim()
-        };
+        const token =
+            localStorage.getItem("token");
 
-        if (
-            !parentData.full_name ||
-            !parentData.email ||
-            !parentData.phone ||
-            !parentData.password ||
-            !parentData.student_admission_number
-        ) {
-            showMessage("Please fill in all required fields.", "error");
+
+        if (!token) {
+
+            showMessage(
+                "Your session has expired. Please login again."
+            );
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "login.html";
+
+            }, 1200);
+
             return;
         }
 
-        try {
-            showMessage("Creating parent account...", "info");
 
-            const response = await fetch("/api/parents/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(parentData)
-            });
+        const formData =
+            new FormData(form);
 
-            const contentType = response.headers.get("content-type") || "";
 
-            if (!contentType.includes("application/json")) {
-                const text = await response.text();
+        const parentData = {
 
-                console.error("Server returned non-JSON:", text);
+            first_name:
+                formData.get("first_name")?.trim(),
 
-                throw new Error(
-                    "The server did not return a valid JSON response."
-                );
-            }
+            last_name:
+                formData.get("last_name")?.trim(),
 
-            const data = await response.json();
+            other_name:
+                formData.get("other_name")?.trim() || "",
 
-            if (!response.ok || !data.success) {
-                throw new Error(
-                    data.message || "Parent registration failed."
-                );
-            }
+            relationship:
+                formData.get("relationship")?.trim(),
+
+            email:
+                formData.get("email")?.trim() || "",
+
+            phone:
+                formData.get("phone")?.trim(),
+
+            alternate_phone:
+                formData.get("alternate_phone")?.trim() || "",
+
+            home_address:
+                formData.get("home_address")?.trim() || "",
+
+            occupation:
+                formData.get("occupation")?.trim() || "",
+
+            passport:
+                formData.get("passport")?.trim() || ""
+
+        };
+
+
+        /*
+        ========================================
+        FRONTEND REQUIRED-FIELD CHECK
+        ========================================
+        */
+
+        if (
+            !parentData.first_name ||
+            !parentData.last_name ||
+            !parentData.relationship ||
+            !parentData.phone
+        ) {
 
             showMessage(
-                "Parent account created successfully. Redirecting to login...",
+                "Please fill in all required fields."
+            );
+
+            return;
+        }
+
+
+        /*
+        ========================================
+        DISABLE BUTTON
+        ========================================
+        */
+
+        button.disabled = true;
+
+        button.textContent =
+            "Registering...";
+
+
+        try {
+
+            /*
+            ========================================
+            IMPORTANT
+
+            This matches parentRoutes.js:
+
+            router.post("/", createParent)
+
+            If server.js mounts:
+
+            /api/parents
+
+            the final endpoint is:
+
+            POST /api/parents
+            ========================================
+            */
+
+            const response = await fetch(
+                "/api/parents",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+                    },
+
+                    body:
+                        JSON.stringify(parentData)
+                }
+            );
+
+
+            /*
+            ========================================
+            HANDLE NON-JSON RESPONSE
+
+            This prevents:
+
+            Unexpected token '<'
+
+            when the server accidentally
+            returns HTML.
+            ========================================
+            */
+
+            const contentType =
+                response.headers.get(
+                    "content-type"
+                ) || "";
+
+
+            let data;
+
+
+            if (
+                contentType.includes(
+                    "application/json"
+                )
+            ) {
+
+                data =
+                    await response.json();
+
+            } else {
+
+                const text =
+                    await response.text();
+
+                console.error(
+                    "Server returned non-JSON:",
+                    text
+                );
+
+                throw new Error(
+                    "Server returned an unexpected response. Check the /api/parents route."
+                );
+            }
+
+
+            /*
+            ========================================
+            BACKEND ERROR
+            ========================================
+            */
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Unable to register parent."
+                );
+            }
+
+
+            /*
+            ========================================
+            SUCCESS
+            ========================================
+            */
+
+            showMessage(
+                data.message ||
+                "Parent registered successfully.",
                 "success"
             );
 
+
             form.reset();
 
+
+            /*
+            ========================================
+            RETURN TO PARENT DIRECTORY
+            ========================================
+            */
+
             setTimeout(() => {
-                window.location.href = "parent-login.html";
-            }, 1500);
+
+                if (
+                    typeof window.showParents ===
+                    "function"
+                ) {
+
+                    window.showParents();
+
+                } else {
+
+                    window.history.back();
+                }
+
+            }, 1000);
+
 
         } catch (error) {
-            console.error("Parent registration error:", error);
+
+            console.error(
+                "PARENT REGISTRATION ERROR:",
+                error
+            );
+
 
             showMessage(
-                error.message || "Something went wrong during registration.",
-                "error"
+                error.message ||
+                "Unable to register parent."
             );
+
+
+        } finally {
+
+            button.disabled = false;
+
+            button.textContent =
+                "Register Parent";
         }
+
     });
 
-    function showMessage(text, type) {
-        if (!message) {
-            alert(text);
-            return;
-        }
-
-        message.textContent = text;
-        message.className = `register-message ${type}`;
-        message.style.display = "block";
-    }
 });
