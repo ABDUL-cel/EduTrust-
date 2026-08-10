@@ -30,6 +30,8 @@ router.post(
     authMiddleware,
     registerStudent
 );
+router.get("/me/profile", protect, getStudentProfile);
+router.get("/me/dashboard", protect, getStudentDashboardData);
 
 // Get all students
 router.get(
