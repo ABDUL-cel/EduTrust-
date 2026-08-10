@@ -1,6 +1,6 @@
 const Class = require("../models/class");
 const Subject = require("../models/subject");
-const User = require("../models/user");
+const User = require("../models/User");
 
 exports.createClass = async (req, res) => {
     try {
