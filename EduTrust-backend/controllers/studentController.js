@@ -526,3 +526,76 @@ exports.deleteStudent = async (req, res) => {
         });
     }
 };
+
+// =======================================
+// Get Logged-In Student Profile (For Student Dashboard)
+// =======================================
+exports.getStudentProfile = async (req, res) => {
+    try {
+        // Fetch logged-in student using student ID or user ID attached to request by auth middleware
+        const studentId = req.user.student_id || req.user.id;
+
+        const student = await Student.findById(studentId);
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student profile not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            student
+        });
+
+    } catch (error) {
+        console.error("GET STUDENT PROFILE ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+// =======================================
+// Get Student Dashboard Summary Data
+// =======================================
+exports.getStudentDashboardData = async (req, res) => {
+    try {
+        const studentId = req.user.student_id || req.user.id;
+
+        const student = await Student.findById(studentId);
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student record not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            dashboard: {
+                studentInfo: {
+                    fullName: `${student.first_name} ${student.last_name}`,
+                    admissionNumber: student.admission_number,
+                    className: student.class_name,
+                    arm: student.arm,
+                    status: student.status,
+                    passport: student.passport
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("GET STUDENT DASHBOARD DATA ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
