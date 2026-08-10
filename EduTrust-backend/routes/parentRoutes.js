@@ -1,45 +1,18 @@
 const express = require("express");
-
 const router = express.Router();
 
 const {
-    getParents,
-    getParentById
+    registerParent,
+    loginParent,
+    getParentProfile
 } = require("../controllers/parentController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 
+router.post("/register", registerParent);
 
-/*
-==================================================
-PARENT MANAGEMENT ROUTES
-==================================================
-*/
+router.post("/login", loginParent);
 
-/*
-GET /api/parents
-
-Returns parents belonging ONLY to the
-logged-in principal's school.
-*/
-router.get(
-    "/",
-    authMiddleware,
-    getParents
-);
-
-
-/*
-GET /api/parents/:id
-
-Returns one parent belonging ONLY to the
-logged-in principal's school.
-*/
-router.get(
-    "/:id",
-    authMiddleware,
-    getParentById
-);
-
+router.get("/profile", authMiddleware, getParentProfile);
 
 module.exports = router;
