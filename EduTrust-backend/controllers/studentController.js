@@ -1019,52 +1019,5 @@ exports.getStudentDashboardData = async (req, res) => {
                 "Failed to load student dashboard.",
             error: error.message
         });
-    }// =======================================
-// PUBLIC SCHOOL SEARCH
-// Used by students/parents during registration
-// =======================================
-exports.searchSchools = async (req, res) => {
-    try {
-        const search = req.query.search?.trim();
-
-        if (!search) {
-            return res.status(400).json({
-                success: false,
-                message: "Please enter a school name."
-            });
-        }
-
-        const School = require("../models/school");
-
-        const schools = await School.find({
-            name: {
-                $regex: search,
-                $options: "i"
-            }
-        })
-            .select(
-                "_id name address phone school_type logo"
-            )
-            .limit(20)
-            .lean();
-
-        return res.status(200).json({
-            success: true,
-            count: schools.length,
-            schools
-        });
-
-    } catch (error) {
-        console.error(
-            "SEARCH SCHOOLS ERROR:",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to search schools.",
-            error: error.message
-        });
     }
-};
 };
