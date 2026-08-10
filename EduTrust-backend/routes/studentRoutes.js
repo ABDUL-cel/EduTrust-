@@ -17,7 +17,6 @@ const {
     deleteStudent,
     getStudentProfile,
     getStudentDashboardData
-   
 } = require("../controllers/studentController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -27,8 +26,10 @@ const authMiddleware = require("../middleware/authMiddleware");
 // STUDENT ROUTES
 // =======================================
 
+
 // =======================================
 // REGISTER STUDENT
+// Principal / authenticated school staff
 // =======================================
 
 router.post(
@@ -91,7 +92,6 @@ router.get(
     authMiddleware,
     getActiveStudents
 );
-
 
 
 // =======================================
