@@ -1,30 +1,39 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
     getCurrentSchool,
-    updateCurrentSchool
+    updateCurrentSchool,
+    searchSchools
 } = require("../controllers/schoolController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware =
+    require("../middleware/authMiddleware");
+
 
 // =======================================
-// GET CURRENT SCHOOL
+// CURRENT SCHOOL
 // =======================================
+
 router.get(
     "/current",
     authMiddleware,
     getCurrentSchool
 );
 
+
 // =======================================
-// UPDATE CURRENT SCHOOL
+// UPDATE SCHOOL
 // =======================================
+
 router.put(
     "/current",
     authMiddleware,
     updateCurrentSchool
 );
+
+
 // =======================================
 // PUBLIC SCHOOL SEARCH
 // =======================================
@@ -33,4 +42,6 @@ router.get(
     "/search",
     searchSchools
 );
+
+
 module.exports = router;
