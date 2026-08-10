@@ -1,12 +1,20 @@
-
 const School = require("../models/school");
 
+
 // =======================================
-// Get Current School
+// GET CURRENT SCHOOL
 // =======================================
+
 exports.getCurrentSchool = async (req, res) => {
     try {
-        const school_id = req.user.school_id;
+        const school_id = req.user?.school_id;
+
+        if (!school_id) {
+            return res.status(400).json({
+                success: false,
+                message: "School account could not be identified."
+            });
+        }
 
         const school = await School.findById(school_id)
             .populate(
@@ -27,7 +35,10 @@ exports.getCurrentSchool = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("GET CURRENT SCHOOL ERROR:", error);
+        console.error(
+            "GET CURRENT SCHOOL ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
@@ -38,8 +49,9 @@ exports.getCurrentSchool = async (req, res) => {
 
 
 // =======================================
-// Update Current School
+// UPDATE CURRENT SCHOOL
 // =======================================
+
 exports.updateCurrentSchool = async (req, res) => {
     try {
         const allowedFields = [
@@ -62,14 +74,15 @@ exports.updateCurrentSchool = async (req, res) => {
             }
         });
 
-        const school = await School.findByIdAndUpdate(
-            req.user.school_id,
-            updates,
-            {
-                new: true,
-                runValidators: true
-            }
-        );
+        const school =
+            await School.findByIdAndUpdate(
+                req.user.school_id,
+                updates,
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
 
         if (!school) {
             return res.status(404).json({
@@ -80,12 +93,16 @@ exports.updateCurrentSchool = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "School information updated successfully.",
+            message:
+                "School information updated successfully.",
             school
         });
 
     } catch (error) {
-        console.error("UPDATE SCHOOL ERROR:", error);
+        console.error(
+            "UPDATE SCHOOL ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
@@ -94,30 +111,36 @@ exports.updateCurrentSchool = async (req, res) => {
     }
 };
 
+
 // =======================================
 // PUBLIC SCHOOL SEARCH
-// Used during Parent / Student / Staff
+// Used by Parent / Student / Staff
 // self-registration
 // =======================================
 
 exports.searchSchools = async (req, res) => {
     try {
-        const search = String(req.query.search || "").trim();
+        const search =
+            String(
+                req.query.search || ""
+            ).trim();
 
         if (search.length < 2) {
             return res.status(400).json({
                 success: false,
-                message: "Please enter at least 2 characters."
+                message:
+                    "Please enter at least 2 characters."
             });
         }
 
-        const schools = await School.find({
-            status: "Active",
-            name: {
-                $regex: search,
-                $options: "i"
-            }
-        })
+        const schools =
+            await School.find({
+                status: "Active",
+                name: {
+                    $regex: search,
+                    $options: "i"
+                }
+            })
             .select(
                 "_id name email address school_type logo website"
             )
@@ -141,7 +164,8 @@ exports.searchSchools = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Failed to search schools.",
+            message:
+                "Failed to search schools.",
             error: error.message
         });
     }
