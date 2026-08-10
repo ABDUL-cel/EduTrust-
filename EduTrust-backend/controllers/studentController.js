@@ -1,10 +1,12 @@
 const Student = require("../models/student");
 const User = require("../models/User");
 
+
 // =======================================
-// Register Student
+// REGISTER STUDENT
 // Principal / authenticated school staff
 // =======================================
+
 exports.registerStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -33,6 +35,7 @@ exports.registerStudent = async (req, res) => {
         // =======================================
         // REQUIRED FIELDS
         // =======================================
+
         if (
             !admission_number?.trim() ||
             !first_name?.trim() ||
@@ -49,10 +52,15 @@ exports.registerStudent = async (req, res) => {
         }
 
         // =======================================
-        // CHECK DUPLICATE ADMISSION NUMBER
+        // NORMALIZE ADMISSION NUMBER
         // =======================================
+
         const normalizedAdmissionNumber =
             admission_number.trim();
+
+        // =======================================
+        // CHECK DUPLICATE
+        // =======================================
 
         const existingStudent = await Student.findOne({
             school_id,
@@ -70,6 +78,7 @@ exports.registerStudent = async (req, res) => {
         // =======================================
         // CREATE STUDENT
         // =======================================
+
         const student = await Student.create({
             school_id,
 
@@ -139,8 +148,9 @@ exports.registerStudent = async (req, res) => {
 
 
 // =======================================
-// Get All Students
+// GET ALL STUDENTS
 // =======================================
+
 exports.getStudents = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -182,8 +192,9 @@ exports.getStudents = async (req, res) => {
 
 
 // =======================================
-// Get Single Student
+// GET ONE STUDENT
 // =======================================
+
 exports.getStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -231,8 +242,9 @@ exports.getStudent = async (req, res) => {
 
 
 // =======================================
-// Get Pending Students
+// GET PENDING STUDENTS
 // =======================================
+
 exports.getPendingStudents = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -275,8 +287,9 @@ exports.getPendingStudents = async (req, res) => {
 
 
 // =======================================
-// Get Active Students
+// GET ACTIVE STUDENTS
 // =======================================
+
 exports.getActiveStudents = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -319,14 +332,17 @@ exports.getActiveStudents = async (req, res) => {
 
 
 // =======================================
-// Approve Student
+// APPROVE STUDENT
 // =======================================
+
 exports.approveStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
+
         const user_id =
             req.user?.id ||
-            req.user?._id;
+            req.user?._id ||
+            null;
 
         if (!school_id) {
             return res.status(400).json({
@@ -336,21 +352,22 @@ exports.approveStudent = async (req, res) => {
             });
         }
 
-        const student = await Student.findOneAndUpdate(
-            {
-                _id: req.params.id,
-                school_id
-            },
-            {
-                status: "Active",
-                approved_by: user_id || null,
-                approved_at: new Date()
-            },
-            {
-                new: true,
-                runValidators: true
-            }
-        );
+        const student =
+            await Student.findOneAndUpdate(
+                {
+                    _id: req.params.id,
+                    school_id
+                },
+                {
+                    status: "Active",
+                    approved_by: user_id,
+                    approved_at: new Date()
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
 
         if (!student) {
             return res.status(404).json({
@@ -384,8 +401,9 @@ exports.approveStudent = async (req, res) => {
 
 
 // =======================================
-// Update Student
+// UPDATE STUDENT
 // =======================================
+
 exports.updateStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -416,10 +434,13 @@ exports.updateStudent = async (req, res) => {
 
         allowedFields.forEach((field) => {
             if (req.body[field] !== undefined) {
-                updates[field] =
-                    req.body[field];
+                updates[field] = req.body[field];
             }
         });
+
+        // =======================================
+        // TRIM TEXT
+        // =======================================
 
         if (updates.admission_number) {
             updates.admission_number =
@@ -452,17 +473,19 @@ exports.updateStudent = async (req, res) => {
         }
 
         // =======================================
-        // CHECK ADMISSION NUMBER DUPLICATE
+        // CHECK DUPLICATE ADMISSION NUMBER
         // =======================================
+
         if (updates.admission_number) {
-            const duplicate = await Student.findOne({
-                school_id,
-                admission_number:
-                    updates.admission_number,
-                _id: {
-                    $ne: req.params.id
-                }
-            });
+            const duplicate =
+                await Student.findOne({
+                    school_id,
+                    admission_number:
+                        updates.admission_number,
+                    _id: {
+                        $ne: req.params.id
+                    }
+                });
 
             if (duplicate) {
                 return res.status(409).json({
@@ -518,14 +541,17 @@ exports.updateStudent = async (req, res) => {
 
 
 // =======================================
-// Suspend Student
+// SUSPEND STUDENT
 // =======================================
+
 exports.suspendStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
+
         const user_id =
             req.user?.id ||
-            req.user?._id;
+            req.user?._id ||
+            null;
 
         const student =
             await Student.findOneAndUpdate(
@@ -535,10 +561,8 @@ exports.suspendStudent = async (req, res) => {
                 },
                 {
                     status: "Suspended",
-                    suspended_by:
-                        user_id || null,
-                    suspended_at:
-                        new Date()
+                    suspended_by: user_id,
+                    suspended_at: new Date()
                 },
                 {
                     new: true,
@@ -578,8 +602,9 @@ exports.suspendStudent = async (req, res) => {
 
 
 // =======================================
-// Reinstate Student
+// REINSTATE STUDENT
 // =======================================
+
 exports.reinstateStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -634,8 +659,9 @@ exports.reinstateStudent = async (req, res) => {
 
 
 // =======================================
-// Graduate Student
+// GRADUATE STUDENT
 // =======================================
+
 exports.graduateStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -687,14 +713,17 @@ exports.graduateStudent = async (req, res) => {
 
 
 // =======================================
-// Archive Student
+// ARCHIVE STUDENT
 // =======================================
+
 exports.archiveStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
+
         const user_id =
             req.user?.id ||
-            req.user?._id;
+            req.user?._id ||
+            null;
 
         const student =
             await Student.findOneAndUpdate(
@@ -704,10 +733,8 @@ exports.archiveStudent = async (req, res) => {
                 },
                 {
                     status: "Archived",
-                    archived_by:
-                        user_id || null,
-                    archived_at:
-                        new Date()
+                    archived_by: user_id,
+                    archived_at: new Date()
                 },
                 {
                     new: true,
@@ -747,8 +774,9 @@ exports.archiveStudent = async (req, res) => {
 
 
 // =======================================
-// Delete Student
+// DELETE STUDENT
 // =======================================
+
 exports.deleteStudent = async (req, res) => {
     try {
         const school_id = req.user?.school_id;
@@ -790,8 +818,9 @@ exports.deleteStudent = async (req, res) => {
 
 
 // =======================================
-// Get Logged-in Student Profile
+// GET LOGGED-IN STUDENT PROFILE
 // =======================================
+
 exports.getStudentProfile = async (req, res) => {
     try {
         const userId =
@@ -812,8 +841,9 @@ exports.getStudentProfile = async (req, res) => {
         let student = null;
 
         // =======================================
-        // FIND BY STUDENT ID
+        // FIND USING STUDENT ID
         // =======================================
+
         if (studentId) {
             student =
                 await Student.findById(
@@ -824,6 +854,7 @@ exports.getStudentProfile = async (req, res) => {
         // =======================================
         // FALLBACK THROUGH USER
         // =======================================
+
         if (!student && userId) {
             const user =
                 await User.findById(
@@ -849,6 +880,7 @@ exports.getStudentProfile = async (req, res) => {
         // =======================================
         // MULTI-SCHOOL SECURITY
         // =======================================
+
         if (
             req.user?.school_id &&
             student.school_id &&
@@ -884,8 +916,9 @@ exports.getStudentProfile = async (req, res) => {
 
 
 // =======================================
-// Get Student Dashboard Summary Data
+// GET STUDENT DASHBOARD DATA
 // =======================================
+
 exports.getStudentDashboardData = async (req, res) => {
     try {
         const userId =
@@ -906,8 +939,9 @@ exports.getStudentDashboardData = async (req, res) => {
         let student = null;
 
         // =======================================
-        // FIND BY STUDENT ID
+        // FIND USING STUDENT ID
         // =======================================
+
         if (studentId) {
             student =
                 await Student.findById(
@@ -918,6 +952,7 @@ exports.getStudentDashboardData = async (req, res) => {
         // =======================================
         // FALLBACK THROUGH USER
         // =======================================
+
         if (!student && userId) {
             const user =
                 await User.findById(
@@ -943,6 +978,7 @@ exports.getStudentDashboardData = async (req, res) => {
         // =======================================
         // MULTI-SCHOOL SECURITY
         // =======================================
+
         if (
             req.user?.school_id &&
             student.school_id &&
@@ -959,6 +995,7 @@ exports.getStudentDashboardData = async (req, res) => {
         // =======================================
         // FULL NAME
         // =======================================
+
         const fullName = [
             student.first_name,
             student.other_name,
@@ -970,6 +1007,7 @@ exports.getStudentDashboardData = async (req, res) => {
         // =======================================
         // DASHBOARD RESPONSE
         // =======================================
+
         return res.status(200).json({
             success: true,
 
