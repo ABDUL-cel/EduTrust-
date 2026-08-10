@@ -176,6 +176,14 @@ router.delete(
     authMiddleware,
     deleteStudent
 );
+// =======================================
+// PUBLIC SCHOOL SEARCH
+// =======================================
+
+router.get(
+    "/search",
+    searchSchools
+);
 
 
 module.exports = router;
