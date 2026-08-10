@@ -57,6 +57,14 @@ const SchoolSchema = new mongoose.Schema(
             trim: true
         },
 
+        school_code: {
+    type: String,
+    required: true,
+    unique: true,
+    uppercase: true,
+    trim: true,
+    index: true
+},
         logo: {
             type: String,
             default: "",
