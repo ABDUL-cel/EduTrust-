@@ -16,8 +16,8 @@ const {
     archiveStudent,
     deleteStudent,
     getStudentProfile,
-    getStudentDashboardData,
-    searchSchools
+    getStudentDashboardData
+   
 } = require("../controllers/studentController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -92,14 +92,6 @@ router.get(
     getActiveStudents
 );
 
-// =======================================
-// PUBLIC SCHOOL SEARCH
-// =======================================
-
-router.get(
-    "/search",
-    searchSchools
-);
 
 
 // =======================================
