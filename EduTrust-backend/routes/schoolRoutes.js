@@ -25,5 +25,12 @@ router.put(
     authMiddleware,
     updateCurrentSchool
 );
+// =======================================
+// PUBLIC SCHOOL SEARCH
+// =======================================
 
+router.get(
+    "/search",
+    searchSchools
+);
 module.exports = router;
