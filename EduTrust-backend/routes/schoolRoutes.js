@@ -1,51 +1,29 @@
-
 const express = require("express");
-
 const router = express.Router();
-
-const authMiddleware = require("../middleware/authMiddleware");
-const roleMiddleware = require("../middleware/roleMiddleware");
 
 const {
     getCurrentSchool,
-    updateCurrentSchool,
-    getSchoolByCode
+    updateCurrentSchool
 } = require("../controllers/schoolController");
 
+const authMiddleware = require("../middleware/authMiddleware");
 
 // =======================================
-// Authentication
-// =======================================
-router.use(authMiddleware);
-
-
-// =======================================
-// View School
+// GET CURRENT SCHOOL
 // =======================================
 router.get(
-    "/",
+    "/current",
+    authMiddleware,
     getCurrentSchool
 );
 
-
 // =======================================
-// Update School
-// Principal only
+// UPDATE CURRENT SCHOOL
 // =======================================
 router.put(
-    "/",
-    roleMiddleware("Principal"),
+    "/current",
+    authMiddleware,
     updateCurrentSchool
-);
-
-// ==========================================
-// PUBLIC SCHOOL VERIFICATION
-// Used during parent/student/staff registration
-// ==========================================
-
-router.get(
-    "/code/:schoolCode",
-    getSchoolByCode
 );
 
 module.exports = router;
