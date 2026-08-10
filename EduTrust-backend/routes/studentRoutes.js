@@ -14,7 +14,9 @@ const {
     reinstateStudent,
     graduateStudent,
     archiveStudent,
-    deleteStudent
+    deleteStudent,
+    getStudentProfile,
+    getStudentDashboardData
 } = require("../controllers/studentController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -30,80 +32,144 @@ router.post(
     authMiddleware,
     registerStudent
 );
-router.get("/me/profile", protect, getStudentProfile);
-router.get("/me/dashboard", protect, getStudentDashboardData);
 
-// Get all students
+
+// =======================================
+// LOGGED-IN STUDENT PROFILE
+// =======================================
+
+router.get(
+    "/me/profile",
+    authMiddleware,
+    getStudentProfile
+);
+
+
+// =======================================
+// LOGGED-IN STUDENT DASHBOARD
+// =======================================
+
+router.get(
+    "/me/dashboard",
+    authMiddleware,
+    getStudentDashboardData
+);
+
+
+// =======================================
+// GET ALL STUDENTS
+// =======================================
+
 router.get(
     "/",
     authMiddleware,
     getStudents
 );
 
-// Get pending students
+
+// =======================================
+// GET PENDING STUDENTS
+// =======================================
+
 router.get(
     "/pending",
     authMiddleware,
     getPendingStudents
 );
 
-// Get active students
+
+// =======================================
+// GET ACTIVE STUDENTS
+// =======================================
+
 router.get(
     "/active",
     authMiddleware,
     getActiveStudents
 );
 
-// Get one student
+
+// =======================================
+// GET ONE STUDENT
+// =======================================
+
 router.get(
     "/:id",
     authMiddleware,
     getStudent
 );
 
-// Approve student
+
+// =======================================
+// APPROVE STUDENT
+// =======================================
+
 router.patch(
     "/:id/approve",
     authMiddleware,
     approveStudent
 );
 
-// Update student
+
+// =======================================
+// UPDATE STUDENT
+// =======================================
+
 router.put(
     "/:id",
     authMiddleware,
     updateStudent
 );
 
-// Suspend student
+
+// =======================================
+// SUSPEND STUDENT
+// =======================================
+
 router.patch(
     "/:id/suspend",
     authMiddleware,
     suspendStudent
 );
 
-// Reinstate student
+
+// =======================================
+// REINSTATE STUDENT
+// =======================================
+
 router.patch(
     "/:id/reinstate",
     authMiddleware,
     reinstateStudent
 );
 
-// Graduate student
+
+// =======================================
+// GRADUATE STUDENT
+// =======================================
+
 router.patch(
     "/:id/graduate",
     authMiddleware,
     graduateStudent
 );
 
-// Archive student
+
+// =======================================
+// ARCHIVE STUDENT
+// =======================================
+
 router.patch(
     "/:id/archive",
     authMiddleware,
     archiveStudent
 );
 
-// Permanently delete student
+
+// =======================================
+// PERMANENTLY DELETE STUDENT
+// =======================================
+
 router.delete(
     "/:id",
     authMiddleware,
