@@ -4,15 +4,20 @@ const router = express.Router();
 const {
     registerParent,
     loginParent,
-    getParentProfile
+    getParentProfile,
+    getParents,
+    getParentById
 } = require("../controllers/parentController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 
-router.post("/register", registerParent);
-
+// Public / Auth routes
+router.post("/register", authMiddleware, registerParent);
 router.post("/login", loginParent);
-
 router.get("/profile", authMiddleware, getParentProfile);
+
+// Dashboard management routes (For Principal / Admin)
+router.get("/", authMiddleware, getParents);
+router.get("/:id", authMiddleware, getParentById);
 
 module.exports = router;
