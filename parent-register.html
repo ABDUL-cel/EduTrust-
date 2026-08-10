@@ -4,363 +4,307 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EduTrust - Parent Registration</title>
-    <link rel="icon" type="image/png" href="logo-icon.png">
-    <link rel="stylesheet" href="auth.css">
+    <title>EduTrust - Register Parent</title>
+<link rel="icon" type="image/png" href="logo-icon.png">
+    <link rel="stylesheet" href="dashboard.css">
 </head>
 
 <body>
 
-<div class="auth-page">
+<div class="page-content">
 
-    <div class="auth-container">
+    <div class="page-introduction">
+        <div>
+            <h2>Register Parent / Guardian</h2>
+            <p>
+                Add a parent or guardian to your school's EduTrust records.
+            </p>
+        </div>
 
-        <div class="auth-header">
+        <button
+            type="button"
+            class="secondary-button"
+            onclick="window.history.back()"
+        >
+            ← Back
+        </button>
+    </div>
 
-            <div class="logo-container">
-                <div class="logo-fallback">
-                    <span>Edu</span>Trust
+
+    <!-- ================================
+         REGISTRATION CARD
+    ================================= -->
+
+    <div class="dashboard-card">
+
+        <form id="parentRegistrationForm">
+
+            <!-- NAME -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label for="first_name">
+                        First Name <span>*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        placeholder="Enter first name"
+                        required
+                    >
                 </div>
+
+
+                <div class="form-group">
+                    <label for="last_name">
+                        Last Name <span>*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        placeholder="Enter last name"
+                        required
+                    >
+                </div>
+
             </div>
 
-            <h1>Parent Registration</h1>
 
-            <p>
-                Create your EduTrust parent account.
-            </p>
+            <!-- OTHER NAME + RELATIONSHIP -->
 
-        </div>
+            <div class="form-row">
 
+                <div class="form-group">
+                    <label for="other_name">
+                        Other Name
+                    </label>
 
-        <div class="dashboard-card auth-card">
-
-            <form id="parentRegistrationForm">
-
-                <!-- =========================
-                     PERSONAL INFORMATION
-                ========================== -->
-
-                <div class="form-section">
-
-                    <div class="section-heading">
-
-                        <h2>Personal Information</h2>
-
-                        <p>
-                            Enter your personal information.
-                        </p>
-
-                    </div>
-
-
-                    <div class="form-row">
-
-                        <div class="form-group">
-
-                            <label for="first_name">
-                                First Name *
-                            </label>
-
-                            <input
-                                type="text"
-                                id="first_name"
-                                name="first_name"
-                                placeholder="Enter first name"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label for="last_name">
-                                Last Name *
-                            </label>
-
-                            <input
-                                type="text"
-                                id="last_name"
-                                name="last_name"
-                                placeholder="Enter last name"
-                                required
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="other_name">
-                            Other Name
-                        </label>
-
-                        <input
-                            type="text"
-                            id="other_name"
-                            name="other_name"
-                            placeholder="Enter other name"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="relationship">
-                            Relationship With Student *
-                        </label>
-
-                        <select
-                            id="relationship"
-                            name="relationship"
-                            required
-                        >
-
-                            <option value="">
-                                Select relationship
-                            </option>
-
-                            <option value="Father">
-                                Father
-                            </option>
-
-                            <option value="Mother">
-                                Mother
-                            </option>
-
-                            <option value="Guardian">
-                                Guardian
-                            </option>
-
-                            <option value="Grandfather">
-                                Grandfather
-                            </option>
-
-                            <option value="Grandmother">
-                                Grandmother
-                            </option>
-
-                            <option value="Uncle">
-                                Uncle
-                            </option>
-
-                            <option value="Aunt">
-                                Aunt
-                            </option>
-
-                            <option value="Other">
-                                Other
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =========================
-                     CONTACT INFORMATION
-                ========================== -->
-
-                <div class="form-section">
-
-                    <div class="section-heading">
-
-                        <h2>Contact Information</h2>
-
-                        <p>
-                            How the school can contact you.
-                        </p>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="email">
-                            Email Address
-                        </label>
-
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="Enter email address"
-                            autocomplete="email"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="phone">
-                            Phone Number *
-                        </label>
-
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            placeholder="Enter phone number"
-                            autocomplete="tel"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="alternate_phone">
-                            Alternative Phone Number
-                        </label>
-
-                        <input
-                            type="tel"
-                            id="alternate_phone"
-                            name="alternate_phone"
-                            placeholder="Enter alternative phone number"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="home_address">
-                            Home Address
-                        </label>
-
-                        <textarea
-                            id="home_address"
-                            name="home_address"
-                            rows="3"
-                            placeholder="Enter home address"
-                        ></textarea>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =========================
-                     OTHER INFORMATION
-                ========================== -->
-
-                <div class="form-section">
-
-                    <div class="section-heading">
-
-                        <h2>Additional Information</h2>
-
-                        <p>
-                            Optional information about you.
-                        </p>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="occupation">
-                            Occupation
-                        </label>
-
-                        <input
-                            type="text"
-                            id="occupation"
-                            name="occupation"
-                            placeholder="Enter occupation"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="passport">
-                            Passport / Profile Image
-                        </label>
-
-                        <input
-                            type="text"
-                            id="passport"
-                            name="passport"
-                            placeholder="Image URL"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- =========================
-                     MESSAGE
-                ========================== -->
-
-                <div
-                    id="registerMessage"
-                    class="register-message"
-                    style="display:none;"
-                ></div>
-
-
-                <!-- =========================
-                     SUBMIT
-                ========================== -->
-
-                <div class="form-actions">
-
-                    <button
-                        type="submit"
-                        class="primary-button"
-                        id="parentRegisterButton"
+                    <input
+                        type="text"
+                        id="other_name"
+                        name="other_name"
+                        placeholder="Enter other name"
                     >
-                        Create Parent Account
-                    </button>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="relationship">
+                        Relationship <span>*</span>
+                    </label>
+
+                    <select
+                        id="relationship"
+                        name="relationship"
+                        required
+                    >
+                        <option value="">
+                            Select relationship
+                        </option>
+
+                        <option value="Father">
+                            Father
+                        </option>
+
+                        <option value="Mother">
+                            Mother
+                        </option>
+
+                        <option value="Guardian">
+                            Guardian
+                        </option>
+
+                        <option value="Uncle">
+                            Uncle
+                        </option>
+
+                        <option value="Aunt">
+                            Aunt
+                        </option>
+
+                        <option value="Grandfather">
+                            Grandfather
+                        </option>
+
+                        <option value="Grandmother">
+                            Grandmother
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+                </div>
+
+            </div>
+
+
+            <!-- CONTACT -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="phone">
+                        Phone Number <span>*</span>
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        placeholder="08012345678"
+                        required
+                    >
 
                 </div>
 
 
-                <!-- =========================
-                     LOGIN
-                ========================== -->
+                <div class="form-group">
 
-                <div class="auth-footer">
+                    <label for="alternate_phone">
+                        Alternate Phone
+                    </label>
 
-                    <p>
-                        Already have an account?
-                        <a href="parent-login.html">
-                            Login here
-                        </a>
-                    </p>
+                    <input
+                        type="tel"
+                        id="alternate_phone"
+                        name="alternate_phone"
+                        placeholder="Optional phone number"
+                    >
 
                 </div>
 
-            </form>
-
-        </div>
+            </div>
 
 
-        <div class="back-link">
+            <!-- EMAIL -->
 
-            <a href="index.html">
-                ← Back to EduTrust
-            </a>
+            <div class="form-row">
 
-        </div>
+                <div class="form-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="parent@example.com"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="occupation">
+                        Occupation
+                    </label>
+
+                    <input
+                        type="text"
+                        id="occupation"
+                        name="occupation"
+                        placeholder="Enter occupation"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- ADDRESS -->
+
+            <div class="form-group">
+
+                <label for="home_address">
+                    Home Address
+                </label>
+
+                <textarea
+                    id="home_address"
+                    name="home_address"
+                    rows="3"
+                    placeholder="Enter residential address"
+                ></textarea>
+
+            </div>
+
+
+            <!-- PASSPORT -->
+
+            <div class="form-group">
+
+                <label for="passport">
+                    Passport / Profile Image URL
+                </label>
+
+                <input
+                    type="text"
+                    id="passport"
+                    name="passport"
+                    placeholder="Paste image URL or leave blank"
+                >
+
+            </div>
+
+
+            <!-- MESSAGE -->
+
+            <div
+                id="parentMessage"
+                style="
+                    display:none;
+                    margin-top:15px;
+                    padding:12px;
+                    border-radius:8px;
+                "
+            ></div>
+
+
+            <!-- ACTIONS -->
+
+            <div
+                class="modal-actions"
+                style="margin-top:25px;"
+            >
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    onclick="window.history.back()"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                    id="registerParentButton"
+                >
+                    Register Parent
+                </button>
+
+            </div>
+
+        </form>
 
     </div>
 
 </div>
 
 
-<script src="parent-register.js"></script>
+<script src="parent-registration.js"></script>
 
 </body>
-    </html>
+</html>
