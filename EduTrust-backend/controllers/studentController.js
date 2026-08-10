@@ -1,11 +1,13 @@
 const Student = require("../models/student");
+const User = require("../models/User");
 
 // =======================================
 // Register Student
+// Principal / authenticated school staff
 // =======================================
 exports.registerStudent = async (req, res) => {
     try {
-        const school_id = req.user.school_id;
+        const school_id = req.user?.school_id;
 
         if (!school_id) {
             return res.status(400).json({
@@ -28,60 +30,109 @@ exports.registerStudent = async (req, res) => {
             passport
         } = req.body;
 
+        // =======================================
+        // REQUIRED FIELDS
+        // =======================================
         if (
-            !admission_number ||
-            !first_name ||
-            !last_name ||
+            !admission_number?.trim() ||
+            !first_name?.trim() ||
+            !last_name?.trim() ||
             !gender ||
-            !class_name
+            !date_of_birth ||
+            !class_name?.trim()
         ) {
             return res.status(400).json({
                 success: false,
                 message:
-                    "Admission number, first name, last name, gender and class are required."
+                    "Admission number, first name, last name, gender, date of birth and class are required."
             });
         }
 
+        // =======================================
+        // CHECK DUPLICATE ADMISSION NUMBER
+        // =======================================
+        const normalizedAdmissionNumber =
+            admission_number.trim();
+
         const existingStudent = await Student.findOne({
             school_id,
-            admission_number: admission_number.trim()
+            admission_number: normalizedAdmissionNumber
         });
 
         if (existingStudent) {
             return res.status(409).json({
                 success: false,
-                message: "A student with this admission number already exists."
+                message:
+                    "A student with this admission number already exists."
             });
         }
 
+        // =======================================
+        // CREATE STUDENT
+        // =======================================
         const student = await Student.create({
             school_id,
-            admission_number: admission_number.trim(),
-            first_name: first_name.trim(),
-            last_name: last_name.trim(),
-            other_name: other_name ? other_name.trim() : "",
+
+            admission_number:
+                normalizedAdmissionNumber,
+
+            first_name:
+                first_name.trim(),
+
+            last_name:
+                last_name.trim(),
+
+            other_name:
+                other_name
+                    ? other_name.trim()
+                    : "",
+
             gender,
-            date_of_birth: date_of_birth || null,
-            class_name,
-            arm: arm || "",
-            home_address: home_address || "",
-            medical_information: medical_information || "",
-            passport: passport || "",
+
+            date_of_birth,
+
+            class_name:
+                class_name.trim(),
+
+            arm:
+                arm
+                    ? arm.trim()
+                    : "",
+
+            home_address:
+                home_address
+                    ? home_address.trim()
+                    : "",
+
+            medical_information:
+                medical_information
+                    ? medical_information.trim()
+                    : "",
+
+            passport:
+                passport || "",
+
             status: "Pending"
         });
 
         return res.status(201).json({
             success: true,
-            message: "Student registration submitted successfully.",
+            message:
+                "Student registration submitted successfully.",
             student
         });
 
     } catch (error) {
-        console.error("REGISTER STUDENT ERROR:", error);
+        console.error(
+            "REGISTER STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to register student.",
+            error: error.message
         });
     }
 };
@@ -92,10 +143,20 @@ exports.registerStudent = async (req, res) => {
 // =======================================
 exports.getStudents = async (req, res) => {
     try {
+        const school_id = req.user?.school_id;
+
+        if (!school_id) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Your account is not connected to a school."
+            });
+        }
+
         const students = await Student.find({
-            school_id: req.user.school_id
+            school_id
         }).sort({
-            createdAt: -1
+            created_at: -1
         });
 
         return res.status(200).json({
@@ -105,11 +166,16 @@ exports.getStudents = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("GET STUDENTS ERROR:", error);
+        console.error(
+            "GET STUDENTS ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to load students.",
+            error: error.message
         });
     }
 };
@@ -120,15 +186,26 @@ exports.getStudents = async (req, res) => {
 // =======================================
 exports.getStudent = async (req, res) => {
     try {
+        const school_id = req.user?.school_id;
+
+        if (!school_id) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Your account is not connected to a school."
+            });
+        }
+
         const student = await Student.findOne({
             _id: req.params.id,
-            school_id: req.user.school_id
+            school_id
         });
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student not found."
+                message:
+                    "Student not found."
             });
         }
 
@@ -138,26 +215,41 @@ exports.getStudent = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("GET STUDENT ERROR:", error);
+        console.error(
+            "GET STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to load student.",
+            error: error.message
         });
     }
 };
 
 
 // =======================================
-// Pending Students
+// Get Pending Students
 // =======================================
 exports.getPendingStudents = async (req, res) => {
     try {
+        const school_id = req.user?.school_id;
+
+        if (!school_id) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Your account is not connected to a school."
+            });
+        }
+
         const students = await Student.find({
-            school_id: req.user.school_id,
+            school_id,
             status: "Pending"
         }).sort({
-            createdAt: -1
+            created_at: -1
         });
 
         return res.status(200).json({
@@ -167,26 +259,41 @@ exports.getPendingStudents = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("GET PENDING STUDENTS ERROR:", error);
+        console.error(
+            "GET PENDING STUDENTS ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to load pending students.",
+            error: error.message
         });
     }
 };
 
 
 // =======================================
-// Active Students
+// Get Active Students
 // =======================================
 exports.getActiveStudents = async (req, res) => {
     try {
+        const school_id = req.user?.school_id;
+
+        if (!school_id) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Your account is not connected to a school."
+            });
+        }
+
         const students = await Student.find({
-            school_id: req.user.school_id,
+            school_id,
             status: "Active"
         }).sort({
-            createdAt: -1
+            created_at: -1
         });
 
         return res.status(200).json({
@@ -196,11 +303,16 @@ exports.getActiveStudents = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("GET ACTIVE STUDENTS ERROR:", error);
+        console.error(
+            "GET ACTIVE STUDENTS ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to load active students.",
+            error: error.message
         });
     }
 };
@@ -211,13 +323,28 @@ exports.getActiveStudents = async (req, res) => {
 // =======================================
 exports.approveStudent = async (req, res) => {
     try {
+        const school_id = req.user?.school_id;
+        const user_id =
+            req.user?.id ||
+            req.user?._id;
+
+        if (!school_id) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Your account is not connected to a school."
+            });
+        }
+
         const student = await Student.findOneAndUpdate(
             {
                 _id: req.params.id,
-                school_id: req.user.school_id
+                school_id
             },
             {
-                status: "Active"
+                status: "Active",
+                approved_by: user_id || null,
+                approved_at: new Date()
             },
             {
                 new: true,
@@ -228,22 +355,29 @@ exports.approveStudent = async (req, res) => {
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student not found."
+                message:
+                    "Student not found."
             });
         }
 
         return res.status(200).json({
             success: true,
-            message: "Student approved successfully.",
+            message:
+                "Student approved successfully.",
             student
         });
 
     } catch (error) {
-        console.error("APPROVE STUDENT ERROR:", error);
+        console.error(
+            "APPROVE STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to approve student.",
+            error: error.message
         });
     }
 };
@@ -254,6 +388,16 @@ exports.approveStudent = async (req, res) => {
 // =======================================
 exports.updateStudent = async (req, res) => {
     try {
+        const school_id = req.user?.school_id;
+
+        if (!school_id) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Your account is not connected to a school."
+            });
+        }
+
         const allowedFields = [
             "admission_number",
             "first_name",
@@ -272,7 +416,8 @@ exports.updateStudent = async (req, res) => {
 
         allowedFields.forEach((field) => {
             if (req.body[field] !== undefined) {
-                updates[field] = req.body[field];
+                updates[field] =
+                    req.body[field];
             }
         });
 
@@ -291,37 +436,82 @@ exports.updateStudent = async (req, res) => {
                 updates.last_name.trim();
         }
 
-        const student = await Student.findOneAndUpdate(
-            {
-                _id: req.params.id,
-                school_id: req.user.school_id
-            },
-            updates,
-            {
-                new: true,
-                runValidators: true
+        if (updates.other_name) {
+            updates.other_name =
+                updates.other_name.trim();
+        }
+
+        if (updates.class_name) {
+            updates.class_name =
+                updates.class_name.trim();
+        }
+
+        if (updates.arm) {
+            updates.arm =
+                updates.arm.trim();
+        }
+
+        // =======================================
+        // CHECK ADMISSION NUMBER DUPLICATE
+        // =======================================
+        if (updates.admission_number) {
+            const duplicate = await Student.findOne({
+                school_id,
+                admission_number:
+                    updates.admission_number,
+                _id: {
+                    $ne: req.params.id
+                }
+            });
+
+            if (duplicate) {
+                return res.status(409).json({
+                    success: false,
+                    message:
+                        "Another student already uses this admission number."
+                });
             }
-        );
+        }
+
+        const student =
+            await Student.findOneAndUpdate(
+                {
+                    _id: req.params.id,
+                    school_id
+                },
+                updates,
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student not found."
+                message:
+                    "Student not found."
             });
         }
 
         return res.status(200).json({
             success: true,
-            message: "Student updated successfully.",
+            message:
+                "Student updated successfully.",
             student
         });
 
     } catch (error) {
-        console.error("UPDATE STUDENT ERROR:", error);
+        console.error(
+            "UPDATE STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to update student.",
+            error: error.message
         });
     }
 };
@@ -332,38 +522,56 @@ exports.updateStudent = async (req, res) => {
 // =======================================
 exports.suspendStudent = async (req, res) => {
     try {
-        const student = await Student.findOneAndUpdate(
-            {
-                _id: req.params.id,
-                school_id: req.user.school_id
-            },
-            {
-                status: "Suspended"
-            },
-            {
-                new: true
-            }
-        );
+        const school_id = req.user?.school_id;
+        const user_id =
+            req.user?.id ||
+            req.user?._id;
+
+        const student =
+            await Student.findOneAndUpdate(
+                {
+                    _id: req.params.id,
+                    school_id
+                },
+                {
+                    status: "Suspended",
+                    suspended_by:
+                        user_id || null,
+                    suspended_at:
+                        new Date()
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student not found."
+                message:
+                    "Student not found."
             });
         }
 
         return res.status(200).json({
             success: true,
-            message: "Student suspended successfully.",
+            message:
+                "Student suspended successfully.",
             student
         });
 
     } catch (error) {
-        console.error("SUSPEND STUDENT ERROR:", error);
+        console.error(
+            "SUSPEND STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to suspend student.",
+            error: error.message
         });
     }
 };
@@ -374,38 +582,52 @@ exports.suspendStudent = async (req, res) => {
 // =======================================
 exports.reinstateStudent = async (req, res) => {
     try {
-        const student = await Student.findOneAndUpdate(
-            {
-                _id: req.params.id,
-                school_id: req.user.school_id
-            },
-            {
-                status: "Active"
-            },
-            {
-                new: true
-            }
-        );
+        const school_id = req.user?.school_id;
+
+        const student =
+            await Student.findOneAndUpdate(
+                {
+                    _id: req.params.id,
+                    school_id
+                },
+                {
+                    status: "Active",
+                    suspended_by: null,
+                    suspended_at: null,
+                    suspension_reason: ""
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student not found."
+                message:
+                    "Student not found."
             });
         }
 
         return res.status(200).json({
             success: true,
-            message: "Student reinstated successfully.",
+            message:
+                "Student reinstated successfully.",
             student
         });
 
     } catch (error) {
-        console.error("REINSTATE STUDENT ERROR:", error);
+        console.error(
+            "REINSTATE STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to reinstate student.",
+            error: error.message
         });
     }
 };
@@ -416,38 +638,49 @@ exports.reinstateStudent = async (req, res) => {
 // =======================================
 exports.graduateStudent = async (req, res) => {
     try {
-        const student = await Student.findOneAndUpdate(
-            {
-                _id: req.params.id,
-                school_id: req.user.school_id
-            },
-            {
-                status: "Graduated"
-            },
-            {
-                new: true
-            }
-        );
+        const school_id = req.user?.school_id;
+
+        const student =
+            await Student.findOneAndUpdate(
+                {
+                    _id: req.params.id,
+                    school_id
+                },
+                {
+                    status: "Graduated"
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student not found."
+                message:
+                    "Student not found."
             });
         }
 
         return res.status(200).json({
             success: true,
-            message: "Student graduated successfully.",
+            message:
+                "Student graduated successfully.",
             student
         });
 
     } catch (error) {
-        console.error("GRADUATE STUDENT ERROR:", error);
+        console.error(
+            "GRADUATE STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to graduate student.",
+            error: error.message
         });
     }
 };
@@ -458,38 +691,56 @@ exports.graduateStudent = async (req, res) => {
 // =======================================
 exports.archiveStudent = async (req, res) => {
     try {
-        const student = await Student.findOneAndUpdate(
-            {
-                _id: req.params.id,
-                school_id: req.user.school_id
-            },
-            {
-                status: "Archived"
-            },
-            {
-                new: true
-            }
-        );
+        const school_id = req.user?.school_id;
+        const user_id =
+            req.user?.id ||
+            req.user?._id;
+
+        const student =
+            await Student.findOneAndUpdate(
+                {
+                    _id: req.params.id,
+                    school_id
+                },
+                {
+                    status: "Archived",
+                    archived_by:
+                        user_id || null,
+                    archived_at:
+                        new Date()
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student not found."
+                message:
+                    "Student not found."
             });
         }
 
         return res.status(200).json({
             success: true,
-            message: "Student archived successfully.",
+            message:
+                "Student archived successfully.",
             student
         });
 
     } catch (error) {
-        console.error("ARCHIVE STUDENT ERROR:", error);
+        console.error(
+            "ARCHIVE STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to archive student.",
+            error: error.message
         });
     }
 };
@@ -500,29 +751,39 @@ exports.archiveStudent = async (req, res) => {
 // =======================================
 exports.deleteStudent = async (req, res) => {
     try {
-        const student = await Student.findOneAndDelete({
-            _id: req.params.id,
-            school_id: req.user.school_id
-        });
+        const school_id = req.user?.school_id;
+
+        const student =
+            await Student.findOneAndDelete({
+                _id: req.params.id,
+                school_id
+            });
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student not found."
+                message:
+                    "Student not found."
             });
         }
 
         return res.status(200).json({
             success: true,
-            message: "Student deleted successfully."
+            message:
+                "Student deleted successfully."
         });
 
     } catch (error) {
-        console.error("DELETE STUDENT ERROR:", error);
+        console.error(
+            "DELETE STUDENT ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message:
+                "Failed to delete student.",
+            error: error.message
         });
     }
 };
@@ -533,50 +794,71 @@ exports.deleteStudent = async (req, res) => {
 // =======================================
 exports.getStudentProfile = async (req, res) => {
     try {
-        const userId = req.user?.id || req.user?._id;
-        const studentId = req.user?.student_id;
+        const userId =
+            req.user?.id ||
+            req.user?._id;
+
+        const studentId =
+            req.user?.student_id;
 
         if (!userId && !studentId) {
             return res.status(401).json({
                 success: false,
-                message: "Authentication required."
+                message:
+                    "Authentication required."
             });
         }
 
-        let student;
+        let student = null;
 
-        // If the authenticated user has a student_id,
-        // use it directly.
+        // =======================================
+        // FIND BY STUDENT ID
+        // =======================================
         if (studentId) {
-            student = await Student.findById(studentId).lean();
-        } else {
-            // Fallback: find the student account through User.
-            const user = await User.findById(userId).lean();
+            student =
+                await Student.findById(
+                    studentId
+                ).lean();
+        }
+
+        // =======================================
+        // FALLBACK THROUGH USER
+        // =======================================
+        if (!student && userId) {
+            const user =
+                await User.findById(
+                    userId
+                ).lean();
 
             if (user?.student_id) {
-                student = await Student.findById(user.student_id).lean();
+                student =
+                    await Student.findById(
+                        user.student_id
+                    ).lean();
             }
         }
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student profile not found."
+                message:
+                    "Student profile not found."
             });
         }
 
         // =======================================
-        // MULTI-SCHOOL SECURITY CHECK
+        // MULTI-SCHOOL SECURITY
         // =======================================
-
         if (
-            req.user.school_id &&
+            req.user?.school_id &&
             student.school_id &&
-            String(req.user.school_id) !== String(student.school_id)
+            String(req.user.school_id) !==
+                String(student.school_id)
         ) {
             return res.status(403).json({
                 success: false,
-                message: "You are not authorized to access this student profile."
+                message:
+                    "You are not authorized to access this student profile."
             });
         }
 
@@ -586,11 +868,15 @@ exports.getStudentProfile = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("GET STUDENT PROFILE ERROR:", error);
+        console.error(
+            "GET STUDENT PROFILE ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: "Failed to load student profile.",
+            message:
+                "Failed to load student profile.",
             error: error.message
         });
     }
@@ -602,88 +888,121 @@ exports.getStudentProfile = async (req, res) => {
 // =======================================
 exports.getStudentDashboardData = async (req, res) => {
     try {
-        const userId = req.user?.id || req.user?._id;
-        const studentId = req.user?.student_id;
+        const userId =
+            req.user?.id ||
+            req.user?._id;
+
+        const studentId =
+            req.user?.student_id;
 
         if (!userId && !studentId) {
             return res.status(401).json({
                 success: false,
-                message: "Authentication required."
+                message:
+                    "Authentication required."
             });
         }
 
-        let student;
+        let student = null;
 
         // =======================================
-        // FIND STUDENT
+        // FIND BY STUDENT ID
         // =======================================
-
         if (studentId) {
-            student = await Student.findById(studentId).lean();
-        } else {
-            const user = await User.findById(userId).lean();
+            student =
+                await Student.findById(
+                    studentId
+                ).lean();
+        }
+
+        // =======================================
+        // FALLBACK THROUGH USER
+        // =======================================
+        if (!student && userId) {
+            const user =
+                await User.findById(
+                    userId
+                ).lean();
 
             if (user?.student_id) {
-                student = await Student.findById(user.student_id).lean();
+                student =
+                    await Student.findById(
+                        user.student_id
+                    ).lean();
             }
         }
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student record not found."
+                message:
+                    "Student record not found."
             });
         }
 
         // =======================================
-        // MULTI-SCHOOL SECURITY CHECK
+        // MULTI-SCHOOL SECURITY
         // =======================================
-
         if (
-            req.user.school_id &&
+            req.user?.school_id &&
             student.school_id &&
-            String(req.user.school_id) !== String(student.school_id)
+            String(req.user.school_id) !==
+                String(student.school_id)
         ) {
             return res.status(403).json({
                 success: false,
-                message: "You are not authorized to access this student dashboard."
+                message:
+                    "You are not authorized to access this student dashboard."
             });
         }
 
         // =======================================
-        // STUDENT DASHBOARD DATA
+        // FULL NAME
         // =======================================
+        const fullName = [
+            student.first_name,
+            student.other_name,
+            student.last_name
+        ]
+            .filter(Boolean)
+            .join(" ");
 
+        // =======================================
+        // DASHBOARD RESPONSE
+        // =======================================
         return res.status(200).json({
             success: true,
 
             dashboard: {
                 studentInfo: {
-                    fullName: [
-                        student.first_name,
-                        student.other_name,
-                        student.last_name
-                    ]
-                        .filter(Boolean)
-                        .join(" "),
+                    fullName,
 
-                    admissionNumber: student.admission_number,
+                    admissionNumber:
+                        student.admission_number,
 
-                    className: student.class_name,
+                    className:
+                        student.class_name,
 
-                    arm: student.arm,
+                    arm:
+                        student.arm,
 
-                    gender: student.gender,
+                    gender:
+                        student.gender,
 
-                    dateOfBirth: student.date_of_birth,
+                    dateOfBirth:
+                        student.date_of_birth,
 
-                    admissionDate: student.admission_date,
+                    admissionDate:
+                        student.admission_date,
 
-                    status: student.status,
+                    status:
+                        student.status,
 
-                    passport: student.passport,
+                    passport:
+                        student.passport,
 
-                    school_id: student.school_id
+                    school_id:
+                        student.school_id
                 }
             }
         });
@@ -696,7 +1015,8 @@ exports.getStudentDashboardData = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Failed to load student dashboard.",
+            message:
+                "Failed to load student dashboard.",
             error: error.message
         });
     }
