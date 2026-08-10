@@ -8,7 +8,8 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 
 const {
     getCurrentSchool,
-    updateCurrentSchool
+    updateCurrentSchool,
+    getSchoolByCode
 } = require("../controllers/schoolController");
 
 
@@ -37,5 +38,14 @@ router.put(
     updateCurrentSchool
 );
 
+// ==========================================
+// PUBLIC SCHOOL VERIFICATION
+// Used during parent/student/staff registration
+// ==========================================
+
+router.get(
+    "/code/:schoolCode",
+    getSchoolByCode
+);
 
 module.exports = router;
