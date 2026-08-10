@@ -1,309 +1,366 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-    name="description"
-    content="Create your EduTrust parent account."
->
-
-<title>EduTrust | Parent Registration</title>
-<link rel="icon" type="image/png" href="logo-icon.png">
-<link rel="stylesheet" href="auth.css">
-```
-
-</head>>
+    <title>EduTrust - Parent Registration</title>
+    <link rel="icon" type="image/png" href="logo-icon.png">
+    <link rel="stylesheet" href="auth.css">
+</head>
 
 <body>
 
-    <div class="auth-page">
+<div class="auth-page">
 
-        <div class="auth-container">
+    <div class="auth-container">
 
-            <!-- ================================
-                 LOGO / BRAND
-            ================================= -->
+        <div class="auth-header">
 
-            <div class="auth-header">
-
-                <div class="logo-container">
-                    <img
-                        src="images/logo.png"
-                        alt="EduTrust Logo"
-                        class="auth-logo"
-                        onerror="this.style.display='none';"
-                    >
-
-                    <div class="logo-fallback">
-                        <span>EDUTRUST</span>
-                    </div>
+            <div class="logo-container">
+                <div class="logo-fallback">
+                    <span>Edu</span>Trust
                 </div>
-
-                <h1>Parent Registration</h1>
-
-                <p>
-                    Create your EduTrust Parent Portal account.
-                </p>
-
             </div>
 
+            <h1>Parent Registration</h1>
 
-            <!-- ================================
-                 REGISTRATION CARD
-            ================================= -->
+            <p>
+                Create your EduTrust parent account.
+            </p>
 
-            <div class="dashboard-card auth-card">
+        </div>
 
-                <form
-                    id="parentRegistrationForm"
-                    novalidate
-                >
 
-                    <!-- ================================
-                         PERSONAL INFORMATION
-                    ================================= -->
+        <div class="dashboard-card auth-card">
 
-                    <div class="form-section">
+            <form id="parentRegistrationForm">
 
-                        <div class="section-heading">
+                <!-- =========================
+                     PERSONAL INFORMATION
+                ========================== -->
 
-                            <h2>Personal Information</h2>
+                <div class="form-section">
 
-                            <p>
-                                Enter your personal details below.
-                            </p>
+                    <div class="section-heading">
 
-                        </div>
-
-
-                        <div class="form-row">
-
-                            <div class="form-group">
-
-                                <label for="full_name">
-                                    Full Name
-                                    <span>*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="full_name"
-                                    name="full_name"
-                                    placeholder="Enter your full name"
-                                    autocomplete="name"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <div class="form-group">
-
-                                <label for="phone">
-                                    Phone Number
-                                    <span>*</span>
-                                </label>
-
-                                <input
-                                    type="tel"
-                                    id="phone"
-                                    name="phone"
-                                    placeholder="Enter your phone number"
-                                    autocomplete="tel"
-                                    required
-                                >
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label for="email">
-                                Email Address
-                                <span>*</span>
-                            </label>
-
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                placeholder="Enter your email address"
-                                autocomplete="email"
-                                required
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- ================================
-                         STUDENT CONNECTION
-                    ================================= -->
-
-                    <div class="form-section">
-
-                        <div class="section-heading">
-
-                            <h2>Student Information</h2>
-
-                            <p>
-                                Connect your parent account to your
-                                child's school record.
-                            </p>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label for="student_admission_number">
-                                Student Admission Number
-                                <span>*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                id="student_admission_number"
-                                name="student_admission_number"
-                                placeholder="Example: PRY00125"
-                                required
-                            >
-
-                            <small>
-                                Enter the admission number given to your child
-                                by the school.
-                            </small>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- ================================
-                         ACCOUNT SECURITY
-                    ================================= -->
-
-                    <div class="form-section">
-
-                        <div class="section-heading">
-
-                            <h2>Account Security</h2>
-
-                            <p>
-                                Create a secure password for your account.
-                            </p>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label for="password">
-                                Password
-                                <span>*</span>
-                            </label>
-
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                placeholder="Create a password"
-                                autocomplete="new-password"
-                                minlength="6"
-                                required
-                            >
-
-                            <small>
-                                Password must contain at least 6 characters.
-                            </small>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- ================================
-                         REGISTRATION MESSAGE
-                    ================================= -->
-
-                    <div
-                        id="registerMessage"
-                        class="register-message"
-                        style="display: none;"
-                        role="alert"
-                        aria-live="polite"
-                    ></div>
-
-
-                    <!-- ================================
-                         SUBMIT BUTTON
-                    ================================= -->
-
-                    <div class="form-actions">
-
-                        <button
-                            type="submit"
-                            class="primary-button"
-                            id="parentRegisterButton"
-                        >
-                            Create Parent Account
-                        </button>
-
-                    </div>
-
-
-                    <!-- ================================
-                         LOGIN LINK
-                    ================================= -->
-
-                    <div class="auth-footer">
+                        <h2>Personal Information</h2>
 
                         <p>
-                            Already have an account?
-                            <a href="parent-login.html">
-                                Login here
-                            </a>
+                            Enter your personal information.
                         </p>
 
                     </div>
 
-                </form>
 
-            </div>
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label for="first_name">
+                                First Name *
+                            </label>
+
+                            <input
+                                type="text"
+                                id="first_name"
+                                name="first_name"
+                                placeholder="Enter first name"
+                                required
+                            >
+
+                        </div>
 
 
-            <!-- ================================
-                 BACK TO HOME
-            ================================= -->
+                        <div class="form-group">
 
-            <div class="back-link">
+                            <label for="last_name">
+                                Last Name *
+                            </label>
 
-                <a href="index.html">
-                    ← Back to EduTrust
-                </a>
+                            <input
+                                type="text"
+                                id="last_name"
+                                name="last_name"
+                                placeholder="Enter last name"
+                                required
+                            >
 
-            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="other_name">
+                            Other Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="other_name"
+                            name="other_name"
+                            placeholder="Enter other name"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="relationship">
+                            Relationship With Student *
+                        </label>
+
+                        <select
+                            id="relationship"
+                            name="relationship"
+                            required
+                        >
+
+                            <option value="">
+                                Select relationship
+                            </option>
+
+                            <option value="Father">
+                                Father
+                            </option>
+
+                            <option value="Mother">
+                                Mother
+                            </option>
+
+                            <option value="Guardian">
+                                Guardian
+                            </option>
+
+                            <option value="Grandfather">
+                                Grandfather
+                            </option>
+
+                            <option value="Grandmother">
+                                Grandmother
+                            </option>
+
+                            <option value="Uncle">
+                                Uncle
+                            </option>
+
+                            <option value="Aunt">
+                                Aunt
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     CONTACT INFORMATION
+                ========================== -->
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+
+                        <h2>Contact Information</h2>
+
+                        <p>
+                            How the school can contact you.
+                        </p>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Enter email address"
+                            autocomplete="email"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Phone Number *
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="Enter phone number"
+                            autocomplete="tel"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="alternate_phone">
+                            Alternative Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="alternate_phone"
+                            name="alternate_phone"
+                            placeholder="Enter alternative phone number"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="home_address">
+                            Home Address
+                        </label>
+
+                        <textarea
+                            id="home_address"
+                            name="home_address"
+                            rows="3"
+                            placeholder="Enter home address"
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     OTHER INFORMATION
+                ========================== -->
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+
+                        <h2>Additional Information</h2>
+
+                        <p>
+                            Optional information about you.
+                        </p>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="occupation">
+                            Occupation
+                        </label>
+
+                        <input
+                            type="text"
+                            id="occupation"
+                            name="occupation"
+                            placeholder="Enter occupation"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="passport">
+                            Passport / Profile Image
+                        </label>
+
+                        <input
+                            type="text"
+                            id="passport"
+                            name="passport"
+                            placeholder="Image URL"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     MESSAGE
+                ========================== -->
+
+                <div
+                    id="registerMessage"
+                    class="register-message"
+                    style="display:none;"
+                ></div>
+
+
+                <!-- =========================
+                     SUBMIT
+                ========================== -->
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                        id="parentRegisterButton"
+                    >
+                        Create Parent Account
+                    </button>
+
+                </div>
+
+
+                <!-- =========================
+                     LOGIN
+                ========================== -->
+
+                <div class="auth-footer">
+
+                    <p>
+                        Already have an account?
+                        <a href="parent-login.html">
+                            Login here
+                        </a>
+                    </p>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <div class="back-link">
+
+            <a href="index.html">
+                ← Back to EduTrust
+            </a>
 
         </div>
 
     </div>
 
+</div>
 
-    <!-- ================================
-         PARENT REGISTRATION JAVASCRIPT
-    ================================= -->
 
-    <script src="parent-register.js"></script>
+<script src="parent-register.js"></script>
 
 </body>
-</html>
+    </html>
