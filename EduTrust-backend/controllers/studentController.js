@@ -527,20 +527,56 @@ exports.deleteStudent = async (req, res) => {
     }
 };
 
+
 // =======================================
-// Get Logged-In Student Profile (For Student Dashboard)
+// Get Logged-in Student Profile
 // =======================================
 exports.getStudentProfile = async (req, res) => {
     try {
-        // Fetch logged-in student using student ID or user ID attached to request by auth middleware
-        const studentId = req.user.student_id || req.user.id;
+        const userId = req.user?.id || req.user?._id;
+        const studentId = req.user?.student_id;
 
-        const student = await Student.findById(studentId);
+        if (!userId && !studentId) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required."
+            });
+        }
+
+        let student;
+
+        // If the authenticated user has a student_id,
+        // use it directly.
+        if (studentId) {
+            student = await Student.findById(studentId).lean();
+        } else {
+            // Fallback: find the student account through User.
+            const user = await User.findById(userId).lean();
+
+            if (user?.student_id) {
+                student = await Student.findById(user.student_id).lean();
+            }
+        }
 
         if (!student) {
             return res.status(404).json({
                 success: false,
                 message: "Student profile not found."
+            });
+        }
+
+        // =======================================
+        // MULTI-SCHOOL SECURITY CHECK
+        // =======================================
+
+        if (
+            req.user.school_id &&
+            student.school_id &&
+            String(req.user.school_id) !== String(student.school_id)
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to access this student profile."
             });
         }
 
@@ -554,19 +590,43 @@ exports.getStudentProfile = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Failed to load student profile.",
+            error: error.message
         });
     }
 };
+
 
 // =======================================
 // Get Student Dashboard Summary Data
 // =======================================
 exports.getStudentDashboardData = async (req, res) => {
     try {
-        const studentId = req.user.student_id || req.user.id;
+        const userId = req.user?.id || req.user?._id;
+        const studentId = req.user?.student_id;
 
-        const student = await Student.findById(studentId);
+        if (!userId && !studentId) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required."
+            });
+        }
+
+        let student;
+
+        // =======================================
+        // FIND STUDENT
+        // =======================================
+
+        if (studentId) {
+            student = await Student.findById(studentId).lean();
+        } else {
+            const user = await User.findById(userId).lean();
+
+            if (user?.student_id) {
+                student = await Student.findById(user.student_id).lean();
+            }
+        }
 
         if (!student) {
             return res.status(404).json({
@@ -575,27 +635,69 @@ exports.getStudentDashboardData = async (req, res) => {
             });
         }
 
+        // =======================================
+        // MULTI-SCHOOL SECURITY CHECK
+        // =======================================
+
+        if (
+            req.user.school_id &&
+            student.school_id &&
+            String(req.user.school_id) !== String(student.school_id)
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to access this student dashboard."
+            });
+        }
+
+        // =======================================
+        // STUDENT DASHBOARD DATA
+        // =======================================
+
         return res.status(200).json({
             success: true,
+
             dashboard: {
                 studentInfo: {
-                    fullName: `${student.first_name} ${student.last_name}`,
+                    fullName: [
+                        student.first_name,
+                        student.other_name,
+                        student.last_name
+                    ]
+                        .filter(Boolean)
+                        .join(" "),
+
                     admissionNumber: student.admission_number,
+
                     className: student.class_name,
+
                     arm: student.arm,
+
+                    gender: student.gender,
+
+                    dateOfBirth: student.date_of_birth,
+
+                    admissionDate: student.admission_date,
+
                     status: student.status,
-                    passport: student.passport
+
+                    passport: student.passport,
+
+                    school_id: student.school_id
                 }
             }
         });
 
     } catch (error) {
-        console.error("GET STUDENT DASHBOARD DATA ERROR:", error);
+        console.error(
+            "GET STUDENT DASHBOARD DATA ERROR:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Failed to load student dashboard.",
+            error: error.message
         });
     }
 };
-
