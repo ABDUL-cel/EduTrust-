@@ -1,258 +1,473 @@
-document.addEventListener("DOMContentLoaded", () => {
-
-    const form = document.getElementById("parentRegistrationForm");
-
-    const button =
-        document.getElementById("registerParentButton");
-
-    const message =
-        document.getElementById("parentMessage");
+const API_BASE_URL =
+    "https://edutrust-15ii.onrender.com/api";
 
 
-    if (!form) {
+// =======================================
+// ELEMENTS
+// =======================================
+
+const schoolSearch =
+    document.getElementById("schoolSearch");
+
+const schoolResults =
+    document.getElementById("schoolResults");
+
+const selectedSchool =
+    document.getElementById("selectedSchool");
+
+const selectedSchoolName =
+    document.getElementById("selectedSchoolName");
+
+const schoolIdInput =
+    document.getElementById("school_id");
+
+const form =
+    document.getElementById(
+        "parentRegistrationForm"
+    );
+
+const message =
+    document.getElementById("message");
+
+const submitBtn =
+    document.getElementById("submitBtn");
+
+
+// =======================================
+// SHOW MESSAGE
+// =======================================
+
+function showMessage(
+    text,
+    type
+) {
+
+    message.textContent = text;
+
+    message.className = "";
+
+    message.classList.add(type);
+
+    message.style.display = "block";
+
+}
+
+
+// =======================================
+// HIDE MESSAGE
+// =======================================
+
+function hideMessage() {
+
+    message.style.display = "none";
+
+}
+
+
+// =======================================
+// SCHOOL SEARCH
+// =======================================
+
+let searchTimer = null;
+
+
+schoolSearch.addEventListener(
+    "input",
+    function () {
+
+        const search =
+            schoolSearch.value.trim();
+
+
+        // Clear selected school
+        schoolIdInput.value = "";
+
+        selectedSchool.style.display =
+            "none";
+
+
+        schoolResults.innerHTML = "";
+
+        schoolResults.style.display =
+            "none";
+
+
+        if (search.length < 2) {
+            return;
+        }
+
+
+        clearTimeout(searchTimer);
+
+
+        searchTimer = setTimeout(
+            () => searchSchools(search),
+            400
+        );
+
+    }
+);
+
+
+// =======================================
+// SEARCH SCHOOLS FROM BACKEND
+// =======================================
+
+async function searchSchools(search) {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/parents/search-schools?search=${encodeURIComponent(search)}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            showSchoolResultsMessage(
+                data.message ||
+                "Unable to search schools."
+            );
+
+            return;
+        }
+
+
+        renderSchools(
+            data.schools || []
+        );
+
+    } catch (error) {
+
         console.error(
-            "Parent registration form was not found."
+            "SCHOOL SEARCH ERROR:",
+            error
+        );
+
+        showSchoolResultsMessage(
+            "Unable to connect to the server."
+        );
+
+    }
+
+}
+
+
+// =======================================
+// DISPLAY SCHOOL RESULTS
+// =======================================
+
+function renderSchools(
+    schools
+) {
+
+    schoolResults.innerHTML = "";
+
+
+    if (!schools.length) {
+
+        showSchoolResultsMessage(
+            "No active school found."
         );
 
         return;
     }
 
 
-    function showMessage(text, type = "error") {
+    schools.forEach(
+        school => {
 
-        if (!message) return;
+            const item =
+                document.createElement(
+                    "div"
+                );
 
-        message.style.display = "block";
 
-        message.textContent = text;
+            item.className =
+                "school-item";
 
-        if (type === "success") {
 
-            message.style.background =
-                "#e8f7ee";
+            item.innerHTML = `
 
-            message.style.color =
-                "#16743a";
+                <div class="school-name">
+                    ${escapeHtml(
+                        school.name || ""
+                    )}
+                </div>
 
-        } else {
+                <div class="school-address">
+                    ${escapeHtml(
+                        school.address || "Address not provided"
+                    )}
+                </div>
 
-            message.style.background =
-                "#fdecec";
+            `;
 
-            message.style.color =
-                "#b42318";
+
+            item.addEventListener(
+                "click",
+                () => {
+
+                    selectSchool(school);
+
+                }
+            );
+
+
+            schoolResults.appendChild(
+                item
+            );
+
         }
-    }
+    );
 
 
-    form.addEventListener("submit", async (event) => {
+    schoolResults.style.display =
+        "block";
+
+}
+
+
+// =======================================
+// NO SCHOOL RESULTS
+// =======================================
+
+function showSchoolResultsMessage(
+    text
+) {
+
+    schoolResults.innerHTML = `
+
+        <div
+            class="school-item"
+            style="cursor:default;"
+        >
+            ${escapeHtml(text)}
+        </div>
+
+    `;
+
+    schoolResults.style.display =
+        "block";
+
+}
+
+
+// =======================================
+// SELECT SCHOOL
+// =======================================
+
+function selectSchool(
+    school
+) {
+
+    schoolIdInput.value =
+        school._id;
+
+
+    selectedSchoolName.textContent =
+        school.name;
+
+
+    selectedSchool.style.display =
+        "block";
+
+
+    schoolResults.style.display =
+        "none";
+
+
+    schoolSearch.value =
+        school.name;
+
+}
+
+
+// =======================================
+// FORM SUBMISSION
+// =======================================
+
+form.addEventListener(
+    "submit",
+    async function (event) {
 
         event.preventDefault();
 
-
-        const token =
-            localStorage.getItem("token");
+        hideMessage();
 
 
-        if (!token) {
+        // ===================================
+        // CHECK SCHOOL
+        // ===================================
 
-            showMessage(
-                "Your session has expired. Please login again."
-            );
-
-            setTimeout(() => {
-
-                window.location.href =
-                    "login.html";
-
-            }, 1200);
-
-            return;
-        }
+        const school_id =
+            schoolIdInput.value.trim();
 
 
-        const formData =
-            new FormData(form);
-
-
-        const parentData = {
-
-            first_name:
-                formData.get("first_name")?.trim(),
-
-            last_name:
-                formData.get("last_name")?.trim(),
-
-            other_name:
-                formData.get("other_name")?.trim() || "",
-
-            relationship:
-                formData.get("relationship")?.trim(),
-
-            email:
-                formData.get("email")?.trim() || "",
-
-            phone:
-                formData.get("phone")?.trim(),
-
-            alternate_phone:
-                formData.get("alternate_phone")?.trim() || "",
-
-            home_address:
-                formData.get("home_address")?.trim() || "",
-
-            occupation:
-                formData.get("occupation")?.trim() || "",
-
-            passport:
-                formData.get("passport")?.trim() || ""
-
-        };
-
-
-        /*
-        ========================================
-        FRONTEND REQUIRED-FIELD CHECK
-        ========================================
-        */
-
-        if (
-            !parentData.first_name ||
-            !parentData.last_name ||
-            !parentData.relationship ||
-            !parentData.phone
-        ) {
+        if (!school_id) {
 
             showMessage(
-                "Please fill in all required fields."
+                "Please search for and select your school first.",
+                "error"
             );
 
             return;
         }
 
 
-        /*
-        ========================================
-        DISABLE BUTTON
-        ========================================
-        */
+        // ===================================
+        // DISABLE BUTTON
+        // ===================================
 
-        button.disabled = true;
+        submitBtn.disabled =
+            true;
 
-        button.textContent =
+        submitBtn.textContent =
             "Registering...";
 
 
         try {
 
-            /*
-            ========================================
-            IMPORTANT
+            const payload = {
 
-            This matches parentRoutes.js:
+                school_id,
 
-            router.post("/", createParent)
+                first_name:
+                    document
+                        .getElementById(
+                            "first_name"
+                        )
+                        .value
+                        .trim(),
 
-            If server.js mounts:
+                last_name:
+                    document
+                        .getElementById(
+                            "last_name"
+                        )
+                        .value
+                        .trim(),
 
-            /api/parents
+                other_name:
+                    document
+                        .getElementById(
+                            "other_name"
+                        )
+                        .value
+                        .trim(),
 
-            the final endpoint is:
+                relationship:
+                    document
+                        .getElementById(
+                            "relationship"
+                        )
+                        .value,
 
-            POST /api/parents
-            ========================================
-            */
+                email:
+                    document
+                        .getElementById(
+                            "email"
+                        )
+                        .value
+                        .trim(),
 
-            const response = await fetch(
-                "/api/parents",
-                {
-                    method: "POST",
+                phone:
+                    document
+                        .getElementById(
+                            "phone"
+                        )
+                        .value
+                        .trim(),
 
-                    headers: {
-                        "Content-Type":
-                            "application/json",
+                alternate_phone:
+                    document
+                        .getElementById(
+                            "alternate_phone"
+                        )
+                        .value
+                        .trim(),
 
-                        "Authorization":
-                            `Bearer ${token}`
-                    },
+                home_address:
+                    document
+                        .getElementById(
+                            "home_address"
+                        )
+                        .value
+                        .trim(),
 
-                    body:
-                        JSON.stringify(parentData)
-                }
-            );
+                occupation:
+                    document
+                        .getElementById(
+                            "occupation"
+                        )
+                        .value
+                        .trim(),
 
+                passport:
+                    document
+                        .getElementById(
+                            "passport"
+                        )
+                        .value
+                        .trim()
 
-            /*
-            ========================================
-            HANDLE NON-JSON RESPONSE
-
-            This prevents:
-
-            Unexpected token '<'
-
-            when the server accidentally
-            returns HTML.
-            ========================================
-            */
-
-            const contentType =
-                response.headers.get(
-                    "content-type"
-                ) || "";
+            };
 
 
-            let data;
+            // ===================================
+            // SEND TO BACKEND
+            // ===================================
 
+            const response =
+                await fetch(
+                    `${API_BASE_URL}/parents/register`,
+                    {
 
-            if (
-                contentType.includes(
-                    "application/json"
-                )
-            ) {
+                        method: "POST",
 
-                data =
-                    await response.json();
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-            } else {
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
 
-                const text =
-                    await response.text();
-
-                console.error(
-                    "Server returned non-JSON:",
-                    text
+                    }
                 );
 
-                throw new Error(
-                    "Server returned an unexpected response. Check the /api/parents route."
-                );
-            }
 
+            // ===================================
+            // READ RESPONSE
+            // ===================================
 
-            /*
-            ========================================
-            BACKEND ERROR
-            ========================================
-            */
+            const data =
+                await response.json();
+
 
             if (!response.ok) {
 
                 throw new Error(
                     data.message ||
-                    "Unable to register parent."
+                    "Parent registration failed."
                 );
+
             }
 
 
-            /*
-            ========================================
-            SUCCESS
-            ========================================
-            */
+            // ===================================
+            // SUCCESS
+            // ===================================
 
             showMessage(
-                data.message ||
-                "Parent registered successfully.",
+                "Parent registration successful!",
                 "success"
             );
 
@@ -260,27 +475,33 @@ document.addEventListener("DOMContentLoaded", () => {
             form.reset();
 
 
-            /*
-            ========================================
-            RETURN TO PARENT DIRECTORY
-            ========================================
-            */
+            schoolIdInput.value =
+                "";
 
-            setTimeout(() => {
+            selectedSchool.style.display =
+                "none";
 
-                if (
-                    typeof window.showParents ===
-                    "function"
-                ) {
 
-                    window.showParents();
+            schoolResults.innerHTML =
+                "";
 
-                } else {
+            schoolResults.style.display =
+                "none";
 
-                    window.history.back();
-                }
 
-            }, 1000);
+            // ===================================
+            // OPTIONAL REDIRECT
+            // ===================================
+
+            setTimeout(
+                () => {
+
+                    window.location.href =
+                        "parent-login.html";
+
+                },
+                1500
+            );
 
 
         } catch (error) {
@@ -293,18 +514,85 @@ document.addEventListener("DOMContentLoaded", () => {
 
             showMessage(
                 error.message ||
-                "Unable to register parent."
+                "Something went wrong during registration.",
+                "error"
             );
-
 
         } finally {
 
-            button.disabled = false;
+            submitBtn.disabled =
+                false;
 
-            button.textContent =
-                "Register Parent";
+            submitBtn.textContent =
+                "Register as Parent";
+
         }
 
-    });
+    }
+);
 
-});
+
+// =======================================
+// ESCAPE HTML
+// Prevent unsafe HTML injection
+// =======================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// =======================================
+// CLOSE SCHOOL RESULTS WHEN CLICKING
+// OUTSIDE SEARCH AREA
+// =======================================
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        if (
+            !schoolSearch.contains(
+                event.target
+            ) &&
+            !schoolResults.contains(
+                event.target
+            )
+        ) {
+
+            schoolResults.style.display =
+                "none";
+
+        }
+
+    }
+);
