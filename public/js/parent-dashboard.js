@@ -1,24 +1,28 @@
 // ======================================================
-// PARENT DASHBOARD
+// EDU TRUST - PARENT DASHBOARD
 // ======================================================
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadParentDashboard();
-});
-
-
-// ======================================================
-// CONFIG
-// ======================================================
-
-const API_BASE = "/api/parents";
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        loadParentDashboard();
+    }
+);
 
 
 // ======================================================
-// AUTH TOKEN
+// API
 // ======================================================
 
-function getToken() {
+const PARENT_API =
+    "/api/parents";
+
+
+// ======================================================
+// TOKEN
+// ======================================================
+
+function getAuthToken() {
     return (
         localStorage.getItem("token") ||
         localStorage.getItem("accessToken") ||
@@ -29,33 +33,41 @@ function getToken() {
 
 
 // ======================================================
-// API REQUEST HELPER
+// API REQUEST
 // ======================================================
 
-async function apiRequest(endpoint, options = {}) {
-    const token = getToken();
+async function apiRequest(
+    endpoint,
+    options = {}
+) {
+    const token =
+        getAuthToken();
 
     const headers = {
-        "Content-Type": "application/json",
+        "Content-Type":
+            "application/json",
         ...(options.headers || {})
     };
 
     if (token) {
-        headers.Authorization = `Bearer ${token}`;
+        headers.Authorization =
+            `Bearer ${token}`;
     }
 
-    const response = await fetch(
-        `${API_BASE}${endpoint}`,
-        {
-            ...options,
-            headers
-        }
-    );
+    const response =
+        await fetch(
+            `${PARENT_API}${endpoint}`,
+            {
+                ...options,
+                headers
+            }
+        );
 
     let data = {};
 
     try {
-        data = await response.json();
+        data =
+            await response.json();
     } catch (error) {
         data = {};
     }
@@ -63,7 +75,7 @@ async function apiRequest(endpoint, options = {}) {
     if (!response.ok) {
         throw new Error(
             data.message ||
-            "Something went wrong."
+            "Request failed."
         );
     }
 
@@ -77,26 +89,29 @@ async function apiRequest(endpoint, options = {}) {
 
 async function loadParentDashboard() {
     try {
+
         showLoading();
 
         const data =
-            await apiRequest("/dashboard");
+            await apiRequest(
+                "/dashboard"
+            );
 
         if (!data.success) {
             throw new Error(
                 data.message ||
-                "Unable to load dashboard."
+                "Dashboard could not be loaded."
             );
         }
 
         const dashboard =
             data.dashboard;
 
-        renderParentInformation(
+        renderParent(
             dashboard.parent
         );
 
-        renderSchoolInformation(
+        renderSchool(
             dashboard.school
         );
 
@@ -111,6 +126,7 @@ async function loadParentDashboard() {
         hideLoading();
 
     } catch (error) {
+
         console.error(
             "PARENT DASHBOARD ERROR:",
             error
@@ -126,162 +142,186 @@ async function loadParentDashboard() {
 
 
 // ======================================================
-// PARENT INFORMATION
+// RENDER PARENT
 // ======================================================
 
-function renderParentInformation(parent) {
+function renderParent(parent) {
+
     if (!parent) {
         return;
     }
 
+    const fullName =
+        parent.fullName ||
+        "Parent";
+
     setText(
         "parentName",
-        parent.fullName || "Parent"
+        fullName
+    );
+
+    setText(
+        "parentProfileName",
+        fullName
     );
 
     setText(
         "parentRelationship",
-        parent.relationship || "-"
+        parent.relationship ||
+        "-"
     );
 
     setText(
         "parentEmail",
-        parent.email || "-"
+        parent.email ||
+        "-"
     );
 
     setText(
         "parentPhone",
-        parent.phone || "-"
+        parent.phone ||
+        "-"
     );
 
     setText(
         "parentAddress",
-        parent.homeAddress || "-"
+        parent.homeAddress ||
+        "-"
     );
 
     setText(
         "parentOccupation",
-        parent.occupation || "-"
+        parent.occupation ||
+        "-"
     );
 
     setText(
         "parentStatus",
-        parent.status || "-"
+        parent.status ||
+        "-"
     );
 
     const passport =
-        document.getElementById(
-            "parentPassport"
-        );
+        parent.passport ||
+        "/images/default-parent.png";
 
-    if (passport) {
-        if (parent.passport) {
-            passport.src =
-                parent.passport;
+    setImage(
+        "parentPassport",
+        passport
+    );
 
-            passport.style.display =
-                "block";
-        } else {
-            passport.style.display =
-                "none";
-        }
-    }
+    setImage(
+        "parentMiniPassport",
+        passport
+    );
 }
 
 
 // ======================================================
-// SCHOOL INFORMATION
+// RENDER SCHOOL
 // ======================================================
 
-function renderSchoolInformation(school) {
+function renderSchool(school) {
+
     if (!school) {
         return;
     }
 
     setText(
         "schoolName",
-        school.name || "School"
+        school.name ||
+        "-"
     );
 
     setText(
         "schoolEmail",
-        school.email || "-"
+        school.email ||
+        "-"
     );
 
     setText(
         "schoolPhone",
-        school.phone || "-"
+        school.phone ||
+        "-"
     );
 
     setText(
         "schoolAddress",
-        school.address || "-"
+        school.address ||
+        "-"
     );
 
     setText(
         "schoolType",
-        school.school_type || "-"
+        school.school_type ||
+        "-"
     );
 
     setText(
         "academicSession",
-        school.academic_session || "-"
+        school.academic_session ||
+        "-"
     );
 
     setText(
         "currentTerm",
-        school.current_term || "-"
+        school.current_term ||
+        "-"
     );
 
     setText(
         "schoolMotto",
-        school.motto || ""
+        school.motto ||
+        ""
     );
 
-    const logo =
-        document.getElementById(
-            "schoolLogo"
+    if (school.logo) {
+        setImage(
+            "schoolLogo",
+            school.logo
         );
-
-    if (logo && school.logo) {
-        logo.src =
-            school.logo;
     }
 }
 
 
 // ======================================================
-// SUMMARY CARDS
+// SUMMARY
 // ======================================================
 
 function renderSummary(summary) {
+
     if (!summary) {
         return;
     }
 
     setText(
         "totalChildren",
-        summary.totalChildren ?? 0
+        summary.totalChildren ||
+        0
     );
 
     setText(
         "activeChildren",
-        summary.activeChildren ?? 0
+        summary.activeChildren ||
+        0
     );
 
     setText(
         "pendingChildren",
-        summary.pendingChildren ?? 0
+        summary.pendingChildren ||
+        0
     );
 
     setText(
         "suspendedChildren",
-        summary.suspendedChildren ?? 0
+        summary.suspendedChildren ||
+        0
     );
 
     setText(
         "graduatedChildren",
-        summary.graduatedChildren ?? 0
+        summary.graduatedChildren ||
+        0
     );
 }
 
@@ -291,6 +331,7 @@ function renderSummary(summary) {
 // ======================================================
 
 function renderChildren(children) {
+
     const container =
         document.getElementById(
             "childrenContainer"
@@ -306,12 +347,14 @@ function renderChildren(children) {
         !children ||
         children.length === 0
     ) {
+
         container.innerHTML = `
             <div class="empty-state">
                 <h3>No children linked</h3>
+
                 <p>
-                    There are currently no students
-                    connected to this parent account.
+                    No student has been linked
+                    to this parent account yet.
                 </p>
             </div>
         `;
@@ -319,22 +362,32 @@ function renderChildren(children) {
         return;
     }
 
-    children.forEach(child => {
-        const card =
-            createChildCard(child);
+    children.forEach(
+        child => {
 
-        container.appendChild(card);
-    });
+            const card =
+                createChildCard(
+                    child
+                );
+
+            container.appendChild(
+                card
+            );
+        }
+    );
 }
 
 
 // ======================================================
-// CREATE CHILD CARD
+// CHILD CARD
 // ======================================================
 
 function createChildCard(child) {
+
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     card.className =
         "child-card";
@@ -349,13 +402,16 @@ function createChildCard(child) {
         "/images/default-student.png";
 
     card.innerHTML = `
+
         <div class="child-card-header">
 
             <img
-                src="${escapeHtml(passport)}"
-                alt="Student passport"
                 class="child-passport"
-                onerror="this.src='/images/default-student.png'"
+                src="${escapeHtml(passport)}"
+                alt="Student"
+                onerror="
+                    this.src='/images/default-student.png'
+                "
             >
 
             <div class="child-main-info">
@@ -367,7 +423,9 @@ function createChildCard(child) {
                     )}
                 </h3>
 
-                <span class="status ${statusClass}">
+                <span
+                    class="status ${statusClass}"
+                >
                     ${escapeHtml(
                         child.status ||
                         "Unknown"
@@ -378,10 +436,14 @@ function createChildCard(child) {
 
         </div>
 
+
         <div class="child-details">
 
             <div>
-                <span>Admission Number</span>
+                <span>
+                    Admission Number
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         child.admissionNumber ||
@@ -390,8 +452,12 @@ function createChildCard(child) {
                 </strong>
             </div>
 
+
             <div>
-                <span>Class</span>
+                <span>
+                    Class
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         child.className ||
@@ -400,8 +466,12 @@ function createChildCard(child) {
                 </strong>
             </div>
 
+
             <div>
-                <span>Arm</span>
+                <span>
+                    Arm
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         child.arm ||
@@ -410,8 +480,12 @@ function createChildCard(child) {
                 </strong>
             </div>
 
+
             <div>
-                <span>Gender</span>
+                <span>
+                    Gender
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         child.gender ||
@@ -422,12 +496,12 @@ function createChildCard(child) {
 
         </div>
 
+
         <div class="child-card-actions">
 
             <button
                 type="button"
                 class="btn-view-child"
-                data-id="${child.id}"
             >
                 View Child
             </button>
@@ -443,6 +517,7 @@ function createChildCard(child) {
     button.addEventListener(
         "click",
         () => {
+
             viewChild(
                 child.id
             );
@@ -457,8 +532,12 @@ function createChildCard(child) {
 // VIEW CHILD
 // ======================================================
 
-async function viewChild(studentId) {
+async function viewChild(
+    studentId
+) {
+
     try {
+
         if (!studentId) {
             return;
         }
@@ -480,6 +559,7 @@ async function viewChild(studentId) {
         );
 
     } catch (error) {
+
         console.error(
             "VIEW CHILD ERROR:",
             error
@@ -497,58 +577,58 @@ async function viewChild(studentId) {
 // ======================================================
 
 function openChildModal(child) {
+
     const modal =
         document.getElementById(
             "childModal"
         );
 
     if (!modal) {
-        // If the HTML does not contain
-        // a modal yet, redirect to
-        // the child page.
-
-        window.location.href =
-            `/student.html?id=${encodeURIComponent(
-                child._id
-            )}`;
-
         return;
     }
 
+    const fullName = [
+        child.first_name,
+        child.other_name,
+        child.last_name
+    ]
+        .filter(Boolean)
+        .join(" ");
+
     setText(
         "modalChildName",
-        [
-            child.first_name,
-            child.other_name,
-            child.last_name
-        ]
-            .filter(Boolean)
-            .join(" ")
+        fullName ||
+        "Student"
     );
 
     setText(
         "modalAdmissionNumber",
-        child.admission_number || "-"
+        child.admission_number ||
+        "-"
     );
 
     setText(
         "modalClass",
-        child.class_name || "-"
+        child.class_name ||
+        "-"
     );
 
     setText(
         "modalArm",
-        child.arm || "-"
+        child.arm ||
+        "-"
     );
 
     setText(
         "modalGender",
-        child.gender || "-"
+        child.gender ||
+        "-"
     );
 
     setText(
         "modalStatus",
-        child.status || "-"
+        child.status ||
+        "-"
     );
 
     setText(
@@ -565,16 +645,11 @@ function openChildModal(child) {
         )
     );
 
-    const passport =
-        document.getElementById(
-            "modalChildPassport"
-        );
-
-    if (passport) {
-        passport.src =
-            child.passport ||
-            "/images/default-student.png";
-    }
+    setImage(
+        "modalChildPassport",
+        child.passport ||
+        "/images/default-student.png"
+    );
 
     modal.classList.add(
         "show"
@@ -583,10 +658,11 @@ function openChildModal(child) {
 
 
 // ======================================================
-// CLOSE CHILD MODAL
+// CLOSE MODAL
 // ======================================================
 
 function closeChildModal() {
+
     const modal =
         document.getElementById(
             "childModal"
@@ -605,6 +681,7 @@ function closeChildModal() {
 // ======================================================
 
 function logoutParent() {
+
     localStorage.removeItem(
         "token"
     );
@@ -627,11 +704,15 @@ function logoutParent() {
 
 
 // ======================================================
-// STATUS CLASS
+// STATUS
 // ======================================================
 
-function getStatusClass(status) {
+function getStatusClass(
+    status
+) {
+
     switch (status) {
+
         case "Active":
             return "status-active";
 
@@ -654,17 +735,16 @@ function getStatusClass(status) {
 
 
 // ======================================================
-// SET TEXT
+// TEXT HELPER
 // ======================================================
 
 function setText(
-    elementId,
+    id,
     value
 ) {
+
     const element =
-        document.getElementById(
-            elementId
-        );
+        document.getElementById(id);
 
     if (element) {
         element.textContent =
@@ -674,10 +754,30 @@ function setText(
 
 
 // ======================================================
-// DATE FORMAT
+// IMAGE HELPER
+// ======================================================
+
+function setImage(
+    id,
+    source
+) {
+
+    const element =
+        document.getElementById(id);
+
+    if (element && source) {
+        element.src =
+            source;
+    }
+}
+
+
+// ======================================================
+// DATE
 // ======================================================
 
 function formatDate(date) {
+
     if (!date) {
         return "-";
     }
@@ -709,6 +809,7 @@ function formatDate(date) {
 // ======================================================
 
 function showLoading() {
+
     const loading =
         document.getElementById(
             "dashboardLoading"
@@ -722,6 +823,7 @@ function showLoading() {
 
 
 function hideLoading() {
+
     const loading =
         document.getElementById(
             "dashboardLoading"
@@ -738,27 +840,30 @@ function hideLoading() {
 // ERROR
 // ======================================================
 
-function showError(message) {
-    const errorBox =
+function showError(
+    message
+) {
+
+    const box =
         document.getElementById(
             "dashboardError"
         );
 
-    if (errorBox) {
-        errorBox.textContent =
+    if (!box) {
+        alert(
             message ||
-            "Unable to load dashboard.";
-
-        errorBox.style.display =
-            "block";
+            "Something went wrong."
+        );
 
         return;
     }
 
-    alert(
+    box.textContent =
         message ||
-        "Unable to load dashboard."
-    );
+        "Something went wrong.";
+
+    box.style.display =
+        "block";
 }
 
 
@@ -767,6 +872,7 @@ function showError(message) {
 // ======================================================
 
 function escapeHtml(value) {
+
     return String(value)
         .replace(
             /&/g,
@@ -792,12 +898,12 @@ function escapeHtml(value) {
 
 
 // ======================================================
-// MODAL CLOSE EVENTS
+// MODAL EVENTS
 // ======================================================
 
 document.addEventListener(
     "click",
-    (event) => {
+    event => {
 
         if (
             event.target.matches(
@@ -813,13 +919,12 @@ document.addEventListener(
         ) {
             closeChildModal();
         }
-
     }
 );
 
 
 // ======================================================
-// EXPORT FOR INLINE HTML BUTTONS
+// GLOBAL FUNCTIONS
 // ======================================================
 
 window.loadParentDashboard =
