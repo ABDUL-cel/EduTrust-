@@ -12,7 +12,9 @@ const {
     linkStudentToParent,
     unlinkStudentFromParent,
     getMyChildren,
-    getMyChild
+    getMyChild,
+    linkParentToUser,
+    getParentDashboard
 } = require("../controllers/parentController");
 
 const authMiddleware =
@@ -20,7 +22,7 @@ const authMiddleware =
 
 
 // ======================================================
-// PUBLIC
+// PUBLIC ROUTES
 // ======================================================
 
 // Parent registration
@@ -29,13 +31,15 @@ router.post(
     registerParent
 );
 
-// Parent login
+
+// Parent login lookup
 router.post(
     "/login",
     loginParent
 );
 
-// Search schools
+
+// School search
 router.get(
     "/search-schools",
     searchSchools
@@ -43,7 +47,7 @@ router.get(
 
 
 // ======================================================
-// LOGGED-IN PARENT
+// LOGGED-IN PARENT ROUTES
 // ======================================================
 
 // Parent profile
@@ -53,12 +57,22 @@ router.get(
     getParentProfile
 );
 
+
+// Parent dashboard
+router.get(
+    "/dashboard",
+    authMiddleware,
+    getParentDashboard
+);
+
+
 // Parent's children
 router.get(
     "/my-children",
     authMiddleware,
     getMyChildren
 );
+
 
 // One child
 router.get(
@@ -69,7 +83,7 @@ router.get(
 
 
 // ======================================================
-// SCHOOL / PRINCIPAL
+// SCHOOL / PRINCIPAL ROUTES
 // ======================================================
 
 // Get all parents
@@ -78,6 +92,7 @@ router.get(
     authMiddleware,
     getParents
 );
+
 
 // Get one parent
 router.get(
@@ -88,7 +103,7 @@ router.get(
 
 
 // ======================================================
-// LINKING
+// PARENT ↔ STUDENT LINKING
 // ======================================================
 
 // Link student to parent
@@ -98,11 +113,24 @@ router.post(
     linkStudentToParent
 );
 
-// Unlink student from parent
+
+// Unlink student
 router.post(
     "/unlink-student",
     authMiddleware,
     unlinkStudentFromParent
+);
+
+
+// ======================================================
+// USER ↔ PARENT LINKING
+// ======================================================
+
+// Link User account to Parent record
+router.post(
+    "/link-user",
+    authMiddleware,
+    linkParentToUser
 );
 
 
