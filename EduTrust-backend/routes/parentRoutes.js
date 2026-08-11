@@ -8,13 +8,9 @@ const {
     getParentProfile,
     getParents,
     getParentById,
-    searchSchools,
-    linkStudentToParent,
-    unlinkStudentFromParent,
-    getMyChildren,
-    getMyChild,
-    linkParentToUser,
-    getParentDashboard
+    getParentDashboard,
+    getParentChildren,
+    getParentChild
 } = require("../controllers/parentController");
 
 const authMiddleware =
@@ -22,35 +18,31 @@ const authMiddleware =
 
 
 // ======================================================
-// PUBLIC ROUTES
+// PUBLIC
+// PARENT REGISTRATION
 // ======================================================
 
-// Parent registration
 router.post(
     "/register",
     registerParent
 );
 
 
-// Parent login lookup
+// ======================================================
+// PUBLIC
+// PARENT LOGIN
+// ======================================================
+
 router.post(
     "/login",
     loginParent
 );
 
 
-// School search
-router.get(
-    "/search-schools",
-    searchSchools
-);
-
-
 // ======================================================
-// LOGGED-IN PARENT ROUTES
+// LOGGED-IN PARENT PROFILE
 // ======================================================
 
-// Parent profile
 router.get(
     "/profile",
     authMiddleware,
@@ -58,7 +50,10 @@ router.get(
 );
 
 
-// Parent dashboard
+// ======================================================
+// LOGGED-IN PARENT DASHBOARD
+// ======================================================
+
 router.get(
     "/dashboard",
     authMiddleware,
@@ -66,27 +61,34 @@ router.get(
 );
 
 
-// Parent's children
-router.get(
-    "/my-children",
-    authMiddleware,
-    getMyChildren
-);
+// ======================================================
+// LOGGED-IN PARENT CHILDREN
+// ======================================================
 
-
-// One child
 router.get(
-    "/my-children/:studentId",
+    "/children",
     authMiddleware,
-    getMyChild
+    getParentChildren
 );
 
 
 // ======================================================
-// SCHOOL / PRINCIPAL ROUTES
+// LOGGED-IN PARENT SINGLE CHILD
+// IMPORTANT: MUST COME BEFORE /:id
 // ======================================================
 
-// Get all parents
+router.get(
+    "/children/:studentId",
+    authMiddleware,
+    getParentChild
+);
+
+
+// ======================================================
+// PRINCIPAL / SCHOOL STAFF
+// GET ALL PARENTS
+// ======================================================
+
 router.get(
     "/",
     authMiddleware,
@@ -94,43 +96,15 @@ router.get(
 );
 
 
-// Get one parent
+// ======================================================
+// PRINCIPAL / SCHOOL STAFF
+// GET ONE PARENT
+// ======================================================
+
 router.get(
     "/:id",
     authMiddleware,
     getParentById
-);
-
-
-// ======================================================
-// PARENT ↔ STUDENT LINKING
-// ======================================================
-
-// Link student to parent
-router.post(
-    "/link-student",
-    authMiddleware,
-    linkStudentToParent
-);
-
-
-// Unlink student
-router.post(
-    "/unlink-student",
-    authMiddleware,
-    unlinkStudentFromParent
-);
-
-
-// ======================================================
-// USER ↔ PARENT LINKING
-// ======================================================
-
-// Link User account to Parent record
-router.post(
-    "/link-user",
-    authMiddleware,
-    linkParentToUser
 );
 
 
