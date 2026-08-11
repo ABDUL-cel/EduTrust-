@@ -1,12 +1,207 @@
 const Parent = require("../models/Parent");
+const Student = require("../models/student");
 const User = require("../models/User");
 const School = require("../models/school");
 
-/* ==========================================================================
-   1. SEARCH SCHOOLS
-   PUBLIC
-   Used by Parent / Student / Staff self-registration
-   ========================================================================== */
+
+// ============================================================
+// REGISTER / CREATE PARENT
+// ============================================================
+
+const registerParent = async (req, res) => {
+    try {
+        const {
+            first_name,
+            last_name,
+            other_name,
+            relationship,
+            email,
+            phone,
+            alternate_phone,
+            home_address,
+            occupation,
+            passport,
+            status,
+            school_id
+        } = req.body;
+
+        let targetSchoolId = school_id;
+
+        if (!targetSchoolId && req.user) {
+            const user = await User.findById(
+                req.user.id || req.user._id
+            );
+
+            targetSchoolId =
+                user?.school_id ||
+                user?.schoolId;
+        }
+
+        if (!targetSchoolId) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "School ID is required to register a parent."
+            });
+        }
+
+        if (
+            !first_name?.trim() ||
+            !last_name?.trim() ||
+            !relationship?.trim() ||
+            !phone?.trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "First name, last name, relationship and phone are required."
+            });
+        }
+
+        const existingParent = await Parent.findOne({
+            school_id: targetSchoolId,
+            phone: phone.trim()
+        });
+
+        if (existingParent) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "A parent with this phone number already exists in this school."
+            });
+        }
+
+        const newParent = await Parent.create({
+            school_id: targetSchoolId,
+
+            first_name: first_name.trim(),
+
+            last_name: last_name.trim(),
+
+            other_name:
+                other_name?.trim() || "",
+
+            relationship:
+                relationship.trim(),
+
+            email:
+                email?.trim().toLowerCase() || "",
+
+            phone:
+                phone.trim(),
+
+            alternate_phone:
+                alternate_phone?.trim() || "",
+
+            home_address:
+                home_address?.trim() || "",
+
+            occupation:
+                occupation?.trim() || "",
+
+            passport:
+                passport || "",
+
+            status:
+                status || "Active"
+        });
+
+        return res.status(201).json({
+            success: true,
+            message:
+                "Parent created successfully.",
+            parent: newParent
+        });
+
+    } catch (error) {
+        console.error(
+            "REGISTER PARENT ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Failed to register parent.",
+            error: error.message
+        });
+    }
+};
+
+
+// ============================================================
+// PARENT LOGIN / LOOKUP
+// ============================================================
+
+const loginParent = async (req, res) => {
+    try {
+        const {
+            phone,
+            email
+        } = req.body;
+
+        if (!phone && !email) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Phone or email is required."
+            });
+        }
+
+        const conditions = [];
+
+        if (phone?.trim()) {
+            conditions.push({
+                phone: phone.trim()
+            });
+        }
+
+        if (email?.trim()) {
+            conditions.push({
+                email:
+                    email.trim().toLowerCase()
+            });
+        }
+
+        const parent = await Parent.findOne({
+            $or: conditions
+        }).lean();
+
+        if (!parent) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "Parent account not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Parent located successfully.",
+            parent
+        });
+
+    } catch (error) {
+        console.error(
+            "PARENT LOGIN ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Parent login failed.",
+            error: error.message
+        });
+    }
+};
+
+
+// ============================================================
+// SEARCH SCHOOLS
+// PUBLIC
+// ============================================================
 
 const searchSchools = async (req, res) => {
     try {
@@ -18,7 +213,7 @@ const searchSchools = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message:
-                    "Please enter at least 2 characters to search."
+                    "Please enter at least 2 characters."
             });
         }
 
@@ -60,313 +255,29 @@ const searchSchools = async (req, res) => {
 };
 
 
-/* ==========================================================================
-   2. REGISTER / CREATE PARENT
-
-   Parent can register themselves.
-
-   The parent selects a school first.
-   The selected school_id is then sent with the registration.
-   ========================================================================== */
-
-const registerParent = async (req, res) => {
-    try {
-        const {
-            first_name,
-            last_name,
-            other_name,
-            relationship,
-            email,
-            phone,
-            alternate_phone,
-            home_address,
-            occupation,
-            passport,
-            school_id
-        } = req.body;
-
-
-        // =======================================
-        // SCHOOL IS REQUIRED
-        // =======================================
-
-        if (!school_id) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Please select your school before registering."
-            });
-        }
-
-
-        // =======================================
-        // VERIFY SCHOOL EXISTS
-        // =======================================
-
-        const school = await School.findOne({
-            _id: school_id,
-            status: "Active"
-        }).lean();
-
-        if (!school) {
-            return res.status(404).json({
-                success: false,
-                message:
-                    "Selected school was not found or is not active."
-            });
-        }
-
-
-        // =======================================
-        // REQUIRED PARENT INFORMATION
-        // =======================================
-
-        if (
-            !first_name?.trim() ||
-            !last_name?.trim() ||
-            !relationship?.trim() ||
-            !phone?.trim()
-        ) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "First name, last name, relationship and phone are required."
-            });
-        }
-
-
-        // =======================================
-        // NORMALIZE PHONE
-        // =======================================
-
-        const normalizedPhone =
-            phone.trim();
-
-
-        // =======================================
-        // CHECK DUPLICATE PHONE
-        // ONLY INSIDE THIS SCHOOL
-        // =======================================
-
-        const existingParent =
-            await Parent.findOne({
-                school_id,
-                phone: normalizedPhone
-            });
-
-        if (existingParent) {
-            return res.status(409).json({
-                success: false,
-                message:
-                    "A parent with this phone number already exists in this school."
-            });
-        }
-
-
-        // =======================================
-        // CREATE PARENT
-        // =======================================
-
-        const newParent =
-            await Parent.create({
-
-                school_id,
-
-                first_name:
-                    first_name.trim(),
-
-                last_name:
-                    last_name.trim(),
-
-                other_name:
-                    other_name
-                        ? other_name.trim()
-                        : "",
-
-                relationship:
-                    relationship.trim(),
-
-                email:
-                    email
-                        ? email.trim().toLowerCase()
-                        : "",
-
-                phone:
-                    normalizedPhone,
-
-                alternate_phone:
-                    alternate_phone
-                        ? alternate_phone.trim()
-                        : "",
-
-                home_address:
-                    home_address
-                        ? home_address.trim()
-                        : "",
-
-                occupation:
-                    occupation
-                        ? occupation.trim()
-                        : "",
-
-                passport:
-                    passport || "",
-
-                status: "Active"
-            });
-
-
-        // =======================================
-        // SUCCESS
-        // =======================================
-
-        return res.status(201).json({
-
-            success: true,
-
-            message:
-                "Parent registration completed successfully.",
-
-            parent: newParent,
-
-            school: {
-                _id: school._id,
-                name: school.name
-            }
-        });
-
-    } catch (error) {
-
-        console.error(
-            "REGISTER PARENT ERROR:",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            message:
-                "Failed to register parent.",
-            error: error.message
-        });
-    }
-};
-
-
-/* ==========================================================================
-   3. PARENT LOGIN
-   Temporary compatibility handler
-
-   IMPORTANT:
-   This is NOT full password authentication yet.
-   We will connect this properly to User.js/authentication next.
-   ========================================================================== */
-
-const loginParent = async (req, res) => {
-    try {
-
-        const {
-            phone,
-            email
-        } = req.body;
-
-
-        if (!phone && !email) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Phone or email is required."
-            });
-        }
-
-
-        const conditions = [];
-
-
-        if (phone) {
-            conditions.push({
-                phone: phone.trim()
-            });
-        }
-
-
-        if (email) {
-            conditions.push({
-                email:
-                    email.trim().toLowerCase()
-            });
-        }
-
-
-        const parent =
-            await Parent.findOne({
-                $or: conditions
-            }).lean();
-
-
-        if (!parent) {
-            return res.status(404).json({
-                success: false,
-                message:
-                    "Parent account not found."
-            });
-        }
-
-
-        return res.status(200).json({
-
-            success: true,
-
-            message:
-                "Parent account located.",
-
-            parent
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            "PARENT LOGIN ERROR:",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            message:
-                "Parent login failed.",
-            error: error.message
-        });
-    }
-};
-
-
-/* ==========================================================================
-   4. GET PARENT PROFILE
-   For authenticated parent
-   ========================================================================== */
+// ============================================================
+// GET PARENT PROFILE
+// ============================================================
 
 const getParentProfile = async (req, res) => {
     try {
-
         const parentId =
             req.user?.parent_id ||
-            req.user?.parentId;
-
+            req.user?.id ||
+            req.user?._id;
 
         if (!parentId) {
             return res.status(401).json({
                 success: false,
                 message:
-                    "Parent authentication required."
+                    "Authentication required."
             });
         }
-
 
         const parent =
             await Parent.findById(
                 parentId
             ).lean();
-
 
         if (!parent) {
             return res.status(404).json({
@@ -376,14 +287,12 @@ const getParentProfile = async (req, res) => {
             });
         }
 
-
         return res.status(200).json({
             success: true,
             parent
         });
 
     } catch (error) {
-
         console.error(
             "GET PARENT PROFILE ERROR:",
             error
@@ -399,21 +308,16 @@ const getParentProfile = async (req, res) => {
 };
 
 
-/* ==========================================================================
-   5. GET ALL PARENTS
-   PRINCIPAL ONLY
-
-   Only parents belonging to the principal's
-   school are returned.
-   ========================================================================== */
+// ============================================================
+// GET ALL PARENTS
+// PRINCIPAL'S SCHOOL
+// ============================================================
 
 const getParents = async (req, res) => {
     try {
-
         const userId =
             req.user?.id ||
             req.user?._id;
-
 
         if (!userId) {
             return res.status(401).json({
@@ -423,12 +327,10 @@ const getParents = async (req, res) => {
             });
         }
 
-
         const principal =
             await User.findById(
                 userId
-            ).lean();
-
+            );
 
         if (!principal) {
             return res.status(404).json({
@@ -438,11 +340,9 @@ const getParents = async (req, res) => {
             });
         }
 
-
         const schoolId =
             principal.school_id ||
             principal.schoolId;
-
 
         if (!schoolId) {
             return res.status(400).json({
@@ -451,7 +351,6 @@ const getParents = async (req, res) => {
                     "Your account is not connected to a school."
             });
         }
-
 
         const parents =
             await Parent.find({
@@ -462,20 +361,13 @@ const getParents = async (req, res) => {
                 })
                 .lean();
 
-
         return res.status(200).json({
-
             success: true,
-
-            count:
-                parents.length,
-
+            count: parents.length,
             parents
-
         });
 
     } catch (error) {
-
         console.error(
             "GET PARENTS ERROR:",
             error
@@ -491,21 +383,18 @@ const getParents = async (req, res) => {
 };
 
 
-/* ==========================================================================
-   6. GET ONE PARENT
-   PRINCIPAL ONLY
-   ========================================================================== */
+// ============================================================
+// GET ONE PARENT
+// ============================================================
 
 const getParentById = async (req, res) => {
     try {
-
         const userId =
             req.user?.id ||
             req.user?._id;
 
         const parentId =
             req.params.id;
-
 
         if (!userId) {
             return res.status(401).json({
@@ -515,12 +404,10 @@ const getParentById = async (req, res) => {
             });
         }
 
-
         const principal =
             await User.findById(
                 userId
-            ).lean();
-
+            );
 
         if (!principal) {
             return res.status(404).json({
@@ -530,11 +417,9 @@ const getParentById = async (req, res) => {
             });
         }
 
-
         const schoolId =
             principal.school_id ||
             principal.schoolId;
-
 
         if (!schoolId) {
             return res.status(400).json({
@@ -544,16 +429,11 @@ const getParentById = async (req, res) => {
             });
         }
 
-
         const parent =
             await Parent.findOne({
-
                 _id: parentId,
-
                 school_id: schoolId
-
             }).lean();
-
 
         if (!parent) {
             return res.status(404).json({
@@ -563,14 +443,12 @@ const getParentById = async (req, res) => {
             });
         }
 
-
         return res.status(200).json({
             success: true,
             parent
         });
 
     } catch (error) {
-
         console.error(
             "GET PARENT ERROR:",
             error
@@ -586,22 +464,241 @@ const getParentById = async (req, res) => {
 };
 
 
-/* ==========================================================================
-   EXPORTS
-   ========================================================================== */
+// ============================================================
+// LINK STUDENT TO PARENT
+// PRINCIPAL / SCHOOL STAFF
+// ============================================================
+
+const linkStudentToParent = async (req, res) => {
+    try {
+        const schoolId =
+            req.user?.school_id;
+
+        const {
+            parent_id,
+            student_id
+        } = req.body;
+
+        if (!schoolId) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Your account is not connected to a school."
+            });
+        }
+
+        if (!parent_id || !student_id) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Parent ID and student ID are required."
+            });
+        }
+
+        const parent =
+            await Parent.findOne({
+                _id: parent_id,
+                school_id: schoolId
+            });
+
+        if (!parent) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "Parent not found in your school."
+            });
+        }
+
+        const student =
+            await Student.findOne({
+                _id: student_id,
+                school_id: schoolId
+            });
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "Student not found in your school."
+            });
+        }
+
+        student.parent_id =
+            parent._id;
+
+        await student.save();
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Student successfully linked to parent.",
+            student
+        });
+
+    } catch (error) {
+        console.error(
+            "LINK STUDENT TO PARENT ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Failed to link student to parent.",
+            error: error.message
+        });
+    }
+};
+
+
+// ============================================================
+// UNLINK STUDENT FROM PARENT
+// PRINCIPAL / SCHOOL STAFF
+// ============================================================
+
+const unlinkStudentFromParent = async (req, res) => {
+    try {
+        const schoolId =
+            req.user?.school_id;
+
+        const {
+            student_id
+        } = req.body;
+
+        if (!schoolId) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Your account is not connected to a school."
+            });
+        }
+
+        if (!student_id) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Student ID is required."
+            });
+        }
+
+        const student =
+            await Student.findOne({
+                _id: student_id,
+                school_id: schoolId
+            });
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "Student not found."
+            });
+        }
+
+        student.parent_id = null;
+
+        await student.save();
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Student unlinked from parent successfully.",
+            student
+        });
+
+    } catch (error) {
+        console.error(
+            "UNLINK STUDENT FROM PARENT ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Failed to unlink student.",
+            error: error.message
+        });
+    }
+};
+
+
+// ============================================================
+// GET CHILDREN OF LOGGED-IN PARENT
+// ============================================================
+
+const getParentChildren = async (req, res) => {
+    try {
+        const parentId =
+            req.user?.parent_id;
+
+        if (!parentId) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Parent account could not be identified."
+            });
+        }
+
+        const parent =
+            await Parent.findById(
+                parentId
+            ).lean();
+
+        if (!parent) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "Parent account not found."
+            });
+        }
+
+        const students =
+            await Student.find({
+                parent_id: parent._id,
+                school_id: parent.school_id
+            })
+                .select(
+                    "admission_number first_name last_name other_name gender date_of_birth class_name arm admission_date passport status"
+                )
+                .sort({
+                    first_name: 1
+                })
+                .lean();
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            children: students
+        });
+
+    } catch (error) {
+        console.error(
+            "GET PARENT CHILDREN ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Failed to load children.",
+            error: error.message
+        });
+    }
+};
+
+
+// ============================================================
+// EXPORTS
+// ============================================================
 
 module.exports = {
-
     registerParent,
-
     loginParent,
-
+    searchSchools,
     getParentProfile,
-
     getParents,
-
     getParentById,
-
-    searchSchools
-
+    linkStudentToParent,
+    unlinkStudentFromParent,
+    getParentChildren
 };
