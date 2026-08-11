@@ -2,32 +2,46 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
     {
-        
-school_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "School",
-    default: null,
-    index: true
-},
-
-
-        principal_name: {
+        // ==================================================
+        // BASIC USER INFORMATION
+        // ==================================================
+        first_name: {
             type: String,
-            required: true,
+            default: "",
             trim: true
         },
 
-        principal_email: {
+        last_name: {
             type: String,
-            required: true,
-            unique: true,
-            lowercase: true,
+            default: "",
             trim: true
+        },
+
+        other_name: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        full_name: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        email: {
+            type: String,
+            default: "",
+            lowercase: true,
+            trim: true,
+            index: true
         },
 
         phone: {
             type: String,
-            required: true
+            default: "",
+            trim: true,
+            index: true
         },
 
         password: {
@@ -35,67 +49,86 @@ school_id: {
             required: true
         },
 
-        school_name: {
-            type: String,
-            required: true
-        },
-
-        school_type: {
-            type: String
-        },
-
-        academic_session: {
-            type: String
-        },
-
-        current_term: {
-            type: String
-        },
-
-        address: {
-            type: String
-        },
-
-        school_motto: {
-            type: String,
-            default: ""
-        },
-
-        website: {
-            type: String,
-            default: ""
-        },
-
+        // ==================================================
+        // ROLE
+        // ==================================================
         role: {
             type: String,
             enum: [
-                "Super Admin",
+                "SuperAdmin",
                 "Principal",
-                "Vice Principal",
-                "Bursar",
                 "Teacher",
-                "Accountant",
-                "Secretary",
                 "Parent",
-                "Student"
+                "Student",
+                "Staff"
             ],
-            default: "Principal"
+            required: true,
+            index: true
         },
 
-        profile_photo: {
-            type: String,
-            default: ""
-        },
-
+        // ==================================================
+        // ACCOUNT STATUS
+        // ==================================================
         status: {
             type: String,
-            enum: ["Active", "Inactive", "Suspended"],
-            default: "Active"
+            enum: [
+                "Active",
+                "Inactive",
+                "Suspended",
+                "Pending"
+            ],
+            default: "Active",
+            index: true
         },
 
-        last_login: {
-            type: Date,
-            default: null
+        // ==================================================
+        // SCHOOL
+        // ==================================================
+        school_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "School",
+            default: null,
+            index: true
+        },
+
+        // ==================================================
+        // STUDENT ACCOUNT LINK
+        // ==================================================
+        student_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Student",
+            default: null,
+            index: true
+        },
+
+        // ==================================================
+        // PARENT ACCOUNT LINK
+        // ==================================================
+        parent_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Parent",
+            default: null,
+            index: true
+        },
+
+        // ==================================================
+        // TEACHER ACCOUNT LINK
+        // ==================================================
+        teacher_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Teacher",
+            default: null,
+            index: true
+        },
+
+        // ==================================================
+        // STAFF ACCOUNT LINK
+        // ==================================================
+        staff_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Staff",
+            default: null,
+            index: true
         }
     },
     {
@@ -105,5 +138,26 @@ school_id: {
         }
     }
 );
+
+
+// ======================================================
+// INDEXES
+// ======================================================
+
+UserSchema.index({
+    school_id: 1,
+    role: 1
+});
+
+UserSchema.index({
+    school_id: 1,
+    email: 1
+});
+
+UserSchema.index({
+    school_id: 1,
+    phone: 1
+});
+
 
 module.exports = mongoose.model("User", UserSchema);
