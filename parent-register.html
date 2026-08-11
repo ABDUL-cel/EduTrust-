@@ -4,300 +4,558 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EduTrust - Register Parent</title>
-<link rel="icon" type="image/png" href="logo-icon.png">
-    <link rel="stylesheet" href="dashboard.css">
+    <title>EduTrust - Parent Registration</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section h2 {
+            font-size: 19px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .school-search {
+            position: relative;
+        }
+
+        .school-search input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .school-search input:focus {
+            border-color: #2563eb;
+        }
+
+        #schoolResults {
+            margin-top: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            overflow: hidden;
+            display: none;
+        }
+
+        .school-item {
+            padding: 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .school-item:last-child {
+            border-bottom: none;
+        }
+
+        .school-item:hover {
+            background: #f3f6ff;
+        }
+
+        .school-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .school-address {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .selected-school {
+            display: none;
+            margin-top: 12px;
+            padding: 13px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+        }
+
+        .selected-school strong {
+            color: #047857;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #2563eb;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .submit-btn {
+            width: 100%;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .submit-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        #message {
+            display: none;
+            margin-bottom: 20px;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        #message.success {
+            display: block;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        #message.error {
+            display: block;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #6b7280;
+        }
+
+        .login-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 650px) {
+            .container {
+                margin: 15px auto;
+                padding: 10px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="page-content">
+<div class="container">
 
-    <div class="page-introduction">
-        <div>
-            <h2>Register Parent / Guardian</h2>
-            <p>
-                Add a parent or guardian to your school's EduTrust records.
-            </p>
+    <div class="card">
+
+        <div class="header">
+            <h1>Parent Registration</h1>
+            <p>Create your EduTrust parent account</p>
         </div>
 
-        <button
-            type="button"
-            class="secondary-button"
-            onclick="window.history.back()"
-        >
-            ← Back
-        </button>
-    </div>
 
+        <!-- =====================================
+             MESSAGE
+        ====================================== -->
 
-    <!-- ================================
-         REGISTRATION CARD
-    ================================= -->
+        <div id="message"></div>
 
-    <div class="dashboard-card">
 
-        <form id="parentRegistrationForm">
+        <!-- =====================================
+             SCHOOL SELECTION
+        ====================================== -->
 
-            <!-- NAME -->
+        <div class="section">
 
-            <div class="form-row">
+            <h2>Select Your School</h2>
 
-                <div class="form-group">
-                    <label for="first_name">
-                        First Name <span>*</span>
-                    </label>
-
-                    <input
-                        type="text"
-                        id="first_name"
-                        name="first_name"
-                        placeholder="Enter first name"
-                        required
-                    >
-                </div>
-
-
-                <div class="form-group">
-                    <label for="last_name">
-                        Last Name <span>*</span>
-                    </label>
-
-                    <input
-                        type="text"
-                        id="last_name"
-                        name="last_name"
-                        placeholder="Enter last name"
-                        required
-                    >
-                </div>
-
-            </div>
-
-
-            <!-- OTHER NAME + RELATIONSHIP -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label for="other_name">
-                        Other Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="other_name"
-                        name="other_name"
-                        placeholder="Enter other name"
-                    >
-                </div>
-
-
-                <div class="form-group">
-                    <label for="relationship">
-                        Relationship <span>*</span>
-                    </label>
-
-                    <select
-                        id="relationship"
-                        name="relationship"
-                        required
-                    >
-                        <option value="">
-                            Select relationship
-                        </option>
-
-                        <option value="Father">
-                            Father
-                        </option>
-
-                        <option value="Mother">
-                            Mother
-                        </option>
-
-                        <option value="Guardian">
-                            Guardian
-                        </option>
-
-                        <option value="Uncle">
-                            Uncle
-                        </option>
-
-                        <option value="Aunt">
-                            Aunt
-                        </option>
-
-                        <option value="Grandfather">
-                            Grandfather
-                        </option>
-
-                        <option value="Grandmother">
-                            Grandmother
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
-                    </select>
-                </div>
-
-            </div>
-
-
-            <!-- CONTACT -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="phone">
-                        Phone Number <span>*</span>
-                    </label>
-
-                    <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        placeholder="08012345678"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="alternate_phone">
-                        Alternate Phone
-                    </label>
-
-                    <input
-                        type="tel"
-                        id="alternate_phone"
-                        name="alternate_phone"
-                        placeholder="Optional phone number"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <!-- EMAIL -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="email">
-                        Email Address
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="parent@example.com"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="occupation">
-                        Occupation
-                    </label>
-
-                    <input
-                        type="text"
-                        id="occupation"
-                        name="occupation"
-                        placeholder="Enter occupation"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <!-- ADDRESS -->
-
-            <div class="form-group">
-
-                <label for="home_address">
-                    Home Address
-                </label>
-
-                <textarea
-                    id="home_address"
-                    name="home_address"
-                    rows="3"
-                    placeholder="Enter residential address"
-                ></textarea>
-
-            </div>
-
-
-            <!-- PASSPORT -->
-
-            <div class="form-group">
-
-                <label for="passport">
-                    Passport / Profile Image URL
-                </label>
+            <div class="school-search">
 
                 <input
                     type="text"
-                    id="passport"
-                    name="passport"
-                    placeholder="Paste image URL or leave blank"
+                    id="schoolSearch"
+                    placeholder="Search your school by name..."
+                    autocomplete="off"
                 >
+
+                <div id="schoolResults"></div>
 
             </div>
 
 
-            <!-- MESSAGE -->
-
             <div
-                id="parentMessage"
-                style="
-                    display:none;
-                    margin-top:15px;
-                    padding:12px;
-                    border-radius:8px;
-                "
-            ></div>
+                id="selectedSchool"
+                class="selected-school"
+            >
+                Selected school:
+                <strong id="selectedSchoolName"></strong>
+            </div>
 
 
-            <!-- ACTIONS -->
+            <!-- Hidden school ID -->
 
-            <div
-                class="modal-actions"
-                style="margin-top:25px;"
+            <input
+                type="hidden"
+                id="school_id"
             >
 
-                <button
-                    type="button"
-                    class="cancel-button"
-                    onclick="window.history.back()"
-                >
-                    Cancel
-                </button>
+        </div>
 
 
-                <button
-                    type="submit"
-                    class="primary-button"
-                    id="registerParentButton"
-                >
-                    Register Parent
-                </button>
+        <!-- =====================================
+             PARENT INFORMATION
+        ====================================== -->
+
+        <form id="parentRegistrationForm">
+
+            <div class="section">
+
+                <h2>Personal Information</h2>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>
+                            First Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="first_name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Last Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="last_name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Other Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="other_name"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Relationship
+                            <span class="required">*</span>
+                        </label>
+
+                        <select
+                            id="relationship"
+                            required
+                        >
+
+                            <option value="">
+                                Select relationship
+                            </option>
+
+                            <option value="Father">
+                                Father
+                            </option>
+
+                            <option value="Mother">
+                                Mother
+                            </option>
+
+                            <option value="Guardian">
+                                Guardian
+                            </option>
+
+                            <option value="Uncle">
+                                Uncle
+                            </option>
+
+                            <option value="Aunt">
+                                Aunt
+                            </option>
+
+                            <option value="Grandfather">
+                                Grandfather
+                            </option>
+
+                            <option value="Grandmother">
+                                Grandmother
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
 
             </div>
 
+
+            <!-- =====================================
+                 CONTACT INFORMATION
+            ====================================== -->
+
+            <div class="section">
+
+                <h2>Contact Information</h2>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>
+                            Phone
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Alternate Phone
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="alternate_phone"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group full">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 ADDITIONAL INFORMATION
+            ====================================== -->
+
+            <div class="section">
+
+                <h2>Additional Information</h2>
+
+                <div class="form-grid">
+
+                    <div class="form-group full">
+
+                        <label>
+                            Home Address
+                        </label>
+
+                        <textarea
+                            id="home_address"
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Occupation
+                        </label>
+
+                        <input
+                            type="text"
+                            id="occupation"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Passport Image URL
+                        </label>
+
+                        <input
+                            type="text"
+                            id="passport"
+                            placeholder="Optional"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 SUBMIT
+            ====================================== -->
+
+            <button
+                type="submit"
+                class="submit-btn"
+                id="submitBtn"
+            >
+                Register as Parent
+            </button>
+
         </form>
+
+
+        <div class="login-link">
+            Already registered?
+            <a href="parent-login.html">
+                Login here
+            </a>
+        </div>
 
     </div>
 
