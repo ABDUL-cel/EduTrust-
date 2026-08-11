@@ -8,61 +8,53 @@ const {
     getParentProfile,
     getParents,
     getParentById,
-    searchSchools,
-    linkStudentToParent,
-    unlinkStudentFromParent,
-    getParentChildren
+    assignParentToStudent,
+    removeParentFromStudent,
+    getStudentParent,
+    getParentChildren,
+    getParentDashboard
 } = require("../controllers/parentController");
 
 const authMiddleware =
     require("../middleware/authMiddleware");
 
 
-// ============================================================
-// PUBLIC PARENT REGISTRATION
-// ============================================================
+// =====================================================
+// PUBLIC
+// =====================================================
 
+// Parent registration
 router.post(
     "/register",
     registerParent
 );
 
-
-// ============================================================
-// PUBLIC PARENT LOGIN
-// ============================================================
-
+// Parent login
 router.post(
     "/login",
     loginParent
 );
 
 
-// ============================================================
-// PUBLIC SCHOOL SEARCH
-// ============================================================
+// =====================================================
+// LOGGED-IN PARENT
+// =====================================================
 
+// Parent dashboard
 router.get(
-    "/search-schools",
-    searchSchools
+    "/me/dashboard",
+    authMiddleware,
+    getParentDashboard
 );
 
-
-// ============================================================
-// LOGGED-IN PARENT PROFILE
-// ============================================================
-
+// Parent profile
 router.get(
-    "/profile",
+    "/me/profile",
     authMiddleware,
     getParentProfile
 );
 
-
-// ============================================================
-// LOGGED-IN PARENT CHILDREN
-// ============================================================
-
+// Parent's children
 router.get(
     "/me/children",
     authMiddleware,
@@ -70,47 +62,48 @@ router.get(
 );
 
 
-// ============================================================
-// PRINCIPAL: LINK STUDENT TO PARENT
-// ============================================================
+// =====================================================
+// SCHOOL / PRINCIPAL PARENT MANAGEMENT
+// =====================================================
 
-router.post(
-    "/link-student",
-    authMiddleware,
-    linkStudentToParent
-);
-
-
-// ============================================================
-// PRINCIPAL: UNLINK STUDENT FROM PARENT
-// ============================================================
-
-router.post(
-    "/unlink-student",
-    authMiddleware,
-    unlinkStudentFromParent
-);
-
-
-// ============================================================
-// PRINCIPAL: GET ALL PARENTS
-// ============================================================
-
+// Get all parents in school
 router.get(
     "/",
     authMiddleware,
     getParents
 );
 
-
-// ============================================================
-// PRINCIPAL: GET ONE PARENT
-// ============================================================
-
+// Get one parent
 router.get(
     "/:id",
     authMiddleware,
     getParentById
+);
+
+
+// =====================================================
+// STUDENT ↔ PARENT LINKING
+// =====================================================
+
+// Assign parent to student
+router.post(
+    "/assign-student",
+    authMiddleware,
+    assignParentToStudent
+);
+
+// Remove parent from student
+router.delete(
+    "/student/:studentId",
+    authMiddleware,
+    removeParentFromStudent
+);
+
+// Get student's parent
+router.get(
+    "/student/:studentId",
+    authMiddleware,
+    getStudentParent
 );
 
 
