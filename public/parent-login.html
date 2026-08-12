@@ -368,6 +368,14 @@ togglePasswordBtn.addEventListener("click", () => {
     }
 });
 
+// Helper function to display status messages
+function showMessage(text, isSuccess) {
+    const messageDiv = document.getElementById("message");
+    messageDiv.textContent = text;
+    messageDiv.style.display = "block";
+    messageDiv.className = `message ${isSuccess ? "success" : "error"}`;
+}
+
 // Form Submission Handling
 document.getElementById("parentLoginForm").addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -376,6 +384,10 @@ document.getElementById("parentLoginForm").addEventListener("submit", async func
     const phoneInput = document.getElementById("phone").value.trim();
     const passwordInputValue = passwordInput.value;
     const rememberMeChecked = document.getElementById("rememberMe").checked;
+    const messageDiv = document.getElementById("message");
+
+    // Reset message
+    messageDiv.style.display = "none";
 
     button.disabled = true;
     button.textContent = "Logging in...";
@@ -387,7 +399,7 @@ document.getElementById("parentLoginForm").addEventListener("submit", async func
         localStorage.removeItem("edutrust_remember_phone");
     }
 
-    const body = {
+    const payload = {
         phone: phoneInput,
         email: phoneInput,
         password: passwordInputValue
@@ -399,39 +411,34 @@ document.getElementById("parentLoginForm").addEventListener("submit", async func
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
 
-        if (!response.ok) {
-            throw new Error(data.message || "Login failed. Please check your credentials.");
-        }
-
-        if (data.token) {
-            localStorage.setItem("parent_token", data.token);
+        if (response.ok && data.success) {
+            // Save token for authenticated dashboard queries
             localStorage.setItem("edutrust_token", data.token);
+
+            showMessage("Login successful! Redirecting...", true);
+
+            setTimeout(() => {
+                window.location.href = data.redirectUrl || "/parent-dashboard.html";
+            }, 1200);
+
+        } else {
+            showMessage(data.message || "Login failed. Please check your details.", false);
+            button.disabled = false;
+            button.textContent = "Log In to Portal";
         }
-
-        showMessage("Login successful! Redirecting to dashboard...", "success");
-
-        setTimeout(() => {
-            window.location.href = data.redirectUrl || "parent-dashboard.html";
-        }, 1200);
 
     } catch (error) {
-        showMessage(error.message, "error");
+        console.error("LOGIN REQUEST ERROR:", error);
+        showMessage("Unable to connect to server. Please check your connection.", false);
         button.disabled = false;
         button.textContent = "Log In to Portal";
     }
 });
-
-function showMessage(text, type) {
-    const message = document.getElementById("message");
-    message.textContent = text;
-    message.className = `message ${type}`;
-    message.style.display = "block";
-}
 </script>
 
 </body>
