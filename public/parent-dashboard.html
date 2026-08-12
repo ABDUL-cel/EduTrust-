@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Parent Dashboard | EduTrust</title>
-
-    
 
     <style>
         * {
@@ -163,6 +160,8 @@
             border-radius: 10px;
             padding: 20px;
             background: #ffffff;
+            display: flex;
+            flex-direction: column;
         }
 
         .child-card h3 {
@@ -208,6 +207,47 @@
 
         .child-row strong {
             text-align: right;
+        }
+
+        .child-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #1769e0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1355b8;
+        }
+
+        .btn-secondary {
+            background: #eef4ff;
+            color: #1769e0;
+        }
+
+        .btn-secondary:hover {
+            background: #dbe7ff;
         }
 
         .status {
@@ -514,7 +554,6 @@
 
     "use strict";
 
-
     // =========================================================
     // CONFIGURATION
     // =========================================================
@@ -522,59 +561,29 @@
     const API_BASE =
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1"
-
             ? "http://localhost:5000/api"
-
             : "https://edutrust-15ii.onrender.com/api";
 
-
-    // Your parent route:
-    // GET https://edutrust-15ii.onrender.com/api/parents/dashboard
-
-    const DASHBOARD_URL =
-        `${API_BASE}/parents/dashboard`;
-
+    const DASHBOARD_URL = `${API_BASE}/parents/dashboard`;
 
     // =========================================================
     // ELEMENTS
     // =========================================================
 
-    const parentName =
-        document.getElementById("parentName");
-
-    const welcomeTitle =
-        document.getElementById("welcomeTitle");
-
-    const childrenCount =
-        document.getElementById("childrenCount");
-
-    const activeCount =
-        document.getElementById("activeCount");
-
-    const pendingCount =
-        document.getElementById("pendingCount");
-
-    const suspendedCount =
-        document.getElementById("suspendedCount");
-
-    const childrenContainer =
-        document.getElementById("children");
-
-    const profileContainer =
-        document.getElementById("profile");
-
-    const schoolInfo =
-        document.getElementById("schoolInfo");
-
-    const errorContainer =
-        document.getElementById("error");
-
-    const logoutButton =
-        document.getElementById("logoutButton");
-
+    const parentName = document.getElementById("parentName");
+    const welcomeTitle = document.getElementById("welcomeTitle");
+    const childrenCount = document.getElementById("childrenCount");
+    const activeCount = document.getElementById("activeCount");
+    const pendingCount = document.getElementById("pendingCount");
+    const suspendedCount = document.getElementById("suspendedCount");
+    const childrenContainer = document.getElementById("children");
+    const profileContainer = document.getElementById("profile");
+    const schoolInfo = document.getElementById("schoolInfo");
+    const errorContainer = document.getElementById("error");
+    const logoutButton = document.getElementById("logoutButton");
 
     // =========================================================
-    // TOKEN (Checks all expected token keys saved across auth forms)
+    // TOKEN
     // =========================================================
 
     const token =
@@ -582,769 +591,268 @@
         localStorage.getItem("edutrust_token") ||
         localStorage.getItem("token");
 
-
     if (!token) {
-
-        window.location.href =
-            "parent-login.html";
-
+        window.location.href = "parent-login.html";
         return;
-
     }
-
 
     // =========================================================
     // LOGOUT
     // =========================================================
 
-    logoutButton.addEventListener(
-        "click",
-        function () {
-
-            localStorage.removeItem(
-                "parent_token"
-            );
-
-            localStorage.removeItem(
-                "edutrust_token"
-            );
-
-            localStorage.removeItem(
-                "token"
-            );
-
-            window.location.href =
-                "parent-login.html";
-
-        }
-    );
-
+    logoutButton.addEventListener("click", function () {
+        localStorage.removeItem("parent_token");
+        localStorage.removeItem("edutrust_token");
+        localStorage.removeItem("token");
+        window.location.href = "parent-login.html";
+    });
 
     // =========================================================
-    // SHOW ERROR
+    // HELPERS
     // =========================================================
 
     function showError(message) {
-
-        errorContainer.textContent =
-            message ||
-            "Something went wrong.";
-
-        errorContainer.style.display =
-            "block";
-
+        errorContainer.textContent = message || "Something went wrong.";
+        errorContainer.style.display = "block";
     }
 
-
-    // =========================================================
-    // ESCAPE HTML
-    // =========================================================
-
     function escapeHtml(value) {
-
         return String(value ?? "")
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
-
     }
-
-
-    // =========================================================
-    // FORMAT DATE
-    // =========================================================
 
     function formatDate(value) {
-
-        if (!value) {
-            return "-";
-        }
-
-        const date =
-            new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return "-";
-        }
-
-        return date.toLocaleDateString(
-            "en-NG",
-            {
-                year: "numeric",
-                month: "short",
-                day: "numeric"
-            }
-        );
-
+        if (!value) return "-";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "-";
+        return date.toLocaleDateString("en-NG", {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
+        });
     }
-
-
-    // =========================================================
-    // GET STATUS CLASS
-    // =========================================================
 
     function getStatusClass(status) {
-
         switch (status) {
-
-            case "Pending":
-                return "pending";
-
-            case "Suspended":
-                return "suspended";
-
-            case "Graduated":
-                return "graduated";
-
-            case "Archived":
-                return "archived";
-
-            default:
-                return "";
-
+            case "Pending": return "pending";
+            case "Suspended": return "suspended";
+            case "Graduated": return "graduated";
+            case "Archived": return "archived";
+            default: return "";
         }
-
     }
-
-
-    // =========================================================
-    // GET INITIALS
-    // =========================================================
 
     function getInitials(name) {
-
-        const parts =
-            String(name || "")
-                .trim()
-                .split(/\s+/)
-                .filter(Boolean);
-
-        if (!parts.length) {
-            return "?";
-        }
-
-        if (parts.length === 1) {
-            return parts[0]
-                .substring(0, 2)
-                .toUpperCase();
-        }
-
-        return (
-            parts[0][0] +
-            parts[parts.length - 1][0]
-        ).toUpperCase();
-
+        const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return "?";
+        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-
     // =========================================================
-    // RENDER CHILDREN
+    // RENDER FUNCTIONS
     // =========================================================
 
     function renderChildren(children) {
-
-        if (
-            !Array.isArray(children) ||
-            children.length === 0
-        ) {
-
+        if (!Array.isArray(children) || children.length === 0) {
             childrenContainer.innerHTML = `
                 <div class="empty">
-                    No children are currently linked
-                    to this parent account.
+                    No children are currently linked to this parent account.
                 </div>
             `;
-
             return;
-
         }
 
+        childrenContainer.innerHTML = children.map(function (child) {
+            const name = child.fullName ||
+                [child.first_name, child.other_name, child.last_name]
+                    .filter(Boolean)
+                    .join(" ") || "Unnamed Student";
 
-        childrenContainer.innerHTML =
-            children
-                .map(function (child) {
+            const status = child.status || "Pending";
+            const statusClass = getStatusClass(status);
+            const passport = child.passport;
+            const childId = child._id || child.id || "";
+            const admissionNo = child.admissionNumber || "";
 
-                    const name =
-                        child.fullName ||
-                        [
-                            child.first_name,
-                            child.other_name,
-                            child.last_name
-                        ]
-                            .filter(Boolean)
-                            .join(" ") ||
-                        "Unnamed Student";
+            const avatar = passport
+                ? `<img class="child-passport" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                   <div class="child-placeholder" style="display:none;">${escapeHtml(getInitials(name))}</div>`
+                : `<div class="child-placeholder">${escapeHtml(getInitials(name))}</div>`;
 
+            return `
+                <article class="child-card">
+                    ${avatar}
+                    <h3>${escapeHtml(name)}</h3>
 
-                    const status =
-                        child.status ||
-                        "Pending";
+                    <div class="child-row">
+                        <span>Admission No.</span>
+                        <strong>${escapeHtml(admissionNo || "-")}</strong>
+                    </div>
 
+                    <div class="child-row">
+                        <span>Class</span>
+                        <strong>${escapeHtml(child.className || "-")}</strong>
+                    </div>
 
-                    const statusClass =
-                        getStatusClass(status);
+                    <div class="child-row">
+                        <span>Arm</span>
+                        <strong>${escapeHtml(child.arm || "-")}</strong>
+                    </div>
 
+                    <div class="child-row">
+                        <span>Gender</span>
+                        <strong>${escapeHtml(child.gender || "-")}</strong>
+                    </div>
 
-                    const passport =
-                        child.passport;
+                    <div class="child-row">
+                        <span>Date of Birth</span>
+                        <strong>${escapeHtml(formatDate(child.dateOfBirth))}</strong>
+                    </div>
 
+                    <div class="child-row">
+                        <span>Admission Date</span>
+                        <strong>${escapeHtml(formatDate(child.admissionDate))}</strong>
+                    </div>
 
-                    const avatar =
-                        passport
+                    <div class="child-row">
+                        <span>Status</span>
+                        <span class="status ${statusClass}">${escapeHtml(status)}</span>
+                    </div>
 
-                            ? `
-                                <img
-                                    class="child-passport"
-                                    src="${escapeHtml(passport)}"
-                                    alt="${escapeHtml(name)}"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                >
-
-                                <div
-                                    class="child-placeholder"
-                                    style="display:none;"
-                                >
-                                    ${escapeHtml(
-                                        getInitials(name)
-                                    )}
-                                </div>
-                            `
-
-                            : `
-                                <div
-                                    class="child-placeholder"
-                                >
-                                    ${escapeHtml(
-                                        getInitials(name)
-                                    )}
-                                </div>
-                            `;
-
-
-                    return `
-
-                        <article class="child-card">
-
-                            ${avatar}
-
-                            <h3>
-                                ${escapeHtml(name)}
-                            </h3>
-
-
-                            <div class="child-row">
-
-                                <span>
-                                    Admission No.
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(
-                                        child.admissionNumber ||
-                                        "-"
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="child-row">
-
-                                <span>
-                                    Class
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(
-                                        child.className ||
-                                        "-"
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="child-row">
-
-                                <span>
-                                    Arm
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(
-                                        child.arm ||
-                                        "-"
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="child-row">
-
-                                <span>
-                                    Gender
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(
-                                        child.gender ||
-                                        "-"
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="child-row">
-
-                                <span>
-                                    Date of Birth
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(
-                                        formatDate(
-                                            child.dateOfBirth
-                                        )
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="child-row">
-
-                                <span>
-                                    Admission Date
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(
-                                        formatDate(
-                                            child.admissionDate
-                                        )
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="child-row">
-
-                                <span>
-                                    Status
-                                </span>
-
-                                <span
-                                    class="status ${statusClass}"
-                                >
-                                    ${escapeHtml(status)}
-                                </span>
-
-                            </div>
-
-                        </article>
-
-                    `;
-
-                })
-                .join("");
-
+                    <div class="child-actions">
+                        <a href="check-result.html?studentId=${encodeURIComponent(childId)}&admissionNo=${encodeURIComponent(admissionNo)}" class="btn-action btn-primary">
+                            Check Exam Result
+                        </a>
+                        <a href="report-card.html?studentId=${encodeURIComponent(childId)}" class="btn-action btn-secondary">
+                            View Report Sheet
+                        </a>
+                    </div>
+                </article>
+            `;
+        }).join("");
     }
-
-
-    // =========================================================
-    // RENDER PROFILE
-    // =========================================================
 
     function renderProfile(parent) {
-
         profileContainer.innerHTML = `
-
             <div class="profile-item">
-
-                <span class="profile-label">
-                    Full Name
-                </span>
-
-                <div class="profile-value">
-                    ${escapeHtml(
-                        parent.fullName || "-"
-                    )}
-                </div>
-
+                <span class="profile-label">Full Name</span>
+                <div class="profile-value">${escapeHtml(parent.fullName || "-")}</div>
             </div>
-
-
             <div class="profile-item">
-
-                <span class="profile-label">
-                    Relationship
-                </span>
-
-                <div class="profile-value">
-                    ${escapeHtml(
-                        parent.relationship || "-"
-                    )}
-                </div>
-
+                <span class="profile-label">Relationship</span>
+                <div class="profile-value">${escapeHtml(parent.relationship || "-")}</div>
             </div>
-
-
             <div class="profile-item">
-
-                <span class="profile-label">
-                    Phone
-                </span>
-
-                <div class="profile-value">
-                    ${escapeHtml(
-                        parent.phone || "-"
-                    )}
-                </div>
-
+                <span class="profile-label">Phone</span>
+                <div class="profile-value">${escapeHtml(parent.phone || "-")}</div>
             </div>
-
-
             <div class="profile-item">
-
-                <span class="profile-label">
-                    Alternate Phone
-                </span>
-
-                <div class="profile-value">
-                    ${escapeHtml(
-                        parent.alternatePhone || "-"
-                    )}
-                </div>
-
+                <span class="profile-label">Alternate Phone</span>
+                <div class="profile-value">${escapeHtml(parent.alternatePhone || "-")}</div>
             </div>
-
-
             <div class="profile-item">
-
-                <span class="profile-label">
-                    Email
-                </span>
-
-                <div class="profile-value">
-                    ${escapeHtml(
-                        parent.email || "-"
-                    )}
-                </div>
-
+                <span class="profile-label">Email</span>
+                <div class="profile-value">${escapeHtml(parent.email || "-")}</div>
             </div>
-
-
             <div class="profile-item">
-
-                <span class="profile-label">
-                    Occupation
-                </span>
-
-                <div class="profile-value">
-                    ${escapeHtml(
-                        parent.occupation || "-"
-                    )}
-                </div>
-
+                <span class="profile-label">Occupation</span>
+                <div class="profile-value">${escapeHtml(parent.occupation || "-")}</div>
             </div>
-
-
             <div class="profile-item">
-
-                <span class="profile-label">
-                    Home Address
-                </span>
-
-                <div class="profile-value">
-                    ${escapeHtml(
-                        parent.homeAddress || "-"
-                    )}
-                </div>
-
+                <span class="profile-label">Home Address</span>
+                <div class="profile-value">${escapeHtml(parent.homeAddress || "-")}</div>
             </div>
-
-
             <div class="profile-item">
-
-                <span class="profile-label">
-                    Account Status
-                </span>
-
+                <span class="profile-label">Account Status</span>
                 <div class="profile-value">
-
-                    <span
-                        class="status ${getStatusClass(
-                            parent.status
-                        )}"
-                    >
-                        ${escapeHtml(
-                            parent.status || "-"
-                        )}
+                    <span class="status ${getStatusClass(parent.status)}">
+                        ${escapeHtml(parent.status || "-")}
                     </span>
-
                 </div>
-
             </div>
-
         `;
-
     }
-
-
-    // =========================================================
-    // RENDER SCHOOL
-    // =========================================================
 
     function renderSchool(parent) {
-
         schoolInfo.innerHTML = `
-
             <p>
-                Your parent account is connected to school:
-                <strong>
-                    ${escapeHtml(
-                        parent.schoolId || "-"
-                    )}
-                </strong>
+                Your parent account is connected to school ID:
+                <strong>${escapeHtml(parent.schoolId || "-")}</strong>
             </p>
-
         `;
-
     }
-
 
     // =========================================================
     // LOAD DASHBOARD
     // =========================================================
 
     async function loadDashboard() {
-
-        errorContainer.style.display =
-            "none";
-
+        errorContainer.style.display = "none";
 
         try {
-
-            const response =
-                await fetch(
-                    DASHBOARD_URL,
-                    {
-                        method: "GET",
-
-                        headers: {
-                            "Authorization":
-                                `Bearer ${token}`,
-
-                            "Content-Type":
-                                "application/json"
-                        }
-                    }
-                );
-
+            const response = await fetch(DASHBOARD_URL, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
 
             let data = null;
-
-
             try {
-
-                data =
-                    await response.json();
-
+                data = await response.json();
             } catch (jsonError) {
-
-                throw new Error(
-                    "Server returned an invalid response."
-                );
-
+                throw new Error("Server returned an invalid response.");
             }
 
-
-            if (
-                response.status === 401 ||
-                response.status === 403
-            ) {
-
-                localStorage.removeItem(
-                    "parent_token"
-                );
-
-                localStorage.removeItem(
-                    "edutrust_token"
-                );
-
-                localStorage.removeItem(
-                    "token"
-                );
-
-                window.location.href =
-                    "parent-login.html";
-
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("parent_token");
+                localStorage.removeItem("edutrust_token");
+                localStorage.removeItem("token");
+                window.location.href = "parent-login.html";
                 return;
-
             }
-
 
             if (!response.ok) {
-
-                throw new Error(
-                    data?.message ||
-                    "Unable to load parent dashboard."
-                );
-
+                throw new Error(data?.message || "Unable to load parent dashboard.");
             }
 
-
-            if (
-                !data ||
-                !data.success ||
-                !data.dashboard
-            ) {
-
-                throw new Error(
-                    "Parent dashboard data was not returned."
-                );
-
+            if (!data || !data.success || !data.dashboard) {
+                throw new Error("Parent dashboard data was not returned.");
             }
 
+            const dashboard = data.dashboard;
+            const parent = dashboard.parent || {};
+            const statistics = dashboard.statistics || {};
+            const children = Array.isArray(dashboard.children) ? dashboard.children : [];
 
-            const dashboard =
-                data.dashboard;
+            const name = parent.fullName || "Parent";
+            parentName.textContent = name;
+            welcomeTitle.textContent = `Welcome, ${name}`;
 
+            childrenCount.textContent = Number(statistics.totalChildren || 0);
+            activeCount.textContent = Number(statistics.activeChildren || 0);
+            pendingCount.textContent = Number(statistics.pendingChildren || 0);
+            suspendedCount.textContent = Number(statistics.suspendedChildren || 0);
 
-            const parent =
-                dashboard.parent || {};
-
-
-            const statistics =
-                dashboard.statistics || {};
-
-
-            const children =
-                Array.isArray(
-                    dashboard.children
-                )
-
-                    ? dashboard.children
-
-                    : [];
-
-
-            // -------------------------------------------------
-            // PARENT NAME
-            // -------------------------------------------------
-
-            const name =
-                parent.fullName ||
-                "Parent";
-
-
-            parentName.textContent =
-                name;
-
-
-            welcomeTitle.textContent =
-                `Welcome, ${name}`;
-
-
-            // -------------------------------------------------
-            // STATISTICS
-            // -------------------------------------------------
-
-            childrenCount.textContent =
-                Number(
-                    statistics.totalChildren || 0
-                );
-
-
-            activeCount.textContent =
-                Number(
-                    statistics.activeChildren || 0
-                );
-
-
-            pendingCount.textContent =
-                Number(
-                    statistics.pendingChildren || 0
-                );
-
-
-            suspendedCount.textContent =
-                Number(
-                    statistics.suspendedChildren || 0
-                );
-
-
-            // -------------------------------------------------
-            // CHILDREN
-            // -------------------------------------------------
-
-            renderChildren(
-                children
-            );
-
-
-            // -------------------------------------------------
-            // PROFILE
-            // -------------------------------------------------
-
-            renderProfile(
-                parent
-            );
-
-
-            // -------------------------------------------------
-            // SCHOOL
-            // -------------------------------------------------
-
-            renderSchool(
-                parent
-            );
-
+            renderChildren(children);
+            renderProfile(parent);
+            renderSchool(parent);
 
         } catch (error) {
+            console.error("PARENT DASHBOARD ERROR:", error);
+            showError(error.message || "Failed to load parent dashboard.");
 
-            console.error(
-                "PARENT DASHBOARD ERROR:",
-                error
-            );
-
-
-            showError(
-                error.message ||
-                "Failed to load parent dashboard."
-            );
-
-
-            childrenContainer.innerHTML = `
-                <div class="empty">
-                    Unable to load children.
-                </div>
-            `;
-
-
-            profileContainer.innerHTML = `
-                <div class="empty">
-                    Unable to load parent profile.
-                </div>
-            `;
-
-
-            schoolInfo.textContent =
-                "Unable to load school information.";
-
+            childrenContainer.innerHTML = `<div class="empty">Unable to load children.</div>`;
+            profileContainer.innerHTML = `<div class="empty">Unable to load parent profile.</div>`;
+            schoolInfo.textContent = "Unable to load school information.";
         }
-
     }
-
-
-    // =========================================================
-    // START
-    // =========================================================
 
     loadDashboard();
 
