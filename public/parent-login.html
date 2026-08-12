@@ -282,6 +282,9 @@
 </div>
 
 <script>
+// Live Render API Base Endpoint for Parent Routes
+const API_BASE_URL = "https://edutrust-15ii.onrender.com/api/parents";
+
 document.getElementById("parentLoginForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -302,7 +305,7 @@ document.getElementById("parentLoginForm").addEventListener("submit", async func
     };
 
     try {
-        const response = await fetch("/parent/login", {
+        const response = await fetch(`${API_BASE_URL}/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
