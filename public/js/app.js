@@ -24,7 +24,14 @@ app.use(
         )
     )
 );
+// ============================================================
+// server.js / app.js
+// ADD THIS WITH YOUR OTHER ROUTES
+// ============================================================
 
+const portalRoutes = require("./routes/portalRoutes");
+
+app.use("/", portalRoutes);
 
 // API routes
 const apiRoutes =
