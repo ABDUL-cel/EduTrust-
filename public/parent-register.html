@@ -441,339 +441,138 @@
 
 
 <script>
+// Define your Render Live Backend API Base URL
+const API_BASE_URL = "https://edutrust-15ii.onrender.com/api/parents";
 
-const schoolSearch =
-    document.getElementById(
-        "schoolSearch"
-    );
-
-const schoolResults =
-    document.getElementById(
-        "schoolResults"
-    );
-
-const selectedSchool =
-    document.getElementById(
-        "selectedSchool"
-    );
-
-const schoolId =
-    document.getElementById(
-        "school_id"
-    );
-
+const schoolSearch = document.getElementById("schoolSearch");
+const schoolResults = document.getElementById("schoolResults");
+const selectedSchool = document.getElementById("selectedSchool");
+const schoolId = document.getElementById("school_id");
 
 let searchTimer;
 
+schoolSearch.addEventListener("input", function () {
+    clearTimeout(searchTimer);
+    const search = this.value.trim();
 
-schoolSearch.addEventListener(
-    "input",
-    function () {
-
-        clearTimeout(searchTimer);
-
-        const search =
-            this.value.trim();
-
-        if (search.length < 2) {
-
-            schoolResults.style.display =
-                "none";
-
-            return;
-
-        }
-
-        searchTimer =
-            setTimeout(
-                () => searchSchools(search),
-                300
-            );
-
+    if (search.length < 2) {
+        schoolResults.style.display = "none";
+        return;
     }
-);
 
+    searchTimer = setTimeout(() => searchSchools(search), 300);
+});
 
 async function searchSchools(search) {
-
     try {
-
-        const response =
-            await fetch(
-                `/parent/search-schools?search=${encodeURIComponent(search)}`
-            );
-
-        const data =
-            await response.json();
+        // Updated to use complete backend URL: /api/parents/search-schools
+        const response = await fetch(`${API_BASE_URL}/search-schools?search=${encodeURIComponent(search)}`);
+        const data = await response.json();
 
         schoolResults.innerHTML = "";
 
-        if (
-            !data.success ||
-            !data.schools.length
-        ) {
-
-            schoolResults.innerHTML =
-                `<div class="school-item">
-                    No active schools found.
-                 </div>`;
-
-            schoolResults.style.display =
-                "block";
-
+        if (!data.success || !data.schools || !data.schools.length) {
+            schoolResults.innerHTML = `<div class="school-item">No active schools found.</div>`;
+            schoolResults.style.display = "block";
             return;
-
         }
 
+        data.schools.forEach(school => {
+            const item = document.createElement("div");
+            item.className = "school-item";
+            item.innerHTML = `
+                <strong>${escapeHtml(school.name)}</strong><br>
+                <small>${escapeHtml(school.address || "")}</small>
+            `;
 
-        data.schools.forEach(
-            school => {
+            item.addEventListener("click", function () {
+                schoolSearch.value = school.name;
+                schoolId.value = school._id;
+                selectedSchool.textContent = `Selected school: ${school.name}`;
+                selectedSchool.style.display = "block";
+                schoolResults.style.display = "none";
+            });
 
-                const item =
-                    document.createElement("div");
+            schoolResults.appendChild(item);
+        });
 
-                item.className =
-                    "school-item";
-
-                item.innerHTML = `
-                    <strong>
-                        ${escapeHtml(school.name)}
-                    </strong>
-                    <br>
-                    <small>
-                        ${escapeHtml(school.address || "")}
-                    </small>
-                `;
-
-                item.addEventListener(
-                    "click",
-                    function () {
-
-                        schoolSearch.value =
-                            school.name;
-
-                        schoolId.value =
-                            school._id;
-
-                        selectedSchool.textContent =
-                            `Selected school: ${school.name}`;
-
-                        selectedSchool.style.display =
-                            "block";
-
-                        schoolResults.style.display =
-                            "none";
-
-                    }
-                );
-
-                schoolResults.appendChild(item);
-
-            }
-        );
-
-        schoolResults.style.display =
-            "block";
-
+        schoolResults.style.display = "block";
     } catch (error) {
+        console.error("Search error:", error);
+    }
+}
 
-        console.error(error);
+document.getElementById("parentRegisterForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
 
+    const button = document.getElementById("submitButton");
+
+    if (!schoolId.value) {
+        showMessage("Please select a school.", "error");
+        return;
     }
 
-}
+    button.disabled = true;
+    button.textContent = "Registering...";
 
+    const body = {
+        first_name: document.getElementById("first_name").value.trim(),
+        last_name: document.getElementById("last_name").value.trim(),
+        other_name: document.getElementById("other_name").value.trim(),
+        relationship: document.getElementById("relationship").value,
+        phone: document.getElementById("phone").value.trim(),
+        alternate_phone: document.getElementById("alternate_phone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        occupation: document.getElementById("occupation").value.trim(),
+        home_address: document.getElementById("home_address").value.trim(),
+        school_id: schoolId.value
+    };
 
-document
-    .getElementById("parentRegisterForm")
-    .addEventListener(
-        "submit",
-        async function (event) {
+    try {
+        // Updated to use complete backend URL: /api/parents/register
+        const response = await fetch(`${API_BASE_URL}/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        });
 
-            event.preventDefault();
+        const data = await response.json();
 
-            const message =
-                document.getElementById("message");
-
-            const button =
-                document.getElementById("submitButton");
-
-
-            if (!schoolId.value) {
-
-                showMessage(
-                    "Please select a school.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            button.disabled =
-                true;
-
-            button.textContent =
-                "Registering...";
-
-
-            const body = {
-
-                first_name:
-                    document.getElementById(
-                        "first_name"
-                    ).value.trim(),
-
-                last_name:
-                    document.getElementById(
-                        "last_name"
-                    ).value.trim(),
-
-                other_name:
-                    document.getElementById(
-                        "other_name"
-                    ).value.trim(),
-
-                relationship:
-                    document.getElementById(
-                        "relationship"
-                    ).value,
-
-                phone:
-                    document.getElementById(
-                        "phone"
-                    ).value.trim(),
-
-                alternate_phone:
-                    document.getElementById(
-                        "alternate_phone"
-                    ).value.trim(),
-
-                email:
-                    document.getElementById(
-                        "email"
-                    ).value.trim(),
-
-                occupation:
-                    document.getElementById(
-                        "occupation"
-                    ).value.trim(),
-
-                home_address:
-                    document.getElementById(
-                        "home_address"
-                    ).value.trim(),
-
-                school_id:
-                    schoolId.value
-
-            };
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        "/parent/register",
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body:
-                                JSON.stringify(body)
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        data.message ||
-                        "Registration failed."
-                    );
-
-                }
-
-
-                showMessage(
-                    "Parent account created successfully. You can now log in.",
-                    "success"
-                );
-
-
-                this.reset();
-
-                schoolId.value =
-                    "";
-
-                selectedSchool.style.display =
-                    "none";
-
-
-            } catch (error) {
-
-                showMessage(
-                    error.message,
-                    "error"
-                );
-
-            } finally {
-
-                button.disabled =
-                    false;
-
-                button.textContent =
-                    "Register Parent";
-
-            }
-
+        if (!response.ok) {
+            throw new Error(data.message || "Registration failed.");
         }
-    );
 
+        showMessage("Parent account created successfully. You can now log in.", "success");
 
-function showMessage(
-    text,
-    type
-) {
+        this.reset();
+        schoolId.value = "";
+        selectedSchool.style.display = "none";
 
-    const message =
-        document.getElementById(
-            "message"
-        );
+    } catch (error) {
+        showMessage(error.message, "error");
+    } finally {
+        button.disabled = false;
+        button.textContent = "Register Parent";
+    }
+});
 
-    message.textContent =
-        text;
-
-    message.className =
-        `message ${type}`;
-
-    message.style.display =
-        "block";
-
+function showMessage(text, type) {
+    const message = document.getElementById("message");
+    message.textContent = text;
+    message.className = `message ${type}`;
+    message.style.display = "block";
 }
-
 
 function escapeHtml(value) {
-
     return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
-
 </script>
-
 </body>
 </html>
