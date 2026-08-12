@@ -325,7 +325,7 @@ document.getElementById("parentLoginForm").addEventListener("submit", async func
 
         // Redirect to Parent Dashboard after successful login
         setTimeout(() => {
-            window.location.href = data.redirectUrl || "/parent/dashboard";
+            window.location.href = data.redirectUrl || "parent-dashboard.html";
         }, 1200);
 
     } catch (error) {
