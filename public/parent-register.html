@@ -3,19 +3,15 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Favicon Icon -->
     <link rel="icon" type="image/png" href="/logo-icon.png">
 
     <title>EduTrust Parent Registration</title>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -165,7 +161,6 @@
         }
 
         @media(max-width:700px) {
-
             .form-grid {
                 grid-template-columns: 1fr;
             }
@@ -177,272 +172,117 @@
             .topbar {
                 padding: 0 15px;
             }
-
         }
-
     </style>
-
 </head>
 
 <body>
 
 <header class="topbar">
-
     <div class="logo">
         EduTrust
     </div>
-
-    <a
-        href="/"
-        class="back"
-    >
+    <a href="/" class="back">
         ← Back
     </a>
-
 </header>
 
-
 <div class="container">
-
     <div class="card">
-
-        <h1>
-            Parent Registration
-        </h1>
-
+        <h1>Parent Registration</h1>
         <p class="subtitle">
-            Create your parent account and select the
-            school your child attends.
+            Create your parent account and select the school your child attends.
         </p>
 
-
         <form id="parentRegisterForm">
-
             <div class="form-grid">
 
-
                 <div class="field">
-
-                    <label>
-                        First Name *
-                    </label>
-
-                    <input
-                        type="text"
-                        id="first_name"
-                        required
-                    >
-
+                    <label>First Name *</label>
+                    <input type="text" id="first_name" required>
                 </div>
 
-
                 <div class="field">
-
-                    <label>
-                        Last Name *
-                    </label>
-
-                    <input
-                        type="text"
-                        id="last_name"
-                        required
-                    >
-
+                    <label>Last Name *</label>
+                    <input type="text" id="last_name" required>
                 </div>
 
-
                 <div class="field">
-
-                    <label>
-                        Other Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="other_name"
-                    >
-
+                    <label>Other Name</label>
+                    <input type="text" id="other_name">
                 </div>
 
-
                 <div class="field">
-
-                    <label>
-                        Relationship *
-                    </label>
-
-                    <select
-                        id="relationship"
-                        required
-                    >
-
-                        <option value="">
-                            Select relationship
-                        </option>
-
-                        <option value="Father">
-                            Father
-                        </option>
-
-                        <option value="Mother">
-                            Mother
-                        </option>
-
-                        <option value="Guardian">
-                            Guardian
-                        </option>
-
-                        <option value="Grandparent">
-                            Grandparent
-                        </option>
-
-                        <option value="Uncle">
-                            Uncle
-                        </option>
-
-                        <option value="Aunt">
-                            Aunt
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
+                    <label>Relationship *</label>
+                    <select id="relationship" required>
+                        <option value="">Select relationship</option>
+                        <option value="Father">Father</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Guardian">Guardian</option>
+                        <option value="Grandparent">Grandparent</option>
+                        <option value="Uncle">Uncle</option>
+                        <option value="Aunt">Aunt</option>
+                        <option value="Other">Other</option>
                     </select>
-
                 </div>
-
 
                 <div class="field">
-
-                    <label>
-                        Phone *
-                    </label>
-
-                    <input
-                        type="tel"
-                        id="phone"
-                        required
-                    >
-
+                    <label>Phone *</label>
+                    <input type="tel" id="phone" required>
                 </div>
-
 
                 <div class="field">
-
-                    <label>
-                        Alternate Phone
-                    </label>
-
-                    <input
-                        type="tel"
-                        id="alternate_phone"
-                    >
-
+                    <label>Alternate Phone</label>
+                    <input type="tel" id="alternate_phone">
                 </div>
-
 
                 <div class="field">
-
-                    <label>
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                    >
-
+                    <label>Email *</label>
+                    <input type="email" id="email" required>
                 </div>
-
 
                 <div class="field">
-
-                    <label>
-                        Occupation
-                    </label>
-
-                    <input
-                        type="text"
-                        id="occupation"
-                    >
-
+                    <label>Occupation</label>
+                    <input type="text" id="occupation">
                 </div>
 
+                <!-- PASSWORD FIELDS -->
+                <div class="field">
+                    <label>Password *</label>
+                    <input type="password" id="password" minlength="6" placeholder="At least 6 characters" required>
+                </div>
+
+                <div class="field">
+                    <label>Confirm Password *</label>
+                    <input type="password" id="confirm_password" minlength="6" placeholder="Re-enter password" required>
+                </div>
 
                 <!-- SCHOOL SELECTION -->
-
                 <div class="field full">
-
-                    <label>
-                        Select School *
-                    </label>
-
-                    <input
-                        type="text"
-                        id="schoolSearch"
-                        placeholder="Search school name..."
-                        autocomplete="off"
-                        required
-                    >
-
-                    <div
-                        id="schoolResults"
-                        class="school-results"
-                    ></div>
-
-                    <div
-                        id="selectedSchool"
-                        class="selected-school"
-                    ></div>
-
-                    <input
-                        type="hidden"
-                        id="school_id"
-                    >
-
+                    <label>Select School *</label>
+                    <input type="text" id="schoolSearch" placeholder="Search school name..." autocomplete="off" required>
+                    <div id="schoolResults" class="school-results"></div>
+                    <div id="selectedSchool" class="selected-school"></div>
+                    <input type="hidden" id="school_id">
                 </div>
 
-
                 <div class="field full">
-
-                    <label>
-                        Home Address
-                    </label>
-
-                    <input
-                        type="text"
-                        id="home_address"
-                    >
-
+                    <label>Home Address</label>
+                    <input type="text" id="home_address">
                 </div>
-
 
             </div>
 
-
-            <button
-                type="submit"
-                id="submitButton"
-            >
+            <button type="submit" id="submitButton">
                 Register Parent
             </button>
 
-
-            <div
-                id="message"
-                class="message"
-            ></div>
-
+            <div id="message" class="message"></div>
         </form>
-
     </div>
-
 </div>
 
-
 <script>
-// Define your Render Live Backend API Base URL
 const API_BASE_URL = "https://edutrust-15ii.onrender.com/api/parents";
 
 const schoolSearch = document.getElementById("schoolSearch");
@@ -466,7 +306,6 @@ schoolSearch.addEventListener("input", function () {
 
 async function searchSchools(search) {
     try {
-        // Updated to use complete backend URL: /api/parents/search-schools
         const response = await fetch(`${API_BASE_URL}/search-schools?search=${encodeURIComponent(search)}`);
         const data = await response.json();
 
@@ -507,6 +346,13 @@ document.getElementById("parentRegisterForm").addEventListener("submit", async f
     event.preventDefault();
 
     const button = document.getElementById("submitButton");
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirm_password").value;
+
+    if (password !== confirmPassword) {
+        showMessage("Passwords do not match.", "error");
+        return;
+    }
 
     if (!schoolId.value) {
         showMessage("Please select a school.", "error");
@@ -525,12 +371,12 @@ document.getElementById("parentRegisterForm").addEventListener("submit", async f
         alternate_phone: document.getElementById("alternate_phone").value.trim(),
         email: document.getElementById("email").value.trim(),
         occupation: document.getElementById("occupation").value.trim(),
+        password: password,
         home_address: document.getElementById("home_address").value.trim(),
         school_id: schoolId.value
     };
 
     try {
-        // Updated to use complete backend URL: /api/parents/register
         const response = await fetch(`${API_BASE_URL}/register`, {
             method: "POST",
             headers: {
