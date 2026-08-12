@@ -1,0 +1,779 @@
+<!-- public/parent-register.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>EduTrust Parent Registration</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .topbar {
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 800;
+            color: #1769e0;
+        }
+
+        .back {
+            color: #1769e0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 45px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: #667085;
+            margin-bottom: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .school-results {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 5px;
+            display: none;
+            max-height: 220px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .school-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .school-item:hover {
+            background: #f4f7fb;
+        }
+
+        .selected-school {
+            margin-top: 8px;
+            padding: 10px;
+            background: #eef5ff;
+            color: #1769e0;
+            border-radius: 8px;
+            display: none;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1769e0;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .success {
+            background: #e9f9ef;
+            color: #18794e;
+        }
+
+        .error {
+            background: #fff0f0;
+            color: #b42318;
+        }
+
+        @media(max-width:700px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="logo">
+        EduTrust
+    </div>
+
+    <a
+        href="/"
+        class="back"
+    >
+        ← Back
+    </a>
+
+</header>
+
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>
+            Parent Registration
+        </h1>
+
+        <p class="subtitle">
+            Create your parent account and select the
+            school your child attends.
+        </p>
+
+
+        <form id="parentRegisterForm">
+
+            <div class="form-grid">
+
+
+                <div class="field">
+
+                    <label>
+                        First Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="first_name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Last Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="last_name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Other Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="other_name"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Relationship *
+                    </label>
+
+                    <select
+                        id="relationship"
+                        required
+                    >
+
+                        <option value="">
+                            Select relationship
+                        </option>
+
+                        <option value="Father">
+                            Father
+                        </option>
+
+                        <option value="Mother">
+                            Mother
+                        </option>
+
+                        <option value="Guardian">
+                            Guardian
+                        </option>
+
+                        <option value="Grandparent">
+                            Grandparent
+                        </option>
+
+                        <option value="Uncle">
+                            Uncle
+                        </option>
+
+                        <option value="Aunt">
+                            Aunt
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Phone *
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="phone"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Alternate Phone
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="alternate_phone"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Occupation
+                    </label>
+
+                    <input
+                        type="text"
+                        id="occupation"
+                    >
+
+                </div>
+
+
+                <!-- SCHOOL SELECTION -->
+
+                <div class="field full">
+
+                    <label>
+                        Select School *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="schoolSearch"
+                        placeholder="Search school name..."
+                        autocomplete="off"
+                        required
+                    >
+
+                    <div
+                        id="schoolResults"
+                        class="school-results"
+                    ></div>
+
+                    <div
+                        id="selectedSchool"
+                        class="selected-school"
+                    ></div>
+
+                    <input
+                        type="hidden"
+                        id="school_id"
+                    >
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label>
+                        Home Address
+                    </label>
+
+                    <input
+                        type="text"
+                        id="home_address"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                type="submit"
+                id="submitButton"
+            >
+                Register Parent
+            </button>
+
+
+            <div
+                id="message"
+                class="message"
+            ></div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const schoolSearch =
+    document.getElementById(
+        "schoolSearch"
+    );
+
+const schoolResults =
+    document.getElementById(
+        "schoolResults"
+    );
+
+const selectedSchool =
+    document.getElementById(
+        "selectedSchool"
+    );
+
+const schoolId =
+    document.getElementById(
+        "school_id"
+    );
+
+
+let searchTimer;
+
+
+schoolSearch.addEventListener(
+    "input",
+    function () {
+
+        clearTimeout(searchTimer);
+
+        const search =
+            this.value.trim();
+
+        if (search.length < 2) {
+
+            schoolResults.style.display =
+                "none";
+
+            return;
+
+        }
+
+        searchTimer =
+            setTimeout(
+                () => searchSchools(search),
+                300
+            );
+
+    }
+);
+
+
+async function searchSchools(search) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/parent/search-schools?search=${encodeURIComponent(search)}`
+            );
+
+        const data =
+            await response.json();
+
+        schoolResults.innerHTML = "";
+
+        if (
+            !data.success ||
+            !data.schools.length
+        ) {
+
+            schoolResults.innerHTML =
+                `<div class="school-item">
+                    No active schools found.
+                 </div>`;
+
+            schoolResults.style.display =
+                "block";
+
+            return;
+
+        }
+
+
+        data.schools.forEach(
+            school => {
+
+                const item =
+                    document.createElement("div");
+
+                item.className =
+                    "school-item";
+
+                item.innerHTML = `
+                    <strong>
+                        ${escapeHtml(school.name)}
+                    </strong>
+                    <br>
+                    <small>
+                        ${escapeHtml(school.address || "")}
+                    </small>
+                `;
+
+                item.addEventListener(
+                    "click",
+                    function () {
+
+                        schoolSearch.value =
+                            school.name;
+
+                        schoolId.value =
+                            school._id;
+
+                        selectedSchool.textContent =
+                            `Selected school: ${school.name}`;
+
+                        selectedSchool.style.display =
+                            "block";
+
+                        schoolResults.style.display =
+                            "none";
+
+                    }
+                );
+
+                schoolResults.appendChild(item);
+
+            }
+        );
+
+        schoolResults.style.display =
+            "block";
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+document
+    .getElementById("parentRegisterForm")
+    .addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            const message =
+                document.getElementById("message");
+
+            const button =
+                document.getElementById("submitButton");
+
+
+            if (!schoolId.value) {
+
+                showMessage(
+                    "Please select a school.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            button.disabled =
+                true;
+
+            button.textContent =
+                "Registering...";
+
+
+            const body = {
+
+                first_name:
+                    document.getElementById(
+                        "first_name"
+                    ).value.trim(),
+
+                last_name:
+                    document.getElementById(
+                        "last_name"
+                    ).value.trim(),
+
+                other_name:
+                    document.getElementById(
+                        "other_name"
+                    ).value.trim(),
+
+                relationship:
+                    document.getElementById(
+                        "relationship"
+                    ).value,
+
+                phone:
+                    document.getElementById(
+                        "phone"
+                    ).value.trim(),
+
+                alternate_phone:
+                    document.getElementById(
+                        "alternate_phone"
+                    ).value.trim(),
+
+                email:
+                    document.getElementById(
+                        "email"
+                    ).value.trim(),
+
+                occupation:
+                    document.getElementById(
+                        "occupation"
+                    ).value.trim(),
+
+                home_address:
+                    document.getElementById(
+                        "home_address"
+                    ).value.trim(),
+
+                school_id:
+                    schoolId.value
+
+            };
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/parent/register",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(body)
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        "Registration failed."
+                    );
+
+                }
+
+
+                showMessage(
+                    "Parent account created successfully. You can now log in.",
+                    "success"
+                );
+
+
+                this.reset();
+
+                schoolId.value =
+                    "";
+
+                selectedSchool.style.display =
+                    "none";
+
+
+            } catch (error) {
+
+                showMessage(
+                    error.message,
+                    "error"
+                );
+
+            } finally {
+
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    "Register Parent";
+
+            }
+
+        }
+    );
+
+
+function showMessage(
+    text,
+    type
+) {
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+    message.textContent =
+        text;
+
+    message.className =
+        `message ${type}`;
+
+    message.style.display =
+        "block";
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
