@@ -1,28 +1,41 @@
-const express = require("express");
+// routes/parentRoutes.js
 
-const router = express.Router();
+const express =
+    require("express");
+
+const router =
+    express.Router();
 
 const {
+
     registerParent,
+
     loginParent,
-    getParentProfile,
-    getParents,
-    getParentById,
+
     searchSchools,
-    getParentDashboard,
-    getParentChildren,
-    getParentChildById,
-    linkStudentToParent,
-    unlinkStudentFromParent
-} = require("../controllers/parentController");
+
+    getParentProfile,
+
+    getParents,
+
+    getParentById,
+
+    getParentDashboard
+
+} =
+    require(
+        "../controllers/parentController"
+    );
 
 const authMiddleware =
-    require("../middleware/authMiddleware");
+    require(
+        "../middleware/authMiddleware"
+    );
 
 
-// ======================================================
+// ============================================================
 // PUBLIC PARENT REGISTRATION
-// ======================================================
+// ============================================================
 
 router.post(
     "/register",
@@ -30,9 +43,9 @@ router.post(
 );
 
 
-// ======================================================
-// PUBLIC PARENT LOGIN LOOKUP
-// ======================================================
+// ============================================================
+// PUBLIC PARENT LOGIN
+// ============================================================
 
 router.post(
     "/login",
@@ -40,9 +53,9 @@ router.post(
 );
 
 
-// ======================================================
+// ============================================================
 // PUBLIC SCHOOL SEARCH
-// ======================================================
+// ============================================================
 
 router.get(
     "/search-schools",
@@ -50,10 +63,9 @@ router.get(
 );
 
 
-// ======================================================
+// ============================================================
 // PARENT DASHBOARD
-// IMPORTANT: KEEP THIS BEFORE /:id
-// ======================================================
+// ============================================================
 
 router.get(
     "/dashboard",
@@ -62,9 +74,9 @@ router.get(
 );
 
 
-// ======================================================
+// ============================================================
 // PARENT PROFILE
-// ======================================================
+// ============================================================
 
 router.get(
     "/profile",
@@ -73,31 +85,10 @@ router.get(
 );
 
 
-// ======================================================
-// PARENT CHILDREN
-// ======================================================
-
-router.get(
-    "/children",
-    authMiddleware,
-    getParentChildren
-);
-
-
-// ======================================================
-// ONE CHILD
-// ======================================================
-
-router.get(
-    "/children/:studentId",
-    authMiddleware,
-    getParentChildById
-);
-
-
-// ======================================================
-// PRINCIPAL: GET ALL PARENTS
-// ======================================================
+// ============================================================
+// SCHOOL PARENTS
+// PRINCIPAL / STAFF
+// ============================================================
 
 router.get(
     "/",
@@ -106,32 +97,9 @@ router.get(
 );
 
 
-// ======================================================
-// PRINCIPAL: LINK STUDENT TO PARENT
-// ======================================================
-
-router.patch(
-    "/link-student",
-    authMiddleware,
-    linkStudentToParent
-);
-
-
-// ======================================================
-// PRINCIPAL: UNLINK STUDENT FROM PARENT
-// ======================================================
-
-router.patch(
-    "/unlink-student/:studentId",
-    authMiddleware,
-    unlinkStudentFromParent
-);
-
-
-// ======================================================
-// PRINCIPAL: GET ONE PARENT
-// IMPORTANT: KEEP THIS LAST
-// ======================================================
+// ============================================================
+// SINGLE PARENT
+// ============================================================
 
 router.get(
     "/:id",
@@ -140,4 +108,5 @@ router.get(
 );
 
 
-module.exports = router;
+module.exports =
+    router;
