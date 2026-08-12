@@ -1,0 +1,302 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduTrust</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        .topbar {
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1769e0;
+        }
+
+        .portal-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .portal-selector label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .portal-selector select {
+            min-width: 180px;
+            padding: 11px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .hero {
+            max-width: 1100px;
+            margin: 70px auto;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            color: #667085;
+            font-size: 17px;
+        }
+
+        .portal-cards {
+            max-width: 1100px;
+            margin: 0 auto 80px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .portal-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 28px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .portal-card h3 {
+            margin-top: 0;
+        }
+
+        .portal-card p {
+            color: #667085;
+            line-height: 1.6;
+        }
+
+        .portal-card button {
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 8px;
+            background: #1769e0;
+            color: white;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        @media (max-width: 800px) {
+            .portal-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .portal-selector label {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="logo">
+        EduTrust
+    </div>
+
+    <!-- TOP PORTAL SELECTION -->
+    <div class="portal-selector">
+
+        <label for="portalSelect">
+            Enter as:
+        </label>
+
+        <select id="portalSelect">
+
+            <option value="">
+                Select portal
+            </option>
+
+            <option value="/student/register">
+                Student
+            </option>
+
+            <option value="/parent/register">
+                Parent
+            </option>
+
+            <option value="/login">
+                School / Staff
+            </option>
+
+        </select>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <section class="hero">
+
+        <h1>
+            Welcome to EduTrust
+        </h1>
+
+        <p>
+            Select your portal above to continue.
+        </p>
+
+    </section>
+
+
+    <section class="portal-cards">
+
+        <!-- STUDENT -->
+
+        <div
+            class="portal-card"
+            onclick="goToPortal('/student/register')"
+        >
+
+            <h3>
+                Student Portal
+            </h3>
+
+            <p>
+                Register as a student or access your
+                student dashboard.
+            </p>
+
+            <button>
+                Enter Student Portal
+            </button>
+
+        </div>
+
+
+        <!-- PARENT -->
+
+        <div
+            class="portal-card"
+            onclick="goToPortal('/parent/register')"
+        >
+
+            <h3>
+                Parent Portal
+            </h3>
+
+            <p>
+                Register as a parent, select your school,
+                link your children and access the parent
+                dashboard.
+            </p>
+
+            <button>
+                Enter Parent Portal
+            </button>
+
+        </div>
+
+
+        <!-- SCHOOL -->
+
+        <div
+            class="portal-card"
+            onclick="goToPortal('/login')"
+        >
+
+            <h3>
+                School Portal
+            </h3>
+
+            <p>
+                Principals, teachers and school staff
+                can access the school management system.
+            </p>
+
+            <button>
+                Enter School Portal
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    const portalSelect =
+        document.getElementById("portalSelect");
+
+    portalSelect.addEventListener(
+        "change",
+        function () {
+
+            const destination =
+                this.value;
+
+            if (!destination) {
+                return;
+            }
+
+            window.location.href =
+                destination;
+
+        }
+    );
+
+
+    function goToPortal(destination) {
+
+        window.location.href =
+            destination;
+
+    }
+
+</script>
+
+</body>
+</html>
