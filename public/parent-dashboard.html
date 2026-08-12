@@ -320,7 +320,7 @@
 
 <header class="topbar">
 
-    <a href="/index.html" class="logo">
+    <a href="/" class="logo">
         Edu<span>Trust</span>
     </a>
 
@@ -525,11 +525,11 @@
 
             ? "http://localhost:5000/api"
 
-            : "/api";
+            : "https://edutrust-15ii.onrender.com/api";
 
 
     // Your parent route:
-    // GET /api/parents/dashboard
+    // GET https://edutrust-15ii.onrender.com/api/parents/dashboard
 
     const DASHBOARD_URL =
         `${API_BASE}/parents/dashboard`;
@@ -574,17 +574,19 @@
 
 
     // =========================================================
-    // TOKEN
+    // TOKEN (Checks all expected token keys saved across auth forms)
     // =========================================================
 
     const token =
-        localStorage.getItem("edutrust_token");
+        localStorage.getItem("parent_token") ||
+        localStorage.getItem("edutrust_token") ||
+        localStorage.getItem("token");
 
 
     if (!token) {
 
         window.location.href =
-            "/login.html";
+            "parent-login.html";
 
         return;
 
@@ -600,6 +602,10 @@
         function () {
 
             localStorage.removeItem(
+                "parent_token"
+            );
+
+            localStorage.removeItem(
                 "edutrust_token"
             );
 
@@ -608,7 +614,7 @@
             );
 
             window.location.href =
-                "/index.html";
+                "parent-login.html";
 
         }
     );
@@ -1164,6 +1170,10 @@
             ) {
 
                 localStorage.removeItem(
+                    "parent_token"
+                );
+
+                localStorage.removeItem(
                     "edutrust_token"
                 );
 
@@ -1172,7 +1182,7 @@
                 );
 
                 window.location.href =
-                    "/login.html";
+                    "parent-login.html";
 
                 return;
 
