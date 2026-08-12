@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>EduTrust - Student Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        /* =======================================
+           HEADER
+        ======================================= */
+
+        .topbar {
+            width: 100%;
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 25px;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .student-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .student-header-name {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .header-avatar {
+            width: 42px;
+            height: 42px;
+
+            border-radius: 50%;
+
+            background: #2563eb;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: 700;
+
+            overflow: hidden;
+        }
+
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* =======================================
+           PAGE
+        ======================================= */
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h1 {
+            font-size: 28px;
+            margin-bottom: 7px;
+        }
+
+        .welcome p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        /* =======================================
+           STATUS
+        ======================================= */
+
+        .status-message {
+            display: none;
+
+            padding: 14px 18px;
+            border-radius: 10px;
+
+            margin-bottom: 20px;
+
+            font-size: 14px;
+        }
+
+        .status-message.error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-message.success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .loading {
+            display: none;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        /* =======================================
+           SUMMARY CARDS
+        ======================================= */
+
+        .summary-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 18px;
+
+            margin-bottom: 28px;
+        }
+
+        .summary-card {
+            background: #ffffff;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            border: 1px solid #e5e7eb;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .summary-label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+
+            word-break: break-word;
+        }
+
+        /* =======================================
+           MAIN GRID
+        ======================================= */
+
+        .main-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.5fr)
+                minmax(300px, 1fr);
+
+            gap: 22px;
+        }
+
+        .card {
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 14px;
+
+            padding: 24px;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-title {
+            font-size: 19px;
+            font-weight: 700;
+
+            margin-bottom: 20px;
+
+            color: #111827;
+        }
+
+        /* =======================================
+           PROFILE
+        ======================================= */
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+
+            gap: 18px;
+
+            padding-bottom: 22px;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            margin-bottom: 20px;
+        }
+
+        .passport-container {
+            width: 90px;
+            height: 90px;
+
+            border-radius: 12px;
+
+            background: #eff6ff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+
+            flex-shrink: 0;
+        }
+
+        .passport-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .passport-placeholder {
+            font-size: 30px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .profile-name {
+            font-size: 22px;
+            font-weight: 700;
+
+            margin-bottom: 6px;
+        }
+
+        .profile-admission {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* =======================================
+           INFORMATION ROWS
+        ======================================= */
+
+        .info-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 18px;
+        }
+
+        .info-item {
+            background: #f9fafb;
+
+            border-radius: 10px;
+
+            padding: 14px;
+        }
+
+        .info-label {
+            display: block;
+
+            font-size: 12px;
+
+            color: #6b7280;
+
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            display: block;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            color: #111827;
+
+            word-break: break-word;
+        }
+
+        /* =======================================
+           STATUS BADGE
+        ======================================= */
+
+        .status-badge {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 6px 12px;
+
+            border-radius: 999px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-suspended {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-graduated {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-archived {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        /* =======================================
+           QUICK ACTIONS
+        ======================================= */
+
+        .actions {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 12px;
+        }
+
+        .action-button {
+            border: none;
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+
+            padding: 14px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            text-align: left;
+
+            transition: 0.2s;
+        }
+
+        .action-button:hover {
+            background: #dbeafe;
+        }
+
+        /* =======================================
+           SCHOOL ID
+        ======================================= */
+
+        .school-id-box {
+            background: #f9fafb;
+
+            border-radius: 10px;
+
+            padding: 16px;
+
+            margin-top: 20px;
+        }
+
+        .school-id-label {
+            color: #6b7280;
+
+            font-size: 12px;
+
+            margin-bottom: 6px;
+        }
+
+        .school-id {
+            font-family: monospace;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            word-break: break-all;
+        }
+
+        /* =======================================
+           LOGOUT
+        ======================================= */
+
+        .logout-button {
+            margin-top: 22px;
+
+            width: 100%;
+
+            border: 1px solid #fecaca;
+
+            background: #fff;
+
+            color: #dc2626;
+
+            padding: 13px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+        }
+
+        .logout-button:hover {
+            background: #fef2f2;
+        }
+
+        /* =======================================
+           RESPONSIVE
+        ======================================= */
+
+        @media (max-width: 950px) {
+
+            .summary-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .student-header-name {
+                display: none;
+            }
+
+            .page {
+                padding: 22px 15px 40px;
+            }
+
+            .welcome h1 {
+                font-size: 23px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-top {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =======================================
+         HEADER
+    ======================================= -->
+
+    <header class="topbar">
+
+        <div class="brand">
+            EduTrust
+        </div>
+
+        <div class="student-header">
+
+            <span
+                id="headerStudentName"
+                class="student-header-name"
+            >
+                Student
+            </span>
+
+            <div
+                id="headerAvatar"
+                class="header-avatar"
+            >
+                S
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =======================================
+         PAGE
+    ======================================= -->
+
+    <main class="page">
+
+        <!-- WELCOME -->
+
+        <section class="welcome">
+
+            <h1 id="welcomeName">
+                Welcome, Student
+            </h1>
+
+            <p>
+                Here is an overview of your EduTrust student account.
+            </p>
+
+        </section>
+
+
+        <!-- STATUS MESSAGE -->
+
+        <div
+            id="statusMessage"
+            class="status-message"
+        ></div>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="loadingMessage"
+            class="loading"
+        >
+            Loading your student dashboard...
+        </div>
+
+
+        <!-- =======================================
+             SUMMARY
+        ======================================= -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Admission Number
+                </div>
+
+                <div
+                    id="summaryAdmissionNumber"
+                    class="summary-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Class
+                </div>
+
+                <div
+                    id="summaryClass"
+                    class="summary-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Arm
+                </div>
+
+                <div
+                    id="summaryArm"
+                    class="summary-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Status
+                </div>
+
+                <div id="summaryStatus">
+                    —
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =======================================
+             MAIN CONTENT
+        ======================================= -->
+
+        <section class="main-grid">
+
+
+            <!-- ===================================
+                 STUDENT PROFILE
+            ==================================== -->
+
+            <div class="card">
+
+                <h2 class="card-title">
+                    My Profile
+                </h2>
+
+
+                <div class="profile-top">
+
+                    <div
+                        id="passportContainer"
+                        class="passport-container"
+                    >
+
+                        <div
+                            id="passportPlaceholder"
+                            class="passport-placeholder"
+                        >
+                            S
+                        </div>
+
+                        <img
+                            id="passportImage"
+                            src=""
+                            alt="Student passport"
+                            style="display: none;"
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <div
+                            id="profileFullName"
+                            class="profile-name"
+                        >
+                            Student
+                        </div>
+
+                        <div
+                            id="profileAdmission"
+                            class="profile-admission"
+                        >
+                            Admission Number: —
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INFORMATION -->
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            First Name
+                        </span>
+
+                        <span
+                            id="firstName"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Last Name
+                        </span>
+
+                        <span
+                            id="lastName"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Other Name
+                        </span>
+
+                        <span
+                            id="otherName"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Gender
+                        </span>
+
+                        <span
+                            id="gender"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Date of Birth
+                        </span>
+
+                        <span
+                            id="dateOfBirth"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Class
+                        </span>
+
+                        <span
+                            id="className"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Arm
+                        </span>
+
+                        <span
+                            id="arm"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Admission Date
+                        </span>
+
+                        <span
+                            id="admissionDate"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Status
+                        </span>
+
+                        <span
+                            id="profileStatus"
+                            class="info-value"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ===================================
+                 QUICK ACTIONS
+            ==================================== -->
+
+            <div class="card">
+
+                <h2 class="card-title">
+                    Student Dashboard
+                </h2>
+
+
+                <div class="actions">
+
+                    <button
+                        class="action-button"
+                        type="button"
+                        onclick="openSection('results')"
+                    >
+                        📊 Results
+                    </button>
+
+
+                    <button
+                        class="action-button"
+                        type="button"
+                        onclick="openSection('attendance')"
+                    >
+                        📅 Attendance
+                    </button>
+
+
+                    <button
+                        class="action-button"
+                        type="button"
+                        onclick="openSection('assignments')"
+                    >
+                        📝 Assignments
+                    </button>
+
+
+                    <button
+                        class="action-button"
+                        type="button"
+                        onclick="openSection('timetable')"
+                    >
+                        🕐 Timetable
+                    </button>
+
+
+                    <button
+                        class="action-button"
+                        type="button"
+                        onclick="openSection('fees')"
+                    >
+                        💳 School Fees
+                    </button>
+
+
+                    <button
+                        class="action-button"
+                        type="button"
+                        onclick="openSection('announcements')"
+                    >
+                        📢 Announcements
+                    </button>
+
+                </div>
+
+
+                <!-- SCHOOL -->
+
+                <div class="school-id-box">
+
+                    <div class="school-id-label">
+                        School ID
+                    </div>
+
+                    <div
+                        id="schoolId"
+                        class="school-id"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <!-- LOGOUT -->
+
+                <button
+                    id="logoutButton"
+                    class="logout-button"
+                    type="button"
+                >
+                    Logout
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =======================================
+         JAVASCRIPT
+    ======================================= -->
+
+    <script>
+
+        // =======================================
+        // API BASE URL
+        // =======================================
+
+        const API_BASE_URL = "https://edutrust-15ii.onrender.com";
+
+
+        // =======================================
+        // GET TOKEN
+        // =======================================
+
+        function getToken() {
+
+            return (
+                localStorage.getItem("token") ||
+                localStorage.getItem("authToken") ||
+                sessionStorage.getItem("token") ||
+                sessionStorage.getItem("authToken")
+            );
+        }
+
+
+        // =======================================
+        // STATUS MESSAGE
+        // =======================================
+
+        function showMessage(message, type = "error") {
+
+            const element =
+                document.getElementById("statusMessage");
+
+            element.textContent = message;
+
+            element.className =
+                "status-message " + type;
+        }
+
+
+        // =======================================
+        // HIDE MESSAGE
+        // =======================================
+
+        function hideMessage() {
+
+            const element =
+                document.getElementById("statusMessage");
+
+            element.className =
+                "status-message";
+        }
+
+
+        // =======================================
+        // LOADING
+        // =======================================
+
+        function setLoading(show) {
+
+            document.getElementById(
+                "loadingMessage"
+            ).style.display =
+                show ? "block" : "none";
+        }
+
+
+        // =======================================
+        // FORMAT DATE
+        // =======================================
+
+        function formatDate(dateValue) {
+
+            if (!dateValue) {
+                return "—";
+            }
+
+            const date =
+                new Date(dateValue);
+
+            if (isNaN(date.getTime())) {
+                return "—";
+            }
+
+            return date.toLocaleDateString(
+                "en-NG",
+                {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
+        }
+
+
+        // =======================================
+        // STATUS BADGE
+        // =======================================
+
+        function createStatusBadge(status) {
+
+            const span =
+                document.createElement("span");
+
+            const normalized =
+                String(status || "")
+                    .toLowerCase();
+
+            span.className =
+                "status-badge";
+
+            if (normalized === "active") {
+
+                span.classList.add(
+                    "status-active"
+                );
+
+            } else if (
+                normalized === "pending"
+            ) {
+
+                span.classList.add(
+                    "status-pending"
+                );
+
+            } else if (
+                normalized === "suspended"
+            ) {
+
+                span.classList.add(
+                    "status-suspended"
+                );
+
+            } else if (
+                normalized === "graduated"
+            ) {
+
+                span.classList.add(
+                    "status-graduated"
+                );
+
+            } else if (
+                normalized === "archived"
+            ) {
+
+                span.classList.add(
+                    "status-archived"
+                );
+            }
+
+            span.textContent =
+                status || "Unknown";
+
+            return span;
+        }
+
+
+        // =======================================
+        // DISPLAY STUDENT
+        // =======================================
+
+        function displayStudent(student) {
+
+            if (!student) {
+                return;
+            }
+
+
+            const fullName = [
+
+                student.first_name,
+
+                student.other_name,
+
+                student.last_name
+
+            ]
+                .filter(Boolean)
+                .join(" ");
+
+
+            // HEADER
+
+            document.getElementById(
+                "headerStudentName"
+            ).textContent =
+                fullName || "Student";
+
+
+            document.getElementById(
+                "welcomeName"
+            ).textContent =
+                `Welcome, ${fullName || "Student"}`;
+
+
+            document.getElementById(
+                "profileFullName"
+            ).textContent =
+                fullName || "Student";
+
+
+            document.getElementById(
+                "profileAdmission"
+            ).textContent =
+                `Admission Number: ${
+                    student.admission_number || "—"
+                }`;
+
+
+            // SUMMARY
+
+            document.getElementById(
+                "summaryAdmissionNumber"
+            ).textContent =
+                student.admission_number || "—";
+
+
+            document.getElementById(
+                "summaryClass"
+            ).textContent =
+                student.class_name || "—";
+
+
+            document.getElementById(
+                "summaryArm"
+            ).textContent =
+                student.arm || "—";
+
+
+            // PROFILE
+
+            document.getElementById(
+                "firstName"
+            ).textContent =
+                student.first_name || "—";
+
+
+            document.getElementById(
+                "lastName"
+            ).textContent =
+                student.last_name || "—";
+
+
+            document.getElementById(
+                "otherName"
+            ).textContent =
+                student.other_name || "—";
+
+
+            document.getElementById(
+                "gender"
+            ).textContent =
+                student.gender || "—";
+
+
+            document.getElementById(
+                "dateOfBirth"
+            ).textContent =
+                formatDate(
+                    student.date_of_birth
+                );
+
+
+            document.getElementById(
+                "className"
+            ).textContent =
+                student.class_name || "—";
+
+
+            document.getElementById(
+                "arm"
+            ).textContent =
+                student.arm || "—";
+
+
+            document.getElementById(
+                "admissionDate"
+            ).textContent =
+                formatDate(
+                    student.admission_date
+                );
+
+
+            // STATUS
+
+            const summaryStatus =
+                document.getElementById(
+                    "summaryStatus"
+                );
+
+            summaryStatus.innerHTML = "";
+
+            summaryStatus.appendChild(
+                createStatusBadge(
+                    student.status
+                )
+            );
+
+
+            const profileStatus =
+                document.getElementById(
+                    "profileStatus"
+                );
+
+            profileStatus.innerHTML = "";
+
+            profileStatus.appendChild(
+                createStatusBadge(
+                    student.status
+                )
+            );
+
+
+            // SCHOOL ID
+
+            document.getElementById(
+                "schoolId"
+            ).textContent =
+                student.school_id || "—";
+
+
+            // PASSPORT
+
+            const passportImage =
+                document.getElementById(
+                    "passportImage"
+                );
+
+            const passportPlaceholder =
+                document.getElementById(
+                    "passportPlaceholder"
+                );
+
+            if (student.passport) {
+
+                passportImage.src =
+                    student.passport;
+
+                passportImage.style.display =
+                    "block";
+
+                passportPlaceholder.style.display =
+                    "none";
+
+                passportImage.onerror =
+                    function () {
+
+                        passportImage.style.display =
+                            "none";
+
+                        passportPlaceholder.style.display =
+                            "flex";
+                    };
+
+            } else {
+
+                passportImage.style.display =
+                    "none";
+
+                passportPlaceholder.style.display =
+                    "flex";
+
+                passportPlaceholder.textContent =
+                    (
+                        fullName.charAt(0) ||
+                        "S"
+                    ).toUpperCase();
+            }
+
+
+            // HEADER AVATAR
+
+            const headerAvatar =
+                document.getElementById(
+                    "headerAvatar"
+                );
+
+            if (student.passport) {
+
+                headerAvatar.innerHTML =
+                    `<img
+                        src="${student.passport}"
+                        alt="Student"
+                    >`;
+
+            } else {
+
+                headerAvatar.textContent =
+                    (
+                        fullName.charAt(0) ||
+                        "S"
+                    ).toUpperCase();
+            }
+        }
+
+
+        // =======================================
+        // LOAD STUDENT DASHBOARD
+        // =======================================
+
+        async function loadStudentDashboard() {
+
+            const token = getToken();
+
+            if (!token) {
+
+                showMessage(
+                    "You are not logged in. Please log in again.",
+                    "error"
+                );
+
+                setTimeout(() => {
+
+                    window.location.href =
+                        "/login.html";
+
+                }, 1500);
+
+                return;
+            }
+
+
+            setLoading(true);
+
+            hideMessage();
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/api/students/me/dashboard`,
+                        {
+                            method: "GET",
+
+                            headers: {
+                                "Authorization":
+                                    `Bearer ${token}`,
+
+                                "Content-Type":
+                                    "application/json"
+                            }
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        "Unable to load student dashboard."
+                    );
+                }
+
+
+                if (
+                    !data.success ||
+                    !data.dashboard
+                ) {
+
+                    throw new Error(
+                        "Student dashboard data was not returned."
+                    );
+                }
+
+
+                const studentInfo =
+                    data.dashboard.studentInfo;
+
+
+                /*
+                 * The dashboard endpoint returns
+                 * studentInfo. We use it to populate
+                 * the visible dashboard.
+                 */
+
+                displayStudent({
+
+                    first_name:
+                        studentInfo.fullName
+                            ? studentInfo.fullName
+                                .split(" ")[0]
+                            : "",
+
+                    last_name:
+                        studentInfo.fullName
+                            ? studentInfo.fullName
+                                .split(" ")
+                                .slice(1)
+                                .join(" ")
+                            : "",
+
+                    other_name: "",
+
+                    admission_number:
+                        studentInfo.admissionNumber,
+
+                    class_name:
+                        studentInfo.className,
+
+                    arm:
+                        studentInfo.arm,
+
+                    gender:
+                        studentInfo.gender,
+
+                    date_of_birth:
+                        studentInfo.dateOfBirth,
+
+                    admission_date:
+                        studentInfo.admissionDate,
+
+                    status:
+                        studentInfo.status,
+
+                    passport:
+                        studentInfo.passport,
+
+                    school_id:
+                        studentInfo.school_id
+                });
+
+
+                /*
+                 * Get the complete profile as well.
+                 * This gives us the original first name,
+                 * last name and other profile fields.
+                 */
+
+                const profileResponse =
+                    await fetch(
+                        `${API_BASE_URL}/api/students/me/profile`,
+                        {
+                            method: "GET",
+
+                            headers: {
+                                "Authorization":
+                                    `Bearer ${token}`,
+
+                                "Content-Type":
+                                    "application/json"
+                            }
+                        }
+                    );
+
+
+                if (profileResponse.ok) {
+
+                    const profileData =
+                        await profileResponse.json();
+
+
+                    if (
+                        profileData.success &&
+                        profileData.student
+                    ) {
+
+                        displayStudent(
+                            profileData.student
+                        );
+                    }
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "STUDENT DASHBOARD ERROR:",
+                    error
+                );
+
+                showMessage(
+                    error.message ||
+                    "Failed to load student dashboard.",
+                    "error"
+                );
+
+            } finally {
+
+                setLoading(false);
+            }
+        }
+
+
+        // =======================================
+        // QUICK ACTION
+        // =======================================
+
+        function openSection(section) {
+
+            /*
+             * These sections will be connected to
+             * their real backend endpoints as we build
+             * Results, Attendance, Assignments,
+             * Timetable, Fees and Announcements.
+             */
+
+            showMessage(
+                `${section.charAt(0).toUpperCase() +
+                section.slice(1)}
+                section is coming next.`,
+                "success"
+            );
+        }
+
+
+        // =======================================
+        // LOGOUT
+        // =======================================
+
+        document.getElementById(
+            "logoutButton"
+        ).addEventListener(
+            "click",
+            function () {
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "authToken"
+                );
+
+                sessionStorage.removeItem(
+                    "token"
+                );
+
+                sessionStorage.removeItem(
+                    "authToken"
+                );
+
+                window.location.href =
+                    "/login.html";
+            }
+        );
+
+
+        // =======================================
+        // START
+        // =======================================
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                loadStudentDashboard();
+
+            }
+        );
+
+    </script>
+
+</body>
+  </html>
