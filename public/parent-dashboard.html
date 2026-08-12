@@ -1,45 +1,49 @@
-<!-- public/parent-dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-<link rel="icon" type="image/png" href="/logo-icon.png">
-    <title>Parent Dashboard - EduTrust</title>
+    <title>Parent Dashboard | EduTrust</title>
+
+    <link rel="icon" type="image/png" href="/logo-icon.png">
 
     <style>
-
         * {
             box-sizing: border-box;
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background: #f4f7fb;
             color: #172033;
         }
 
+        button {
+            font-family: inherit;
+        }
+
         .topbar {
-            height: 70px;
-            background: white;
+            min-height: 70px;
+            background: #ffffff;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 30px;
+            gap: 20px;
         }
 
         .logo {
             color: #1769e0;
             font-size: 23px;
             font-weight: 800;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #172033;
         }
 
         .top-right {
@@ -56,15 +60,20 @@
             border: 0;
             background: #ef4444;
             color: white;
-            padding: 9px 15px;
+            padding: 10px 16px;
             border-radius: 7px;
             cursor: pointer;
+            font-weight: 700;
+        }
+
+        .logout:hover {
+            background: #dc2626;
         }
 
         .container {
-            max-width: 1150px;
-            margin: 35px auto;
-            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 35px 20px 60px;
         }
 
         .welcome {
@@ -72,24 +81,40 @@
         }
 
         .welcome h1 {
-            margin-bottom: 5px;
+            margin: 0 0 7px;
+            font-size: 30px;
         }
 
         .welcome p {
+            margin: 0;
+            color: #667085;
+        }
+
+        .error {
+            background: #fff0f0;
+            border: 1px solid #f5b5b5;
+            color: #b42318;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
             color: #667085;
         }
 
         .stats {
             display: grid;
-            grid-template-columns:
-                repeat(4, 1fr);
-
+            grid-template-columns: repeat(4, 1fr);
             gap: 18px;
             margin-bottom: 25px;
         }
 
         .stat-card {
-            background: white;
+            background: #ffffff;
             border-radius: 12px;
             padding: 22px;
             border: 1px solid #e5e7eb;
@@ -98,31 +123,38 @@
         .stat-title {
             color: #667085;
             font-size: 13px;
+            margin-bottom: 8px;
         }
 
         .stat-value {
-            margin-top: 8px;
             font-size: 28px;
             font-weight: 800;
         }
 
         .section {
-            background: white;
+            background: #ffffff;
             border-radius: 12px;
             border: 1px solid #e5e7eb;
             padding: 25px;
             margin-bottom: 25px;
         }
 
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
         .section h2 {
-            margin-top: 0;
+            margin: 0;
+            font-size: 21px;
         }
 
         .children {
             display: grid;
-            grid-template-columns:
-                repeat(3, 1fr);
-
+            grid-template-columns: repeat(3, 1fr);
             gap: 18px;
         }
 
@@ -130,17 +162,52 @@
             border: 1px solid #e5e7eb;
             border-radius: 10px;
             padding: 20px;
+            background: #ffffff;
         }
 
         .child-card h3 {
-            margin-top: 0;
+            margin: 0 0 18px;
+            font-size: 18px;
+        }
+
+        .child-passport {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }
+
+        .child-placeholder {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #eef4ff;
+            color: #1769e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: 800;
+            margin-bottom: 12px;
         }
 
         .child-row {
             display: flex;
             justify-content: space-between;
-            margin: 9px 0;
+            align-items: flex-start;
+            gap: 15px;
+            margin: 10px 0;
             font-size: 14px;
+        }
+
+        .child-row span:first-child {
+            color: #667085;
+        }
+
+        .child-row strong {
+            text-align: right;
         }
 
         .status {
@@ -153,40 +220,73 @@
             font-weight: 700;
         }
 
+        .status.pending {
+            background: #fff7e6;
+            color: #b54708;
+        }
+
+        .status.suspended {
+            background: #fff0f0;
+            color: #b42318;
+        }
+
+        .status.graduated {
+            background: #eef4ff;
+            color: #1769e0;
+        }
+
+        .status.archived {
+            background: #f2f4f7;
+            color: #667085;
+        }
+
         .empty {
             color: #667085;
             padding: 20px 0;
+            text-align: center;
         }
 
-        .error {
-            background: #fff0f0;
-            color: #b42318;
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .profile-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
             padding: 15px;
-            border-radius: 8px;
-            display: none;
         }
 
-        @media(max-width:900px) {
+        .profile-label {
+            display: block;
+            color: #667085;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
 
+        .profile-value {
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .school-info {
+            color: #667085;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 900px) {
             .stats {
-                grid-template-columns:
-                    repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .children {
-                grid-template-columns:
-                    1fr 1fr;
+                grid-template-columns: 1fr 1fr;
             }
-
         }
 
-        @media(max-width:600px) {
-
-            .stats,
-            .children {
-                grid-template-columns: 1fr;
-            }
-
+        @media (max-width: 600px) {
             .topbar {
                 padding: 0 15px;
             }
@@ -195,20 +295,34 @@
                 display: none;
             }
 
+            .container {
+                padding: 25px 15px 50px;
+            }
+
+            .stats,
+            .children,
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+
+            .section {
+                padding: 18px;
+            }
         }
-
     </style>
-
 </head>
-
 
 <body>
 
 <header class="topbar">
 
-    <div class="logo">
-        EduTrust
-    </div>
+    <a href="/index.html" class="logo">
+        Edu<span>Trust</span>
+    </a>
 
     <div class="top-right">
 
@@ -221,7 +335,8 @@
 
         <button
             class="logout"
-            onclick="logout()"
+            id="logoutButton"
+            type="button"
         >
             Logout
         </button>
@@ -235,7 +350,7 @@
 
     <section class="welcome">
 
-        <h1>
+        <h1 id="welcomeTitle">
             Parent Dashboard
         </h1>
 
@@ -323,16 +438,21 @@
 
     <section class="section">
 
-        <h2>
-            My Children
-        </h2>
+        <div class="section-header">
+
+            <h2>
+                My Children
+            </h2>
+
+        </div>
+
 
         <div
             id="children"
             class="children"
         >
 
-            <div class="empty">
+            <div class="loading">
                 Loading children...
             </div>
 
@@ -343,14 +463,44 @@
 
     <section class="section">
 
-        <h2>
-            Parent Information
-        </h2>
+        <div class="section-header">
 
-        <div id="profile">
+            <h2>
+                Parent Information
+            </h2>
 
-            Loading profile...
+        </div>
 
+
+        <div
+            id="profile"
+            class="profile-grid"
+        >
+
+            <div class="loading">
+                Loading profile...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <h2>
+                School
+            </h2>
+
+        </div>
+
+        <div
+            id="schoolInfo"
+            class="school-info"
+        >
+            Loading school information...
         </div>
 
     </section>
@@ -360,292 +510,835 @@
 
 <script>
 
-const token =
-    localStorage.getItem(
-        "edutrust_token"
-    );
+(function () {
+
+    "use strict";
 
 
-if (!token) {
+    // =========================================================
+    // CONFIGURATION
+    // =========================================================
 
-    window.location.href =
-        "/parent/login";
+    const API_BASE =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
 
-}
+            ? "http://localhost:5000/api"
 
-
-async function loadDashboard() {
-
-    try {
-
-        const response =
-            await fetch(
-                "/parent/dashboard",
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            );
+            : "/api";
 
 
-        const data =
-            await response.json();
+    // Your parent route:
+    // GET /api/parents/dashboard
+
+    const DASHBOARD_URL =
+        `${API_BASE}/parents/dashboard`;
 
 
-        if (!response.ok) {
+    // =========================================================
+    // ELEMENTS
+    // =========================================================
 
-            throw new Error(
-                data.message ||
-                "Unable to load parent dashboard."
-            );
+    const parentName =
+        document.getElementById("parentName");
 
-        }
+    const welcomeTitle =
+        document.getElementById("welcomeTitle");
 
+    const childrenCount =
+        document.getElementById("childrenCount");
 
-        const dashboard =
-            data.dashboard;
+    const activeCount =
+        document.getElementById("activeCount");
 
+    const pendingCount =
+        document.getElementById("pendingCount");
 
-        document.getElementById(
-            "parentName"
-        ).textContent =
-            dashboard.parent.fullName;
+    const suspendedCount =
+        document.getElementById("suspendedCount");
 
+    const childrenContainer =
+        document.getElementById("children");
 
-        document.getElementById(
-            "childrenCount"
-        ).textContent =
-            dashboard.statistics.totalChildren;
+    const profileContainer =
+        document.getElementById("profile");
 
+    const schoolInfo =
+        document.getElementById("schoolInfo");
 
-        document.getElementById(
-            "activeCount"
-        ).textContent =
-            dashboard.statistics.activeChildren;
+    const errorContainer =
+        document.getElementById("error");
 
-
-        document.getElementById(
-            "pendingCount"
-        ).textContent =
-            dashboard.statistics.pendingChildren;
-
-
-        document.getElementById(
-            "suspendedCount"
-        ).textContent =
-            dashboard.statistics.suspendedChildren;
+    const logoutButton =
+        document.getElementById("logoutButton");
 
 
-        renderChildren(
-            dashboard.children
-        );
+    // =========================================================
+    // TOKEN
+    // =========================================================
+
+    const token =
+        localStorage.getItem("edutrust_token");
 
 
-        renderProfile(
-            dashboard.parent
-        );
+    if (!token) {
 
-
-    } catch (error) {
-
-        showError(
-            error.message
-        );
-
-    }
-
-}
-
-
-function renderChildren(children) {
-
-    const container =
-        document.getElementById(
-            "children"
-        );
-
-
-    if (!children ||
-        children.length === 0) {
-
-        container.innerHTML =
-            `<div class="empty">
-                No children are currently linked
-                to this parent account.
-             </div>`;
+        window.location.href =
+            "/login.html";
 
         return;
 
     }
 
 
-    container.innerHTML =
-        children.map(
-            child => `
+    // =========================================================
+    // LOGOUT
+    // =========================================================
 
-                <div class="child-card">
+    logoutButton.addEventListener(
+        "click",
+        function () {
 
-                    <h3>
+            localStorage.removeItem(
+                "edutrust_token"
+            );
+
+            localStorage.removeItem(
+                "token"
+            );
+
+            window.location.href =
+                "/index.html";
+
+        }
+    );
+
+
+    // =========================================================
+    // SHOW ERROR
+    // =========================================================
+
+    function showError(message) {
+
+        errorContainer.textContent =
+            message ||
+            "Something went wrong.";
+
+        errorContainer.style.display =
+            "block";
+
+    }
+
+
+    // =========================================================
+    // ESCAPE HTML
+    // =========================================================
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    // =========================================================
+    // FORMAT DATE
+    // =========================================================
+
+    function formatDate(value) {
+
+        if (!value) {
+            return "-";
+        }
+
+        const date =
+            new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "-";
+        }
+
+        return date.toLocaleDateString(
+            "en-NG",
+            {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+            }
+        );
+
+    }
+
+
+    // =========================================================
+    // GET STATUS CLASS
+    // =========================================================
+
+    function getStatusClass(status) {
+
+        switch (status) {
+
+            case "Pending":
+                return "pending";
+
+            case "Suspended":
+                return "suspended";
+
+            case "Graduated":
+                return "graduated";
+
+            case "Archived":
+                return "archived";
+
+            default:
+                return "";
+
+        }
+
+    }
+
+
+    // =========================================================
+    // GET INITIALS
+    // =========================================================
+
+    function getInitials(name) {
+
+        const parts =
+            String(name || "")
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+
+        if (!parts.length) {
+            return "?";
+        }
+
+        if (parts.length === 1) {
+            return parts[0]
+                .substring(0, 2)
+                .toUpperCase();
+        }
+
+        return (
+            parts[0][0] +
+            parts[parts.length - 1][0]
+        ).toUpperCase();
+
+    }
+
+
+    // =========================================================
+    // RENDER CHILDREN
+    // =========================================================
+
+    function renderChildren(children) {
+
+        if (
+            !Array.isArray(children) ||
+            children.length === 0
+        ) {
+
+            childrenContainer.innerHTML = `
+                <div class="empty">
+                    No children are currently linked
+                    to this parent account.
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        childrenContainer.innerHTML =
+            children
+                .map(function (child) {
+
+                    const name =
+                        child.fullName ||
+                        [
+                            child.first_name,
+                            child.other_name,
+                            child.last_name
+                        ]
+                            .filter(Boolean)
+                            .join(" ") ||
+                        "Unnamed Student";
+
+
+                    const status =
+                        child.status ||
+                        "Pending";
+
+
+                    const statusClass =
+                        getStatusClass(status);
+
+
+                    const passport =
+                        child.passport;
+
+
+                    const avatar =
+                        passport
+
+                            ? `
+                                <img
+                                    class="child-passport"
+                                    src="${escapeHtml(passport)}"
+                                    alt="${escapeHtml(name)}"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                >
+
+                                <div
+                                    class="child-placeholder"
+                                    style="display:none;"
+                                >
+                                    ${escapeHtml(
+                                        getInitials(name)
+                                    )}
+                                </div>
+                            `
+
+                            : `
+                                <div
+                                    class="child-placeholder"
+                                >
+                                    ${escapeHtml(
+                                        getInitials(name)
+                                    )}
+                                </div>
+                            `;
+
+
+                    return `
+
+                        <article class="child-card">
+
+                            ${avatar}
+
+                            <h3>
+                                ${escapeHtml(name)}
+                            </h3>
+
+
+                            <div class="child-row">
+
+                                <span>
+                                    Admission No.
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        child.admissionNumber ||
+                                        "-"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="child-row">
+
+                                <span>
+                                    Class
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        child.className ||
+                                        "-"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="child-row">
+
+                                <span>
+                                    Arm
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        child.arm ||
+                                        "-"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="child-row">
+
+                                <span>
+                                    Gender
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        child.gender ||
+                                        "-"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="child-row">
+
+                                <span>
+                                    Date of Birth
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        formatDate(
+                                            child.dateOfBirth
+                                        )
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="child-row">
+
+                                <span>
+                                    Admission Date
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        formatDate(
+                                            child.admissionDate
+                                        )
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="child-row">
+
+                                <span>
+                                    Status
+                                </span>
+
+                                <span
+                                    class="status ${statusClass}"
+                                >
+                                    ${escapeHtml(status)}
+                                </span>
+
+                            </div>
+
+                        </article>
+
+                    `;
+
+                })
+                .join("");
+
+    }
+
+
+    // =========================================================
+    // RENDER PROFILE
+    // =========================================================
+
+    function renderProfile(parent) {
+
+        profileContainer.innerHTML = `
+
+            <div class="profile-item">
+
+                <span class="profile-label">
+                    Full Name
+                </span>
+
+                <div class="profile-value">
+                    ${escapeHtml(
+                        parent.fullName || "-"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="profile-item">
+
+                <span class="profile-label">
+                    Relationship
+                </span>
+
+                <div class="profile-value">
+                    ${escapeHtml(
+                        parent.relationship || "-"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="profile-item">
+
+                <span class="profile-label">
+                    Phone
+                </span>
+
+                <div class="profile-value">
+                    ${escapeHtml(
+                        parent.phone || "-"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="profile-item">
+
+                <span class="profile-label">
+                    Alternate Phone
+                </span>
+
+                <div class="profile-value">
+                    ${escapeHtml(
+                        parent.alternatePhone || "-"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="profile-item">
+
+                <span class="profile-label">
+                    Email
+                </span>
+
+                <div class="profile-value">
+                    ${escapeHtml(
+                        parent.email || "-"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="profile-item">
+
+                <span class="profile-label">
+                    Occupation
+                </span>
+
+                <div class="profile-value">
+                    ${escapeHtml(
+                        parent.occupation || "-"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="profile-item">
+
+                <span class="profile-label">
+                    Home Address
+                </span>
+
+                <div class="profile-value">
+                    ${escapeHtml(
+                        parent.homeAddress || "-"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="profile-item">
+
+                <span class="profile-label">
+                    Account Status
+                </span>
+
+                <div class="profile-value">
+
+                    <span
+                        class="status ${getStatusClass(
+                            parent.status
+                        )}"
+                    >
                         ${escapeHtml(
-                            child.fullName
+                            parent.status || "-"
                         )}
-                    </h3>
-
-                    <div class="child-row">
-                        <span>
-                            Admission No.
-                        </span>
-
-                        <strong>
-                            ${escapeHtml(
-                                child.admissionNumber ||
-                                "-"
-                            )}
-                        </strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>
-                            Class
-                        </span>
-
-                        <strong>
-                            ${escapeHtml(
-                                child.className ||
-                                "-"
-                            )}
-                        </strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>
-                            Arm
-                        </span>
-
-                        <strong>
-                            ${escapeHtml(
-                                child.arm ||
-                                "-"
-                            )}
-                        </strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>
-                            Status
-                        </span>
-
-                        <span class="status">
-                            ${escapeHtml(
-                                child.status
-                            )}
-                        </span>
-                    </div>
+                    </span>
 
                 </div>
 
-            `
-        )
-        .join("");
+            </div>
 
-}
+        `;
 
-
-function renderProfile(parent) {
-
-    document.getElementById(
-        "profile"
-    ).innerHTML = `
-
-        <p>
-            <strong>Name:</strong>
-            ${escapeHtml(parent.fullName)}
-        </p>
-
-        <p>
-            <strong>Relationship:</strong>
-            ${escapeHtml(
-                parent.relationship || "-"
-            )}
-        </p>
-
-        <p>
-            <strong>Phone:</strong>
-            ${escapeHtml(
-                parent.phone || "-"
-            )}
-        </p>
-
-        <p>
-            <strong>Email:</strong>
-            ${escapeHtml(
-                parent.email || "-"
-            )}
-        </p>
-
-        <p>
-            <strong>Occupation:</strong>
-            ${escapeHtml(
-                parent.occupation || "-"
-            )}
-        </p>
-
-        <p>
-            <strong>Address:</strong>
-            ${escapeHtml(
-                parent.homeAddress || "-"
-            )}
-        </p>
-
-    `;
-
-}
+    }
 
 
-function showError(message) {
+    // =========================================================
+    // RENDER SCHOOL
+    // =========================================================
 
-    const error =
-        document.getElementById(
-            "error"
-        );
+    function renderSchool(parent) {
 
-    error.textContent =
-        message;
+        schoolInfo.innerHTML = `
 
-    error.style.display =
-        "block";
+            <p>
+                Your parent account is connected to school:
+                <strong>
+                    ${escapeHtml(
+                        parent.schoolId || "-"
+                    )}
+                </strong>
+            </p>
 
-}
+        `;
 
-
-function logout() {
-
-    localStorage.removeItem(
-        "edutrust_token"
-    );
-
-    window.location.href =
-        "/";
-
-}
+    }
 
 
-function escapeHtml(value) {
+    // =========================================================
+    // LOAD DASHBOARD
+    // =========================================================
 
-    return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    async function loadDashboard() {
 
-}
+        errorContainer.style.display =
+            "none";
 
 
-loadDashboard();
+        try {
 
+            const response =
+                await fetch(
+                    DASHBOARD_URL,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization":
+                                `Bearer ${token}`,
+
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            let data = null;
+
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch (jsonError) {
+
+                throw new Error(
+                    "Server returned an invalid response."
+                );
+
+            }
+
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+
+                localStorage.removeItem(
+                    "edutrust_token"
+                );
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                window.location.href =
+                    "/login.html";
+
+                return;
+
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data?.message ||
+                    "Unable to load parent dashboard."
+                );
+
+            }
+
+
+            if (
+                !data ||
+                !data.success ||
+                !data.dashboard
+            ) {
+
+                throw new Error(
+                    "Parent dashboard data was not returned."
+                );
+
+            }
+
+
+            const dashboard =
+                data.dashboard;
+
+
+            const parent =
+                dashboard.parent || {};
+
+
+            const statistics =
+                dashboard.statistics || {};
+
+
+            const children =
+                Array.isArray(
+                    dashboard.children
+                )
+
+                    ? dashboard.children
+
+                    : [];
+
+
+            // -------------------------------------------------
+            // PARENT NAME
+            // -------------------------------------------------
+
+            const name =
+                parent.fullName ||
+                "Parent";
+
+
+            parentName.textContent =
+                name;
+
+
+            welcomeTitle.textContent =
+                `Welcome, ${name}`;
+
+
+            // -------------------------------------------------
+            // STATISTICS
+            // -------------------------------------------------
+
+            childrenCount.textContent =
+                Number(
+                    statistics.totalChildren || 0
+                );
+
+
+            activeCount.textContent =
+                Number(
+                    statistics.activeChildren || 0
+                );
+
+
+            pendingCount.textContent =
+                Number(
+                    statistics.pendingChildren || 0
+                );
+
+
+            suspendedCount.textContent =
+                Number(
+                    statistics.suspendedChildren || 0
+                );
+
+
+            // -------------------------------------------------
+            // CHILDREN
+            // -------------------------------------------------
+
+            renderChildren(
+                children
+            );
+
+
+            // -------------------------------------------------
+            // PROFILE
+            // -------------------------------------------------
+
+            renderProfile(
+                parent
+            );
+
+
+            // -------------------------------------------------
+            // SCHOOL
+            // -------------------------------------------------
+
+            renderSchool(
+                parent
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "PARENT DASHBOARD ERROR:",
+                error
+            );
+
+
+            showError(
+                error.message ||
+                "Failed to load parent dashboard."
+            );
+
+
+            childrenContainer.innerHTML = `
+                <div class="empty">
+                    Unable to load children.
+                </div>
+            `;
+
+
+            profileContainer.innerHTML = `
+                <div class="empty">
+                    Unable to load parent profile.
+                </div>
+            `;
+
+
+            schoolInfo.textContent =
+                "Unable to load school information.";
+
+        }
+
+    }
+
+
+    // =========================================================
+    // START
+    // =========================================================
+
+    loadDashboard();
+
+})();
 </script>
 
 </body>
