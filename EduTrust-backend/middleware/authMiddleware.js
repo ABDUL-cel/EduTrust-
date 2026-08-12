@@ -1,4 +1,3 @@
-
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
@@ -27,7 +26,9 @@ const authMiddleware = async (req, res, next) => {
 
         const decoded = jwt.verify(token, JWT_SECRET);
 
-        const user = await User.findById(decoded.id).select("-password");
+        const user = await User.findById(decoded.id)
+            .select("-password")
+            .lean();
 
         if (!user) {
             return res.status(401).json({
@@ -43,18 +44,21 @@ const authMiddleware = async (req, res, next) => {
             });
         }
 
-        /*
-         * Current EduTrust tenant structure:
-         * The school owner/principal account is the tenant owner.
-         *
-         * Until the dedicated School/User relationship is completed,
-         * we use the authenticated user's ID consistently as school_id.
-         */
-        const school_id = user.school_id || user._id;
+        // --------------------------------------------------
+        // IMPORTANT:
+        // school_id must come from the User account.
+        // Do NOT replace it with user._id.
+        // --------------------------------------------------
 
-        req.user = user;
-
-        req.user.school_id = school_id;
+        req.user = {
+            id: user._id,
+            role: user.role,
+            school_id: user.school_id,
+            parent_id: user.parent_id,
+            student_id: user.student_id,
+            teacher_id: user.teacher_id,
+            staff_id: user.staff_id
+        };
 
         next();
 
