@@ -1,313 +1,67 @@
-// ============================================================
-// EduTrust Parent Registration
-// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("parent-form");
+    const messageDiv = document.getElementById("message");
+    const submitBtn = document.getElementById("submit-btn");
 
-const API_BASE = "";
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        messageDiv.innerText = "";
+        messageDiv.className = "msg";
 
-// ------------------------------------------------------------
-// HELPERS
-// ------------------------------------------------------------
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirm_password").value;
 
-function getValue(id) {
-    const element =
-        document.getElementById(id);
-
-    return element
-        ? element.value.trim()
-        : "";
-}
-
-function showMessage(message, type = "error") {
-    let box =
-        document.getElementById(
-            "registerMessage"
-        );
-
-    if (!box) {
-        box =
-            document.createElement(
-                "div"
-            );
-
-        box.id =
-            "registerMessage";
-
-        box.style.marginTop =
-            "15px";
-
-        box.style.padding =
-            "12px";
-
-        box.style.borderRadius =
-            "8px";
-
-        const form =
-            document.querySelector("form");
-
-        if (form) {
-            form.appendChild(box);
-        }
-    }
-
-    box.textContent =
-        message;
-
-    box.style.display =
-        "block";
-
-    if (type === "success") {
-        box.style.background =
-            "#ecfdf5";
-
-        box.style.color =
-            "#047857";
-    } else {
-        box.style.background =
-            "#fef2f2";
-
-        box.style.color =
-            "#b91c1c";
-    }
-}
-
-// ------------------------------------------------------------
-// SCHOOL SEARCH
-// ------------------------------------------------------------
-
-async function searchSchools(search) {
-    try {
-        const response =
-            await fetch(
-                `${API_BASE}/parent/search-schools?search=${encodeURIComponent(search)}`
-            );
-
-        const data =
-            await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                data.message ||
-                "Unable to search schools."
-            );
+        // Password Match Validation
+        if (password !== confirmPassword) {
+            messageDiv.innerText = "Passwords do not match!";
+            messageDiv.className = "msg error";
+            return;
         }
 
-        return data.schools || [];
+        const payload = {
+            first_name: document.getElementById("first_name").value.trim(),
+            last_name: document.getElementById("last_name").value.trim(),
+            other_name: document.getElementById("other_name").value.trim(),
+            relationship: document.getElementById("relationship").value,
+            phone: document.getElementById("phone").value.trim(),
+            alternate_phone: document.getElementById("alternate_phone").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            password: password,
+            occupation: document.getElementById("occupation").value.trim(),
+            home_address: document.getElementById("home_address").value.trim(),
+            school_id: document.getElementById("school_id").value.trim()
+        };
 
-    } catch (error) {
-        console.error(
-            "SCHOOL SEARCH ERROR:",
-            error
-        );
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Registering...";
 
-        return [];
-    }
-}
+        try {
+            const response = await fetch("http://localhost:5000/api/parents/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
 
-// ------------------------------------------------------------
-// REGISTRATION
-// ------------------------------------------------------------
+            const data = await response.json();
 
-async function registerParent(event) {
-    event.preventDefault();
-
-    const first_name =
-        getValue("first_name");
-
-    const last_name =
-        getValue("last_name");
-
-    const other_name =
-        getValue("other_name");
-
-    const relationship =
-        getValue("relationship");
-
-    const email =
-        getValue("email");
-
-    const phone =
-        getValue("phone");
-
-    const alternate_phone =
-        getValue("alternate_phone");
-
-    const home_address =
-        getValue("home_address");
-
-    const occupation =
-        getValue("occupation");
-
-    const passport =
-        getValue("passport");
-
-    const school_id =
-        getValue("school_id");
-
-    const password =
-        getValue("password");
-
-    const confirm_password =
-        getValue("confirm_password");
-
-    // --------------------------------------------------------
-    // VALIDATION
-    // --------------------------------------------------------
-
-    if (
-        !first_name ||
-        !last_name ||
-        !relationship ||
-        !phone ||
-        !school_id
-    ) {
-        showMessage(
-            "Please complete all required fields."
-        );
-
-        return;
-    }
-
-    if (
-        password &&
-        password !== confirm_password
-    ) {
-        showMessage(
-            "Passwords do not match."
-        );
-
-        return;
-    }
-
-    const submitButton =
-        document.querySelector(
-            'button[type="submit"]'
-        );
-
-    if (submitButton) {
-        submitButton.disabled =
-            true;
-
-        submitButton.textContent =
-            "Creating account...";
-    }
-
-    try {
-        const response =
-            await fetch(
-                `${API_BASE}/parent/register`,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-                            first_name,
-                            last_name,
-                            other_name,
-                            relationship,
-                            email,
-                            phone,
-                            alternate_phone,
-                            home_address,
-                            occupation,
-                            passport,
-                            school_id,
-                            password
-                        })
-                }
-            );
-
-        const data =
-            await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                data.message ||
-                "Parent registration failed."
-            );
+            if (response.ok) {
+                messageDiv.innerText = "Registration successful! You can now log in.";
+                messageDiv.className = "msg success";
+                form.reset();
+            } else {
+                messageDiv.innerText = data.message || "Registration failed. Please try again.";
+                messageDiv.className = "msg error";
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            messageDiv.innerText = "Network error. Please check backend connection.";
+            messageDiv.className = "msg error";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Register";
         }
-
-        // ----------------------------------------------------
-        // SAVE AUTH TOKEN
-        // ----------------------------------------------------
-
-        if (data.token) {
-            localStorage.setItem(
-                "edutrust_token",
-                data.token
-            );
-        }
-
-        // ----------------------------------------------------
-        // SAVE PARENT INFORMATION
-        // ----------------------------------------------------
-
-        if (data.parent) {
-            localStorage.setItem(
-                "edutrust_parent",
-                JSON.stringify(
-                    data.parent
-                )
-            );
-        }
-
-        // ----------------------------------------------------
-        // SUCCESS
-        // ----------------------------------------------------
-
-        showMessage(
-            "Registration successful. Opening your parent dashboard...",
-            "success"
-        );
-
-        setTimeout(() => {
-            window.location.href =
-                data.redirect ||
-                "/parent-dashboard.html";
-        }, 800);
-
-    } catch (error) {
-        console.error(
-            "PARENT REGISTRATION ERROR:",
-            error
-        );
-
-        showMessage(
-            error.message ||
-            "Registration failed."
-        );
-
-        if (submitButton) {
-            submitButton.disabled =
-                false;
-
-            submitButton.textContent =
-                "Register";
-        }
-    }
-}
-
-// ------------------------------------------------------------
-// FORM CONNECTION
-// ------------------------------------------------------------
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-        const form =
-            document.querySelector(
-                "form"
-            );
-
-        if (form) {
-            form.addEventListener(
-                "submit",
-                registerParent
-            );
-        }
-    }
-);
+    });
+});
