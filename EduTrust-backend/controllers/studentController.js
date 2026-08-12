@@ -982,3 +982,165 @@ exports.getStudentDashboardData = async (req, res) => {
         });
     }
 };
+// ============================================================
+// backend/controllers/studentController.js
+// IMPORTANT ADDITION:
+// LINK A STUDENT TO A PARENT
+// ============================================================
+// ============================================================
+// LINK STUDENT TO PARENT
+// Principal / authorized school staff
+// ============================================================
+
+exports.linkStudentParent = async (req, res) => {
+
+    try {
+
+        const schoolId =
+            req.user?.school_id;
+
+        const studentId =
+            req.params.id;
+
+        const {
+            parent_id
+        } = req.body;
+
+
+        if (!schoolId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Your account is not connected to a school."
+
+            });
+
+        }
+
+
+        if (!parent_id) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Parent ID is required."
+
+            });
+
+        }
+
+
+        // ====================================================
+        // FIND PARENT IN SAME SCHOOL
+        // ====================================================
+
+        const parent =
+            await Parent.findOne({
+
+                _id:
+                    parent_id,
+
+                school_id:
+                    schoolId,
+
+                status: "Active"
+
+            });
+
+
+        if (!parent) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Parent not found in this school."
+
+            });
+
+        }
+
+
+        // ====================================================
+        // FIND STUDENT IN SAME SCHOOL
+        // ====================================================
+
+        const student =
+            await Student.findOneAndUpdate(
+
+                {
+                    _id:
+                        studentId,
+
+                    school_id:
+                        schoolId
+
+                },
+
+                {
+                    parent_id:
+                        parent._id
+                },
+
+                {
+                    new: true,
+                    runValidators: true
+                }
+
+            );
+
+
+        if (!student) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Student not found."
+
+            });
+
+        }
+
+
+        return res.status(200).json({
+
+            success: true,
+
+            message:
+                "Student successfully linked to parent.",
+
+            student
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "LINK STUDENT PARENT ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to link student to parent.",
+
+            error:
+                error.message
+
+        });
+
+    }
+
+};
