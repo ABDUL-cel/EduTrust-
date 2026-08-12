@@ -1,69 +1,58 @@
-<!-- public/index.html -->
+<!-- ============================================================
+     public/index.html
+     EduTrust Home / Portal Selection
+============================================================ -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>EduTrust</title>
+<link rel="icon" type="image/png" href="/logo-icon.png">
+    <title>EduTrust | School Management Platform</title>
 
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
             color: #172033;
+            min-height: 100vh;
         }
 
-        .topbar {
-            height: 70px;
+        header {
             background: #ffffff;
             border-bottom: 1px solid #e5e7eb;
+            padding: 18px 7%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
         }
 
         .logo {
-            font-size: 24px;
+            font-size: 25px;
             font-weight: 800;
-            color: #1769e0;
+            color: #2563eb;
         }
 
-        .portal-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .logo span {
+            color: #111827;
         }
 
-        .portal-selector label {
-            font-size: 14px;
+        .header-btn {
+            text-decoration: none;
+            color: #2563eb;
             font-weight: 600;
         }
 
-        .portal-selector select {
-            min-width: 180px;
-            padding: 11px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            background: white;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
         .hero {
-            max-width: 1100px;
-            margin: 70px auto;
-            padding: 40px;
             text-align: center;
+            padding: 70px 20px 35px;
         }
 
         .hero h1 {
@@ -71,65 +60,140 @@
             margin-bottom: 15px;
         }
 
-        .hero p {
-            color: #667085;
-            font-size: 17px;
+        .hero h1 span {
+            color: #2563eb;
         }
 
-        .portal-cards {
+        .hero p {
+            max-width: 700px;
+            margin: auto;
+            color: #64748b;
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        .portal-section {
             max-width: 1100px;
-            margin: 0 auto 80px;
-            padding: 20px;
+            margin: 35px auto 80px;
+            padding: 0 20px;
+        }
+
+        .portal-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 25px;
         }
 
         .portal-card {
-            background: white;
+            background: #ffffff;
             border: 1px solid #e5e7eb;
-            border-radius: 14px;
-            padding: 28px;
-            cursor: pointer;
-            transition: 0.2s;
+            border-radius: 18px;
+            padding: 35px 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            transition: 0.25s ease;
         }
 
         .portal-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
         }
 
-        .portal-card h3 {
-            margin-top: 0;
+        .portal-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            background: #eff6ff;
+        }
+
+        .portal-card h2 {
+            margin-bottom: 12px;
+            font-size: 23px;
         }
 
         .portal-card p {
-            color: #667085;
+            color: #64748b;
             line-height: 1.6;
+            margin-bottom: 25px;
         }
 
-        .portal-card button {
+        .portal-btn {
+            display: inline-block;
             width: 100%;
-            padding: 12px;
-            border: 0;
-            border-radius: 8px;
-            background: #1769e0;
+            padding: 13px 18px;
+            border-radius: 10px;
+            text-decoration: none;
             color: white;
-            cursor: pointer;
+            background: #2563eb;
             font-weight: 700;
+            transition: 0.2s;
         }
 
-        @media (max-width: 800px) {
-            .portal-cards {
+        .portal-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .parent .portal-icon {
+            background: #ecfdf5;
+        }
+
+        .parent .portal-btn {
+            background: #059669;
+        }
+
+        .parent .portal-btn:hover {
+            background: #047857;
+        }
+
+        .student .portal-icon {
+            background: #fef3c7;
+        }
+
+        .student .portal-btn {
+            background: #d97706;
+        }
+
+        .student .portal-btn:hover {
+            background: #b45309;
+        }
+
+        .staff .portal-icon {
+            background: #f3e8ff;
+        }
+
+        .staff .portal-btn {
+            background: #7c3aed;
+        }
+
+        .staff .portal-btn:hover {
+            background: #6d28d9;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: #111827;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 850px) {
+            .portal-grid {
                 grid-template-columns: 1fr;
             }
 
-            .topbar {
-                padding: 0 15px;
+            .hero h1 {
+                font-size: 32px;
             }
 
-            .portal-selector label {
-                display: none;
+            .portal-card {
+                max-width: 500px;
+                margin: auto;
+                width: 100%;
             }
         }
     </style>
@@ -137,164 +201,156 @@
 
 <body>
 
-<header class="topbar">
-
+<header>
     <div class="logo">
-        EduTrust
+        Edu<span>Trust</span>
     </div>
 
-    <!-- TOP PORTAL SELECTION -->
-    <div class="portal-selector">
-
-        <label for="portalSelect">
-            Enter as:
-        </label>
-
-        <select id="portalSelect">
-
-            <option value="">
-                Select portal
-            </option>
-
-            <option value="/student/register">
-                Student
-            </option>
-
-            <option value="/parent/register">
-                Parent
-            </option>
-
-            <option value="/login">
-                School / Staff
-            </option>
-
-        </select>
-
-    </div>
-
+    <a href="/login" class="header-btn">
+        Login
+    </a>
 </header>
 
 
-<main>
+<section class="hero">
 
-    <section class="hero">
+    <h1>
+        Welcome to <span>EduTrust</span>
+    </h1>
 
-        <h1>
-            Welcome to EduTrust
-        </h1>
+    <p>
+        Select your portal below to continue.
+        Parents, students and school staff have separate
+        dashboards designed for their specific responsibilities.
+    </p>
 
-        <p>
-            Select your portal above to continue.
-        </p>
-
-    </section>
-
-
-    <section class="portal-cards">
-
-        <!-- STUDENT -->
-
-        <div
-            class="portal-card"
-            onclick="goToPortal('/student/register')"
-        >
-
-            <h3>
-                Student Portal
-            </h3>
-
-            <p>
-                Register as a student or access your
-                student dashboard.
-            </p>
-
-            <button>
-                Enter Student Portal
-            </button>
-
-        </div>
+</section>
 
 
-        <!-- PARENT -->
+<section class="portal-section">
 
-        <div
-            class="portal-card"
-            onclick="goToPortal('/parent/register')"
-        >
+    <div class="portal-grid">
 
-            <h3>
-                Parent Portal
-            </h3>
+        <!-- =====================================================
+             PARENT
+        ====================================================== -->
+
+        <div class="portal-card parent">
+
+            <div class="portal-icon">
+                👨‍👩‍👧
+            </div>
+
+            <h2>Parent Portal</h2>
 
             <p>
-                Register as a parent, select your school,
-                link your children and access the parent
-                dashboard.
+                Register your child, view your children's
+                academic information, attendance, results,
+                fees and school updates.
             </p>
 
-            <button>
+            <a
+                href="/parent/login"
+                class="portal-btn"
+            >
                 Enter Parent Portal
-            </button>
+            </a>
 
         </div>
 
 
-        <!-- SCHOOL -->
+        <!-- =====================================================
+             STUDENT
+        ====================================================== -->
 
-        <div
-            class="portal-card"
-            onclick="goToPortal('/login')"
-        >
+        <div class="portal-card student">
 
-            <h3>
-                School Portal
-            </h3>
+            <div class="portal-icon">
+                🎓
+            </div>
+
+            <h2>Student Portal</h2>
 
             <p>
-                Principals, teachers and school staff
-                can access the school management system.
+                Access your student dashboard, profile,
+                academic records, results, attendance,
+                timetable and school information.
             </p>
 
-            <button>
-                Enter School Portal
-            </button>
+            <a
+                href="/student/login"
+                class="portal-btn"
+            >
+                Enter Student Portal
+            </a>
 
         </div>
 
-    </section>
 
-</main>
+        <!-- =====================================================
+             STAFF
+        ====================================================== -->
+
+        <div class="portal-card staff">
+
+            <div class="portal-icon">
+                👨‍🏫
+            </div>
+
+            <h2>Staff Portal</h2>
+
+            <p>
+                Teachers and school staff can manage
+                students, attendance, classes, records
+                and other school responsibilities.
+            </p>
+
+            <a
+                href="/staff/login"
+                class="portal-btn"
+            >
+                Enter Staff Portal
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<footer>
+    <p>
+        © 2026 EduTrust. All rights reserved.
+    </p>
+</footer>
 
 
 <script>
 
-    const portalSelect =
-        document.getElementById("portalSelect");
-
-    portalSelect.addEventListener(
-        "change",
-        function () {
-
-            const destination =
-                this.value;
-
-            if (!destination) {
-                return;
-            }
-
-            window.location.href =
-                destination;
-
-        }
-    );
-
-
-    function goToPortal(destination) {
-
-        window.location.href =
-            destination;
-
-    }
+    /*
+     * ============================================================
+     * PORTAL ACCESS CHECK
+     * ============================================================
+     *
+     * These routes are intentionally separated:
+     *
+     * Parent  -> /parent/login
+     * Student -> /student/login
+     * Staff   -> /staff/login
+     *
+     * After successful login, each portal should redirect the user
+     * to the correct dashboard.
+     *
+     * Parent:
+     * /parent/dashboard
+     *
+     * Student:
+     * /student/dashboard
+     *
+     * Staff:
+     * /staff/dashboard
+     */
 
 </script>
 
