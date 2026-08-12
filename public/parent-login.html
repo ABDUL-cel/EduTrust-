@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrust Parent Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .topbar {
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 800;
+            color: #1769e0;
+        }
+
+        .back {
+            color: #1769e0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 35px 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 26px;
+            color: #101828;
+        }
+
+        .subtitle {
+            color: #667085;
+            margin-bottom: 28px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #344054;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            border-color: #1769e0;
+            box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.12);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #475467;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .remember-me input {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: #1769e0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1769e0;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1254b7;
+        }
+
+        button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success {
+            background: #e9f9ef;
+            color: #18794e;
+        }
+
+        .error {
+            background: #fff0f0;
+            color: #b42318;
+        }
+
+        .auth-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 14px;
+            color: #667085;
+        }
+
+        .auth-footer a {
+            color: #1769e0;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media(max-width: 500px) {
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .card {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="logo">
+        EduTrust
+    </div>
+
+    <a href="/" class="back">
+        ← Back
+    </a>
+</header>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Parent Portal Login</h1>
+
+        <p class="subtitle">
+            Welcome back! Access your children's performance, grades, and attendance records.
+        </p>
+
+        <form id="parentLoginForm">
+
+            <div class="form-grid">
+
+                <!-- Primary Identification: Phone or Email -->
+                <div class="field">
+                    <label for="phone">
+                        Phone Number or Email *
+                    </label>
+                    <input
+                        type="text"
+                        id="phone"
+                        placeholder="e.g. 08012345678 or parent@gmail.com"
+                        required
+                    >
+                </div>
+
+                <!-- Password -->
+                <div class="field">
+                    <label for="password">
+                        Password *
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="••••••••"
+                        required
+                    >
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        Remember me
+                    </label>
+                    <a href="/parent/forgot-password" class="forgot-password">
+                        Forgot Password?
+                    </a>
+                </div>
+
+            </div>
+
+            <button type="submit" id="submitButton">
+                Log In to Portal
+            </button>
+
+            <div id="message" class="message"></div>
+
+        </form>
+
+        <div class="auth-footer">
+            Don't have a parent account yet? 
+            <a href="/parent-register.html">Register Here</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.getElementById("parentLoginForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const message = document.getElementById("message");
+    const button = document.getElementById("submitButton");
+
+    const phoneInput = document.getElementById("phone").value.trim();
+    const passwordInput = document.getElementById("password").value;
+
+    button.disabled = true;
+    button.textContent = "Logging in...";
+
+    // Dynamic payload sending both phone/email field and password matching backend expected keys
+    const body = {
+        phone: phoneInput,
+        email: phoneInput,
+        password: passwordInput
+    };
+
+    try {
+        const response = await fetch("/parent/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Login failed. Please check your credentials.");
+        }
+
+        // Store JWT access token or session data if provided
+        if (data.token) {
+            localStorage.setItem("parent_token", data.token);
+        }
+
+        showMessage("Login successful! Redirecting to dashboard...", "success");
+
+        // Redirect to Parent Dashboard after successful login
+        setTimeout(() => {
+            window.location.href = data.redirectUrl || "/parent/dashboard";
+        }, 1200);
+
+    } catch (error) {
+        showMessage(error.message, "error");
+        button.disabled = false;
+        button.textContent = "Log In to Portal";
+    }
+});
+
+function showMessage(text, type) {
+    const message = document.getElementById("message");
+    message.textContent = text;
+    message.className = `message ${type}`;
+    message.style.display = "block";
+}
+</script>
+
+</body>
+</html>
