@@ -661,6 +661,7 @@
         if (!Array.isArray(children) || children.length === 0) {
             childrenContainer.innerHTML = `
                 <div class="empty">
+
                     No children are currently linked to this parent account.
                 </div>
             `;
@@ -679,12 +680,13 @@
             const childId = child._id || child.id || "";
             const admissionNo = child.admissionNumber || "";
 
-            const avatar = passport
-                ? `<img class="child-passport" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                   <div class="child-placeholder" style="display:none;">${escapeHtml(getInitials(name))}</div>`
-                : `<div class="child-placeholder">${escapeHtml(getInitials(name))}</div>`;
+          //  ADDED loading="lazy" HERE INSIDE THE AVATAR GENERATION
+        const avatar = passport
+            ? `<img class="child-passport" loading="lazy" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <div class="child-placeholder" style="display:none;">${escapeHtml(getInitials(name))}</div>`
+            : `<div class="child-placeholder">${escapeHtml(getInitials(name))}</div>`;
 
-            return `
+        return `
                 <article class="child-card">
                     ${avatar}
                     <h3>${escapeHtml(name)}</h3>
