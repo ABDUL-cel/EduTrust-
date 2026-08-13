@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parent Dashboard | EduTrust</title>
-
+    <title>Parent Login | EduTrust</title>
     <style>
         * {
             box-sizing: border-box;
@@ -15,26 +14,31 @@
             font-family: Arial, Helvetica, sans-serif;
             background: #f4f7fb;
             color: #172033;
-        }
-
-        button {
-            font-family: inherit;
-        }
-
-        .topbar {
-            min-height: 70px;
-            background: #ffffff;
-            border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            gap: 20px;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            padding: 35px 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
         }
 
         .logo {
             color: #1769e0;
-            font-size: 23px;
+            font-size: 26px;
             font-weight: 800;
             text-decoration: none;
         }
@@ -43,391 +47,148 @@
             color: #172033;
         }
 
-        .top-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .login-card h2 {
+            margin: 15px 0 5px;
+            font-size: 22px;
+            text-align: center;
         }
 
-        .parent-name {
-            font-weight: 700;
-        }
-
-        .logout {
-            border: 0;
-            background: #ef4444;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 7px;
-            cursor: pointer;
-            font-weight: 700;
-        }
-
-        .logout:hover {
-            background: #dc2626;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 35px 20px 60px;
-        }
-
-        .welcome {
-            margin-bottom: 25px;
-        }
-
-        .welcome h1 {
-            margin: 0 0 7px;
-            font-size: 30px;
-        }
-
-        .welcome p {
-            margin: 0;
+        .login-card p {
+            margin: 0 0 25px;
             color: #667085;
+            font-size: 14px;
+            text-align: center;
         }
 
-        .error {
-            background: #fff0f0;
-            border: 1px solid #f5b5b5;
-            color: #b42318;
-            padding: 15px;
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #344054;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #d0d5dd;
             border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #1769e0;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #1769e0;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: #1355b8;
+        }
+
+        .btn-submit:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .alert-message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 13px;
             margin-bottom: 20px;
             display: none;
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #667085;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 22px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .stat-title {
-            color: #667085;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-        }
-
-        .section {
-            background: #ffffff;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .section h2 {
-            margin: 0;
-            font-size: 21px;
-        }
-
-        .children {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-        }
-
-        .child-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 20px;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .child-card h3 {
-            margin: 0 0 18px;
-            font-size: 18px;
-        }
-
-        .child-passport {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid #e5e7eb;
-            margin-bottom: 12px;
-        }
-
-        .child-placeholder {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            background: #eef4ff;
-            color: #1769e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 25px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .child-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-
-        .child-row span:first-child {
-            color: #667085;
-        }
-
-        .child-row strong {
-            text-align: right;
-        }
-
-        .child-actions {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed #e5e7eb;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .btn-action {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            text-align: center;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 13px;
-            text-decoration: none;
-            cursor: pointer;
-            border: none;
-            transition: background 0.2s;
-        }
-
-        .btn-primary {
-            background: #1769e0;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1355b8;
-        }
-
-        .btn-secondary {
-            background: #eef4ff;
-            color: #1769e0;
-        }
-
-        .btn-secondary:hover {
-            background: #dbe7ff;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 9px;
-            border-radius: 20px;
-            background: #e8f7ee;
-            color: #18794e;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .status.pending {
-            background: #fff7e6;
-            color: #b54708;
-        }
-
-        .status.suspended {
+        .alert-error {
             background: #fff0f0;
+            border: 1px solid #f5b5b5;
             color: #b42318;
         }
 
-        .status.graduated {
-            background: #eef4ff;
-            color: #1769e0;
+        .alert-success {
+            background: #e8f7ee;
+            border: 1px solid #a6e5bd;
+            color: #18794e;
         }
 
-        .status.archived {
-            background: #f2f4f7;
-            color: #667085;
-        }
-
-        .empty {
-            color: #667085;
-            padding: 20px 0;
+        .footer-links {
+            margin-top: 25px;
             text-align: center;
-        }
-
-        .profile-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .profile-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 9px;
-            padding: 15px;
-        }
-
-        .profile-label {
-            display: block;
+            font-size: 13px;
             color: #667085;
-            font-size: 12px;
-            margin-bottom: 6px;
         }
 
-        .profile-value {
+        .footer-links a {
+            color: #1769e0;
+            text-decoration: none;
             font-weight: 700;
-            word-break: break-word;
         }
 
-        .school-info {
-            color: #667085;
-            font-size: 14px;
-            margin-top: 15px;
-        }
-
-        @media (max-width: 900px) {
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .children {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .topbar {
-                padding: 0 15px;
-            }
-
-            .parent-name {
-                display: none;
-            }
-
-            .container {
-                padding: 25px 15px 50px;
-            }
-
-            .stats,
-            .children,
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .welcome h1 {
-                font-size: 25px;
-            }
-
-            .section {
-                padding: 18px;
-            }
+        .footer-links a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
-
 <body>
 
-<header class="topbar">
-    <a href="index.html" class="logo">
-        Edu<span>Trust</span>
-    </a>
-
-    <div class="top-right">
-        <span id="parentName" class="parent-name">Loading...</span>
-        <button class="logout" id="logoutButton" type="button">Logout</button>
+<main class="login-card">
+    <div class="logo-container">
+        <a href="index.html" class="logo">
+            Edu<span>Trust</span>
+        </a>
+        <h2>Parent Portal Login</h2>
+        <p>Enter your credentials to access your dashboard</p>
     </div>
-</header>
 
-<main class="container">
-    <section class="welcome">
-        <h1 id="welcomeTitle">Parent Dashboard</h1>
-        <p>Manage your children and monitor their school information from one place.</p>
-    </section>
+    <div id="alertBox" class="alert-message"></div>
 
-    <div id="error" class="error"></div>
-
-    <section class="stats">
-        <div class="stat-card">
-            <div class="stat-title">Children</div>
-            <div class="stat-value" id="childrenCount">0</div>
+    <form id="loginForm" novalidate>
+        <div class="form-group">
+            <label for="identity">Email or Phone Number</label>
+            <input 
+                type="text" 
+                id="identity" 
+                name="identity" 
+                placeholder="e.g. parent@example.com or 08012345678" 
+                required
+            >
         </div>
 
-        <div class="stat-card">
-            <div class="stat-title">Active</div>
-            <div class="stat-value" id="activeCount">0</div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="••••••••" 
+                required
+            >
         </div>
 
-        <div class="stat-card">
-            <div class="stat-title">Pending</div>
-            <div class="stat-value" id="pendingCount">0</div>
-        </div>
+        <button type="submit" id="submitBtn" class="btn-submit">Sign In</button>
+    </form>
 
-        <div class="stat-card">
-            <div class="stat-title">Suspended</div>
-            <div class="stat-value" id="suspendedCount">0</div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="section-header">
-            <h2>My Children</h2>
-        </div>
-
-        <div id="children" class="children">
-            <div class="loading">Loading children...</div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="section-header">
-            <h2>Parent Information</h2>
-        </div>
-
-        <div id="profile" class="profile-grid">
-            <div class="loading">Loading profile...</div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="section-header">
-            <h2>School</h2>
-        </div>
-
-        <div id="schoolInfo" class="school-info">
-            Loading school information...
-        </div>
-    </section>
+    <div class="footer-links">
+        Don't have an account? <a href="parent-register.html">Register Parent</a>
+    </div>
 </main>
 
 <script>
@@ -439,22 +200,25 @@
             ? "http://localhost:5000/api"
             : "https://edutrust-15ii.onrender.com/api";
 
-    const DASHBOARD_URL = `${API_BASE}/parents/dashboard`;
+    const LOGIN_URL = `${API_BASE}/parents/login`;
 
-    const parentName = document.getElementById("parentName");
-    const welcomeTitle = document.getElementById("welcomeTitle");
-    const childrenCount = document.getElementById("childrenCount");
-    const activeCount = document.getElementById("activeCount");
-    const pendingCount = document.getElementById("pendingCount");
-    const suspendedCount = document.getElementById("suspendedCount");
-    const childrenContainer = document.getElementById("children");
-    const profileContainer = document.getElementById("profile");
-    const schoolInfo = document.getElementById("schoolInfo");
-    const errorContainer = document.getElementById("error");
-    const logoutButton = document.getElementById("logoutButton");
+    const loginForm = document.getElementById("loginForm");
+    const identityInput = document.getElementById("identity");
+    const passwordInput = document.getElementById("password");
+    const submitBtn = document.getElementById("submitBtn");
+    const alertBox = document.getElementById("alertBox");
 
-    // Clear all possible token storage names on explicit logout
-    function clearTokens() {
+    function showAlert(message, isSuccess = false) {
+        alertBox.textContent = message;
+        alertBox.className = `alert-message ${isSuccess ? 'alert-success' : 'alert-error'}`;
+        alertBox.style.display = "block";
+    }
+
+    function hideAlert() {
+        alertBox.style.display = "none";
+    }
+
+    function clearOldTokens() {
         localStorage.removeItem("parent_token");
         localStorage.removeItem("edutrust_token");
         localStorage.removeItem("token");
@@ -463,271 +227,78 @@
         sessionStorage.removeItem("token");
     }
 
-    // Retrieve token safely from localStorage or sessionStorage
-    function getToken() {
-        return (
-            localStorage.getItem("parent_token") ||
-            localStorage.getItem("edutrust_token") ||
-            localStorage.getItem("token") ||
-            sessionStorage.getItem("parent_token") ||
-            sessionStorage.getItem("edutrust_token") ||
-            sessionStorage.getItem("token")
-        );
-    }
+    loginForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        hideAlert();
 
-    const token = getToken();
+        const identity = identityInput.value.trim();
+        const password = passwordInput.value;
 
-    // Prevent loop redirecting by rendering an error if no token is found
-    if (!token) {
-        showError("No active login session found. Please login to access your dashboard.");
-        setTimeout(() => {
-            window.location.href = "parent-login.html";
-        }, 2000);
-        return;
-    }
-
-    logoutButton.addEventListener("click", function () {
-        clearTokens();
-        window.location.href = "parent-login.html";
-    });
-
-    function showError(message) {
-        errorContainer.textContent = message || "Something went wrong.";
-        errorContainer.style.display = "block";
-    }
-
-    function escapeHtml(value) {
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    function formatDate(value) {
-        if (!value) return "-";
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return "-";
-        return date.toLocaleDateString("en-NG", {
-            year: "numeric",
-            month: "short",
-            day: "numeric"
-        });
-    }
-
-    function getStatusClass(status) {
-        switch (status) {
-            case "Pending": return "pending";
-            case "Suspended": return "suspended";
-            case "Graduated": return "graduated";
-            case "Archived": return "archived";
-            default: return "";
-        }
-    }
-
-    function getInitials(name) {
-        const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
-        if (!parts.length) return "?";
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-
-    function renderChildren(children) {
-        if (!Array.isArray(children) || children.length === 0) {
-            childrenContainer.innerHTML = `
-                <div class="empty">
-                    No children are currently linked to this parent account.
-                </div>
-            `;
+        if (!identity || !password) {
+            showAlert("Please enter both email/phone and password.");
             return;
         }
 
-        childrenContainer.innerHTML = children.map(function (child) {
-            const name = child.fullName ||
-                [child.first_name, child.other_name, child.last_name]
-                    .filter(Boolean)
-                    .join(" ") || "Unnamed Student";
-
-            const status = child.status || "Pending";
-            const statusClass = getStatusClass(status);
-            const passport = child.passport;
-            const childId = child._id || child.id || "";
-            const admissionNo = child.admissionNumber || "";
-
-            const avatar = passport
-                ? `<img class="child-passport" loading="lazy" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                   <div class="child-placeholder" style="display:none;">${escapeHtml(getInitials(name))}</div>`
-                : `<div class="child-placeholder">${escapeHtml(getInitials(name))}</div>`;
-
-            return `
-                <article class="child-card">
-                    ${avatar}
-                    <h3>${escapeHtml(name)}</h3>
-
-                    <div class="child-row">
-                        <span>Admission No.</span>
-                        <strong>${escapeHtml(admissionNo || "-")}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Class</span>
-                        <strong>${escapeHtml(child.className || "-")}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Arm</span>
-                        <strong>${escapeHtml(child.arm || "-")}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Gender</span>
-                        <strong>${escapeHtml(child.gender || "-")}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Date of Birth</span>
-                        <strong>${escapeHtml(formatDate(child.dateOfBirth))}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Admission Date</span>
-                        <strong>${escapeHtml(formatDate(child.admissionDate))}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Status</span>
-                        <span class="status ${statusClass}">${escapeHtml(status)}</span>
-                    </div>
-
-                    <div class="child-actions">
-                        <a href="check-result.html?studentId=${encodeURIComponent(childId)}&admissionNo=${encodeURIComponent(admissionNo)}" class="btn-action btn-primary">
-                            Check Exam Result
-                        </a>
-                        <a href="report-card.html?studentId=${encodeURIComponent(childId)}" class="btn-action btn-secondary">
-                            View Report Sheet
-                        </a>
-                    </div>
-                </article>
-            `;
-        }).join("");
-    }
-
-    function renderProfile(parent) {
-        profileContainer.innerHTML = `
-            <div class="profile-item">
-                <span class="profile-label">Full Name</span>
-                <div class="profile-value">${escapeHtml(parent.fullName || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Relationship</span>
-                <div class="profile-value">${escapeHtml(parent.relationship || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Phone</span>
-                <div class="profile-value">${escapeHtml(parent.phone || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Alternate Phone</span>
-                <div class="profile-value">${escapeHtml(parent.alternatePhone || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Email</span>
-                <div class="profile-value">${escapeHtml(parent.email || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Occupation</span>
-                <div class="profile-value">${escapeHtml(parent.occupation || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Home Address</span>
-                <div class="profile-value">${escapeHtml(parent.homeAddress || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Account Status</span>
-                <div class="profile-value">
-                    <span class="status ${getStatusClass(parent.status)}">
-                        ${escapeHtml(parent.status || "-")}
-                    </span>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderSchool(parent) {
-        schoolInfo.innerHTML = `
-            <p>
-                Your parent account is connected to school ID:
-                <strong>${escapeHtml(parent.schoolId || "-")}</strong>
-            </p>
-        `;
-    }
-
-    async function loadDashboard() {
-        errorContainer.style.display = "none";
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Authenticating...";
 
         try {
-            const response = await fetch(DASHBOARD_URL, {
-                method: "GET",
+            const response = await fetch(LOGIN_URL, {
+                method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json"
-                }
+                },
+                body: JSON.stringify({
+                    emailOrPhone: identity,
+                    identity: identity,
+                    email: identity,
+                    phone: identity,
+                    password: password
+                })
             });
 
             let data = null;
             try {
                 data = await response.json();
-            } catch (jsonError) {
+            } catch (err) {
                 throw new Error("Server returned an invalid response.");
             }
 
-            if (response.status === 401 || response.status === 403) {
-                clearTokens();
-                showError("Session expired or unauthorized. Redirecting to login...");
-                setTimeout(() => {
-                    window.location.href = "parent-login.html";
-                }, 1500);
-                return;
+            if (!response.ok || !data.success) {
+                throw new Error(data?.message || "Invalid credentials. Please try again.");
             }
 
-            if (!response.ok) {
-                throw new Error(data?.message || "Unable to load parent dashboard.");
+            // Extract string token safely
+            let token = data.token || data.accessToken || data.jwt;
+
+            if (typeof token === "object" && token !== null) {
+                token = token.token || token.accessToken;
             }
 
-            if (!data || !data.success || !data.dashboard) {
-                throw new Error("Parent dashboard data was not returned.");
+            if (!token || typeof token !== "string") {
+                throw new Error("Authentication succeeded, but no valid token was returned.");
             }
 
-            const dashboard = data.dashboard;
-            const parent = dashboard.parent || {};
-            const statistics = dashboard.statistics || {};
-            const children = Array.isArray(dashboard.children) ? dashboard.children : [];
+            // Clear residual sessions from other accounts
+            clearOldTokens();
 
-            const name = parent.fullName || "Parent";
-            parentName.textContent = name;
-            welcomeTitle.textContent = `Welcome, ${name}`;
+            // Store clean raw string token
+            localStorage.setItem("parent_token", token);
+            localStorage.setItem("edutrust_token", token);
 
-            childrenCount.textContent = Number(statistics.totalChildren || 0);
-            activeCount.textContent = Number(statistics.activeChildren || 0);
-            pendingCount.textContent = Number(statistics.pendingChildren || 0);
-            suspendedCount.textContent = Number(statistics.suspendedChildren || 0);
+            showAlert("Login successful! Redirecting to dashboard...", true);
 
-            renderChildren(children);
-            renderProfile(parent);
-            renderSchool(parent);
+            setTimeout(() => {
+                window.location.href = "parent-dashboard.html";
+            }, 1000);
 
         } catch (error) {
-            console.error("PARENT DASHBOARD ERROR:", error);
-            showError(error.message || "Failed to load parent dashboard.");
-
-            childrenContainer.innerHTML = `<div class="empty">Unable to load children.</div>`;
-            profileContainer.innerHTML = `<div class="empty">Unable to load parent profile.</div>`;
-            schoolInfo.textContent = "Unable to load school information.";
+            console.error("LOGIN ERROR:", error);
+            showAlert(error.message || "Failed to connect to server.");
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Sign In";
         }
-    }
-
-    loadDashboard();
+    });
 })();
 </script>
 
