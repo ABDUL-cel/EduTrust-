@@ -581,7 +581,20 @@
 
         `;
 
-
+// Attach Event Delegation for Parent View Buttons
+const tbody = document.getElementById("parentsTableBody");
+if (tbody) {
+    tbody.addEventListener("click", function (event) {
+        const viewBtn = event.target.closest(".parent-view-button");
+        if (viewBtn) {
+            const parentId = viewBtn.getAttribute("data-parent-id");
+            if (parentId) {
+                // Navigate to parent detail view
+                window.location.href = `parent-details.html?id=${encodeURIComponent(parentId)}`;
+            }
+        }
+    });
+}
         /*
         ================================================
         SEARCH
