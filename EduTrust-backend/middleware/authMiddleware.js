@@ -44,21 +44,27 @@ const authMiddleware = async (req, res, next) => {
             });
         }
 
-        // --------------------------------------------------
-        // IMPORTANT:
-        // school_id must come from the User account.
-        // Do NOT replace it with user._id.
-        // --------------------------------------------------
+        /*
+         * Every non-SuperAdmin user must belong to a school.
+         */
+        if (user.role !== "SuperAdmin" && !user.school_id) {
+            return res.status(403).json({
+                success: false,
+                message: "This account is not connected to a school."
+            });
+        }
 
-        req.user = {
-            id: user._id,
-            role: user.role,
-            school_id: user.school_id,
-            parent_id: user.parent_id,
-            student_id: user.student_id,
-            teacher_id: user.teacher_id,
-            staff_id: user.staff_id
-        };
+        /*
+         * The authenticated User record is the source of truth.
+         *
+         * Do NOT create another school token.
+         * The same JWT identifies:
+         *   - the User
+         *   - the role
+         *   - the school
+         *   - the linked profile
+         */
+        req.user = user;
 
         next();
 
