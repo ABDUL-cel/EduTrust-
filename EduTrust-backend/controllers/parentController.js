@@ -1,7 +1,7 @@
 // controllers/parentController.js
 
 const Parent = require("../models/Parent");
-const Student = require("../models/Student"); // Case-sensitive fix for Render
+const Student = require("../models/student"); // Case-sensitive fix for Render
 const User = require("../models/User");
 const School = require("../models/school");
 const bcrypt = require("bcryptjs");
