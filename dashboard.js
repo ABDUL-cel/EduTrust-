@@ -1,10 +1,5 @@
 /* =========================================================
-   EDUTRUST PRINCIPAL DASHBOARD
-   COMPLETE DASHBOARD.JS
-   ========================================================= */
-
-/* =========================================================
-   AUTH & SESSION INITIALIZATION
+   EDUTRUST PRINCIPAL DASHBOARD - DASHBOARD.JS
    ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -184,6 +179,7 @@ function formatCurrency(amount) {
 
 
 function showLoading(message = "Loading...") {
+    if (!contentArea) return;
     contentArea.innerHTML = `
         <div class="page-content">
             <div class="dashboard-card">
@@ -197,6 +193,7 @@ function showLoading(message = "Loading...") {
 
 
 function showError(message) {
+    if (!contentArea) return;
     contentArea.innerHTML = `
         <div class="page-content">
             <div class="dashboard-card">
@@ -230,8 +227,7 @@ const contentArea = document.getElementById("contentArea");
 const sidebar = document.querySelector(".sidebar");
 const menuToggle = document.getElementById("menu-toggle");
 const notificationButton = document.getElementById("notification-button");
-const notificationDropdown =
-    document.getElementById("notification-dropdown");
+const notificationDropdown = document.getElementById("notification-dropdown");
 
 
 navItems.forEach((item) => {
@@ -342,6 +338,57 @@ navItems.forEach((item) => {
         }
     });
 });
+
+
+/* =========================================================
+   OVERVIEW & PLACEHOLDERS
+   ========================================================= */
+
+function showOverview() {
+    if (!contentArea) return;
+    contentArea.innerHTML = `
+        <div class="page-content" id="overviewPage">
+            <div class="page-introduction">
+                <div>
+                    <h2>School Overview</h2>
+                    <p>Here's what's happening in your school today.</p>
+                </div>
+                <button class="primary-button">+ Add Student</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <p>Total Students</p>
+                    <h3>1,248</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Fees Collected</p>
+                    <h3>₦8.4M</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Outstanding Fees</p>
+                    <h3>₦2.1M</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Active Parents</p>
+                    <h3>936</h3>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function showComingSoon(pageName) {
+    if (!contentArea) return;
+    contentArea.innerHTML = `
+        <div class="page-content">
+            <div class="dashboard-card" style="text-align: center; padding: 3rem;">
+                <h2>${escapeHtml(pageName)}</h2>
+                <p style="margin-top: 1rem; color: #666;">This feature is currently under development.</p>
+            </div>
+        </div>
+    `;
+}
 
 
 /* =========================================================
@@ -600,11 +647,25 @@ function showCreateAssessment() {
                                 id="assessment-type"
                                 required
                             >
-                                <option value="">Select type</option>
-                                <option value="test">Test</option>
-                                <option value="exam">Examination</option>
-                                <option value="assignment">Assignment</option>
-                                <option value="quiz">Quiz</option>
+                                <option value="">
+                                    Select type
+                                </option>
+
+                                <option value="test">
+                                    Test
+                                </option>
+
+                                <option value="exam">
+                                    Examination
+                                </option>
+
+                                <option value="assignment">
+                                    Assignment
+                                </option>
+
+                                <option value="quiz">
+                                    Quiz
+                                </option>
                             </select>
                         </div>
 
@@ -656,10 +717,21 @@ function showCreateAssessment() {
                                 id="assessment-term"
                                 required
                             >
-                                <option value="">Select term</option>
-                                <option value="First Term">First Term</option>
-                                <option value="Second Term">Second Term</option>
-                                <option value="Third Term">Third Term</option>
+                                <option value="">
+                                    Select term
+                                </option>
+
+                                <option value="First Term">
+                                    First Term
+                                </option>
+
+                                <option value="Second Term">
+                                    Second Term
+                                </option>
+
+                                <option value="Third Term">
+                                    Third Term
+                                </option>
                             </select>
                         </div>
 
@@ -682,19 +754,26 @@ function showCreateAssessment() {
                         <div class="form-group">
                             <label>Status</label>
 
-                            <select id="assessment-status">
-                                <option value="draft">Draft</option>
-                                <option value="published">Published</option>
+                            <select
+                                id="assessment-status"
+                            >
+                                <option value="draft">
+                                    Draft
+                                </option>
+
+                                <option value="published">
+                                    Published
+                                </option>
                             </select>
                         </div>
 
                     </div>
 
-                    <div class="modal-actions">
+                    <div class="modal-actions" style="margin-top: 1.5rem;">
 
                         <button
                             type="button"
-                            class="cancel-button"
+                            class="secondary-button"
                             id="cancel-assessment-btn"
                         >
                             Cancel
@@ -726,384 +805,82 @@ function showCreateAssessment() {
 
     document
         .getElementById("assessment-form")
-        ?.addEventListener("submit", submitAssessment);
+        ?.addEventListener("submit", handleCreateAssessmentSubmit);
 }
 
 
-async function submitAssessment(event) {
+/* =========================================================
+   SUBMIT CREATE ASSESSMENT FORM
+   ========================================================= */
 
-    event.preventDefault();
-
-    const submitButton = event.target.querySelector('button[type="submit"]');
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Saving...";
+async function handleCreateAssessmentSubmit(e) {
+    e.preventDefault();
 
     const payload = {
-        title: document.getElementById("assessment-title").value.trim(),
+        title: document.getElementById("assessment-title").value,
         type: document.getElementById("assessment-type").value,
-        class_name: document.getElementById("assessment-class").value.trim(),
-        subject: document.getElementById("assessment-subject").value.trim(),
-        academic_session: document.getElementById("assessment-session").value.trim(),
+        class_name: document.getElementById("assessment-class").value,
+        subject: document.getElementById("assessment-subject").value,
+        session: document.getElementById("assessment-session").value,
         term: document.getElementById("assessment-term").value,
         total_marks: Number(document.getElementById("assessment-total-marks").value),
         status: document.getElementById("assessment-status").value
     };
 
     try {
-
         await apiRequest("/api/assessments", {
             method: "POST",
             body: payload
         });
 
-        alert("Assessment created successfully.");
         showAssessmentStructure();
-
     } catch (error) {
-
-        alert(error.message || "Unable to create assessment.");
-        submitButton.disabled = false;
-        submitButton.textContent = "Save Assessment";
+        alert("Error creating assessment: " + error.message);
     }
 }
 
 
 /* =========================================================
-   VIEW ASSESSMENT
+   VIEW ASSESSMENT DETAILS
    ========================================================= */
 
 async function viewAssessment(id) {
-
-    if (!id) {
-        alert("Assessment ID is missing.");
-        return;
-    }
-
-    showLoading("Loading assessment...");
+    if (!id) return;
+    showLoading("Fetching assessment details...");
 
     try {
-
         const data = await apiRequest(`/api/assessments/${id}`);
-
-        const assessment =
-            data?.assessment ||
-            data?.data ||
-            data;
+        const assessment = data.assessment || data.data || data;
 
         contentArea.innerHTML = `
             <div class="page-content">
 
                 <div class="page-introduction">
-
                     <div>
-                        <h2>
-                            ${escapeHtml(
-                                assessment.title ||
-                                assessment.name ||
-                                "Assessment"
-                            )}
-                        </h2>
-
-                        <p>Assessment details</p>
+                        <h2>${escapeHtml(assessment.title || "Assessment View")}</h2>
+                        <p>Assessment Details</p>
                     </div>
 
                     <button
                         class="secondary-button"
-                        id="back-assessments"
+                        onclick="showAssessmentStructure()"
                     >
-                        ← Back
+                        ← Back to Assessments
                     </button>
-
                 </div>
 
                 <div class="dashboard-card">
-
-                    <div class="detail-item">
-                        <span>Title</span>
-                        <strong>
-                            ${escapeHtml(
-                                assessment.title ||
-                                assessment.name ||
-                                "N/A"
-                            )}
-                        </strong>
-                    </div>
-
-                    <div class="detail-item">
-                        <span>Type</span>
-                        <strong>
-                            ${escapeHtml(assessment.type || "N/A")}
-                        </strong>
-                    </div>
-
-                    <div class="detail-item">
-                        <span>Class</span>
-                        <strong>
-                            ${escapeHtml(
-                                assessment.class_name ||
-                                assessment.className ||
-                                "N/A"
-                            )}
-                        </strong>
-                    </div>
-
-                    <div class="detail-item">
-                        <span>Subject</span>
-                        <strong>
-                            ${escapeHtml(assessment.subject || "N/A")}
-                        </strong>
-                    </div>
-
-                    <div class="detail-item">
-                        <span>Academic Session</span>
-                        <strong>
-                            ${escapeHtml(
-                                assessment.academic_session ||
-                                assessment.session ||
-                                "N/A"
-                            )}
-                        </strong>
-                    </div>
-
-                    <div class="detail-item">
-                        <span>Term</span>
-                        <strong>
-                            ${escapeHtml(assessment.term || "N/A")}
-                        </strong>
-                    </div>
-
-                    <div class="detail-item">
-                        <span>Total Marks</span>
-                        <strong>
-                            ${escapeHtml(
-                                assessment.total_marks ||
-                                assessment.totalMarks ||
-                                "N/A"
-                            )}
-                        </strong>
-                    </div>
-
-                    <div class="detail-item">
-                        <span>Status</span>
-                        <strong>
-                            ${escapeHtml(assessment.status || "draft")}
-                        </strong>
-                    </div>
-
+                    <p><strong>Type:</strong> ${escapeHtml(assessment.type || "N/A")}</p>
+                    <p><strong>Class:</strong> ${escapeHtml(assessment.class_name || assessment.className || "N/A")}</p>
+                    <p><strong>Subject:</strong> ${escapeHtml(assessment.subject || "N/A")}</p>
+                    <p><strong>Term:</strong> ${escapeHtml(assessment.term || "N/A")}</p>
+                    <p><strong>Status:</strong> ${escapeHtml(assessment.status || "draft")}</p>
+                    <p><strong>Total Marks:</strong> ${escapeHtml(assessment.total_marks || 100)}</p>
                 </div>
 
             </div>
         `;
-
-        document
-            .getElementById("back-assessments")
-            ?.addEventListener("click", showAssessmentStructure);
-
     } catch (error) {
-
-        showError(
-            error.message ||
-            "Unable to load assessment."
-        );
+        showError(error.message || "Failed to retrieve assessment details.");
     }
-}
-
-
-/* =========================================================
-   RESULTS
-   ========================================================= */
-
-async function showResults() {
-
-    showLoading("Loading student results...");
-
-    try {
-
-        const data = await apiRequest("/api/results");
-
-        const results =
-            data?.results ||
-            data?.data ||
-            [];
-
-        contentArea.innerHTML = `
-            <div class="page-content">
-
-                <div class="page-introduction">
-
-                    <div>
-                        <h2>Student Results</h2>
-
-                        <p>
-                            View and manage academic results
-                            for students in your school.
-                        </p>
-                    </div>
-
-                    <button
-                        class="primary-button"
-                        id="refresh-results-btn"
-                    >
-                        🔄 Refresh
-                    </button>
-
-                </div>
-
-                <div class="stats-grid">
-
-                    <div class="stat-card">
-                        <p>Total Results</p>
-                        <h3>${results.length}</h3>
-                        <small>Recorded results</small>
-                    </div>
-
-                    <div class="stat-card">
-                        <p>Published</p>
-                        <h3>
-                            ${
-                                results.filter(
-                                    result => result.status === "published"
-                                ).length
-                            }
-                        </h3>
-                        <small>Available to parents/students</small>
-                    </div>
-
-                    <div class="stat-card">
-                        <p>Pending Review</p>
-                        <h3>
-                            ${
-                                results.filter(
-                                    result => result.status !== "published"
-                                ).length
-                            }
-                        </h3>
-                        <small>Drafts or awaiting approval</small>
-                    </div>
-
-                </div>
-
-                <div class="dashboard-card">
-
-                    <div class="card-header">
-                        <h3>Results List</h3>
-                    </div>
-
-                    <div class="table-responsive">
-
-                        <table class="fee-table">
-
-                            <thead>
-                                <tr>
-                                    <th>Student</th>
-                                    <th>Class</th>
-                                    <th>Subject</th>
-                                    <th>Score</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                ${
-                                    results.length
-                                        ? results
-                                              .map(
-                                                  res => `
-                                    <tr>
-                                        <td>${escapeHtml(res.student_name || "N/A")}</td>
-                                        <td>${escapeHtml(res.class_name || "N/A")}</td>
-                                        <td>${escapeHtml(res.subject || "N/A")}</td>
-                                        <td>${escapeHtml(res.score ?? "N/A")}</td>
-                                        <td>
-                                            <span class="status ${
-                                                res.status === "published"
-                                                    ? "paid"
-                                                    : "pending"
-                                            }">
-                                                ${escapeHtml(res.status || "draft")}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                `
-                                              )
-                                              .join("")
-                                        : `
-                                    <tr>
-                                        <td colspan="5" style="text-align:center; padding:2rem;">
-                                            No results found.
-                                        </td>
-                                    </tr>
-                                `
-                                }
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </div>
-        `;
-
-        document
-            .getElementById("refresh-results-btn")
-            ?.addEventListener("click", showResults);
-
-    } catch (error) {
-
-        showError(
-            error.message ||
-            "Unable to load student results."
-        );
-    }
-}
-
-
-/* =========================================================
-   STUB & PLACEHOLDER FUNCTIONS
-   ========================================================= */
-
-function showOverview() {
-    contentArea.innerHTML = `
-        <div class="page-content">
-            <h2>Overview</h2>
-            <p>Welcome to the EduTrust Principal Dashboard.</p>
-        </div>
-    `;
-}
-
-function showSchoolManagement() { showComingSoon("School Management"); }
-function showClasses() { showComingSoon("Classes"); }
-function showAcademicSessions() { showComingSoon("Academic Sessions"); }
-function showSchoolFees() { showComingSoon("School Fees"); }
-function showParentPayments() { showComingSoon("Parent Payments"); }
-function showOutstandingFees() { showComingSoon("Outstanding Fees"); }
-function showStudents() { showComingSoon("Students"); }
-function showParentsFromBackend() { showComingSoon("Parents"); }
-function showStaff() { showComingSoon("Staff"); }
-function showAnnouncements() { showComingSoon("Announcements"); }
-function showMessages() { showComingSoon("Messages"); }
-function showNotifications() { showComingSoon("Notifications"); }
-function showSchoolProfile() { showComingSoon("School Profile"); }
-function showUserRoles() { showComingSoon("User Roles"); }
-function showPaymentSettings() { showComingSoon("Payment Settings"); }
-function showSecurity() { showComingSoon("Security Settings"); }
-function showEmailSettings() { showComingSoon("Email Settings"); }
-function showBackup() { showComingSoon("Backup & Restore"); }
-
-function showComingSoon(featureName) {
-    contentArea.innerHTML = `
-        <div class="page-content">
-            <div class="dashboard-card">
-                <div style="text-align:center; padding:3rem;">
-                    <h3>${escapeHtml(featureName)}</h3>
-                    <p>This module is currently under development.</p>
-                </div>
-            </div>
-        </div>
-    `;
 }
