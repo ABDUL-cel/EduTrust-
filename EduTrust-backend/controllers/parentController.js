@@ -207,10 +207,7 @@ exports.registerParent = async (req, res) => {
             }
         });
 
-  } catch (error) {
-    console.error("REGISTER PARENT ERROR:", error);
-
-    return res.status(500).json({
+     return res.status(500).json({
         success: false,
         message: error.message || "Failed to register parent.",
         error: error.message,
@@ -219,7 +216,8 @@ exports.registerParent = async (req, res) => {
         keyPattern: error.keyPattern || null,
         keyValue: error.keyValue || null
     });
-}
+    }
+};
 // ============================================================
 // SEARCH SCHOOLS
 // ============================================================
