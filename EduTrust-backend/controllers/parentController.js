@@ -1,16 +1,10 @@
 // controllers/parentController.js
 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
 const Parent = require("../models/Parent");
-const Student = require("../models/Student");
+const Student = require("../models/student");
 const User = require("../models/User");
-const School = require("../models/School");
+const School = require("../models/school");
 
-// ============================================================
-// REGISTER PARENT
-// ============================================================
 // ============================================================
 // REGISTER PARENT
 // ============================================================
@@ -27,39 +21,21 @@ exports.registerParent = async (req, res) => {
             home_address,
             occupation,
             passport,
-            school_id,
-            password
+            school_id
         } = req.body;
-
-        // --------------------------------------------------
-        // VALIDATION
-        // --------------------------------------------------
 
         if (
             !first_name?.trim() ||
             !last_name?.trim() ||
             !relationship?.trim() ||
             !phone?.trim() ||
-            !school_id ||
-            !password
+            !school_id
         ) {
             return res.status(400).json({
                 success: false,
-                message:
-                    "First name, last name, relationship, phone, password and school are required."
+                message: "First name, last name, relationship, phone and school are required."
             });
         }
-
-        if (password.length < 6) {
-            return res.status(400).json({
-                success: false,
-                message: "Password must be at least 6 characters."
-            });
-        }
-
-        // --------------------------------------------------
-        // FIND SCHOOL
-        // --------------------------------------------------
 
         const school = await School.findOne({
             _id: school_id,
@@ -73,156 +49,52 @@ exports.registerParent = async (req, res) => {
             });
         }
 
-        const cleanPhone = phone.trim();
-        const cleanEmail = email?.trim().toLowerCase() || "";
-
-        // --------------------------------------------------
-        // CHECK PARENT DUPLICATE
-        // --------------------------------------------------
-
-        const parentConditions = [
-            {
-                school_id,
-                phone: cleanPhone
-            }
-        ];
-
-        if (cleanEmail) {
-            parentConditions.push({
-                school_id,
-                email: cleanEmail
-            });
+        // Check if parent already exists by phone or email in this school
+        const duplicateConditions = [{ school_id, phone: phone.trim() }];
+        if (email?.trim()) {
+            duplicateConditions.push({ school_id, email: email.trim().toLowerCase() });
         }
 
-        const existingParent = await Parent.findOne({
-            $or: parentConditions
-        });
+        const existingParent = await Parent.findOne({ $or: duplicateConditions });
 
         if (existingParent) {
             return res.status(409).json({
                 success: false,
-                message:
-                    "A parent with this phone number or email already exists in this school."
+                message: "A parent with this phone number or email already exists in this school."
             });
         }
-
-        // --------------------------------------------------
-        // CHECK USER DUPLICATE
-        // --------------------------------------------------
-
-        const userConditions = [
-            {
-                school_id,
-                phone: cleanPhone
-            }
-        ];
-
-        if (cleanEmail) {
-            userConditions.push({
-                school_id,
-                email: cleanEmail
-            });
-        }
-
-        const existingUser = await User.findOne({
-            $or: userConditions
-        });
-
-        if (existingUser) {
-            return res.status(409).json({
-                success: false,
-                message:
-                    "A user account with this phone number or email already exists in this school."
-            });
-        }
-
-        // --------------------------------------------------
-        // HASH PASSWORD
-        // --------------------------------------------------
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // --------------------------------------------------
-        // CREATE PARENT PROFILE
-        // --------------------------------------------------
 
         const parent = await Parent.create({
-            school_id: school._id,
-
+            school_id,
             first_name: first_name.trim(),
             last_name: last_name.trim(),
             other_name: other_name?.trim() || "",
-
             relationship: relationship.trim(),
-
-            email: cleanEmail,
-            phone: cleanPhone,
-
+            email: email?.trim().toLowerCase() || "",
+            phone: phone.trim(),
             alternate_phone: alternate_phone?.trim() || "",
             home_address: home_address?.trim() || "",
             occupation: occupation?.trim() || "",
             passport: passport || "",
-
             status: "Active"
         });
-
-        // --------------------------------------------------
-        // CREATE LOGIN USER
-        // --------------------------------------------------
-
-        const user = await User.create({
-            first_name: first_name.trim(),
-            last_name: last_name.trim(),
-            other_name: other_name?.trim() || "",
-
-            full_name: [
-                first_name.trim(),
-                other_name?.trim(),
-                last_name.trim()
-            ]
-                .filter(Boolean)
-                .join(" "),
-
-            email: cleanEmail,
-            phone: cleanPhone,
-
-            password: hashedPassword,
-
-            role: "Parent",
-            status: "Active",
-
-            school_id: school._id,
-            parent_id: parent._id
-        });
-
-        // --------------------------------------------------
-        // SUCCESS
-        // --------------------------------------------------
 
         return res.status(201).json({
             success: true,
             message: "Parent registered successfully.",
-
-            parent: {
-                id: parent._id,
-                fullName: user.full_name,
-                school_id: school._id
-            }
+            parent
         });
 
     } catch (error) {
         console.error("REGISTER PARENT ERROR:", error);
         return res.status(500).json({
             success: false,
-            message: error.message || "Failed to register parent.",
-            error: error.message,
-            name: error.name,
-            code: error.code || null,
-            keyPattern: error.keyPattern || null,
-            keyValue: error.keyValue || null
+            message: "Failed to register parent.",
+            error: error.message
         });
     }
 };
+
 // ============================================================
 // SEARCH SCHOOLS
 // ============================================================
@@ -267,107 +139,42 @@ exports.searchSchools = async (req, res) => {
 // ============================================================
 exports.loginParent = async (req, res) => {
     try {
-        const { phone, email, password } = req.body;
+        const { phone, email } = req.body;
 
-        const identifier = phone?.trim() || email?.trim();
-
-        if (!identifier) {
+        if (!phone?.trim() && !email?.trim()) {
             return res.status(400).json({
                 success: false,
-                message: "Phone number or email is required."
+                message: "Phone or email is required."
             });
         }
 
-        if (!password) {
-            return res.status(400).json({
+        const conditions = [];
+
+        if (phone?.trim()) {
+            conditions.push({ phone: phone.trim() });
+        }
+
+        if (email?.trim()) {
+            conditions.push({ email: email.trim().toLowerCase() });
+        }
+
+        const parent = await Parent.findOne({ $or: conditions }).lean();
+
+        if (!parent) {
+            return res.status(404).json({
                 success: false,
-                message: "Password is required."
+                message: "Parent account not found."
             });
         }
-
-        // --------------------------------------------------
-        // FIND PARENT USER ACCOUNT
-        // --------------------------------------------------
-
-        const conditions = [{ phone: identifier }];
-
-        if (identifier.includes("@")) {
-            conditions.push({ email: identifier.toLowerCase() });
-        }
-
-        const user = await User.findOne({
-            role: "Parent",
-            status: "Active",
-            $or: conditions
-        });
-
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid phone/email or password."
-            });
-        }
-
-        // --------------------------------------------------
-        // CHECK PARENT AND SCHOOL REFS
-        // --------------------------------------------------
-
-        if (!user.parent_id) {
-            return res.status(403).json({
-                success: false,
-                message: "This parent account is not linked to a parent profile."
-            });
-        }
-
-        if (!user.school_id) {
-            return res.status(403).json({
-                success: false,
-                message: "This parent account is not linked to a school."
-            });
-        }
-
-        // --------------------------------------------------
-        // CHECK PASSWORD
-        // --------------------------------------------------
-
-        const passwordMatches = await bcrypt.compare(password, user.password);
-
-        if (!passwordMatches) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid phone/email or password."
-            });
-        }
-
-        // --------------------------------------------------
-        // CREATE ONE UNIFIED AUTH TOKEN
-        // --------------------------------------------------
-
-        const token = jwt.sign(
-            {
-                id: user._id,
-                role: user.role,
-                school_id: user.school_id,
-                parent_id: user.parent_id
-            },
-            process.env.JWT_SECRET || "edutrust_fallback_secret_key",
-            { expiresIn: "7d" }
-        );
-
-        // --------------------------------------------------
-        // SUCCESS
-        // --------------------------------------------------
 
         return res.status(200).json({
             success: true,
-            message: "Parent login successful.",
-            token,
-            redirectUrl: "/parent-dashboard.html"
+            message: "Parent account found.",
+            parent
         });
 
     } catch (error) {
         console.error("PARENT LOGIN ERROR:", error);
-
         return res.status(500).json({
             success: false,
             message: "Parent login failed.",
@@ -381,20 +188,22 @@ exports.loginParent = async (req, res) => {
 // ============================================================
 exports.getParentProfile = async (req, res) => {
     try {
+        const userId = req.user?.id || req.user?._id;
         const parentId = req.user?.parent_id;
-        const school_id = req.user?.school_id;
 
-        if (!parentId) {
-            return res.status(403).json({
-                success: false,
-                message: "This account is not linked to a parent profile."
-            });
+        let parent = null;
+
+        if (parentId) {
+            parent = await Parent.findById(parentId).lean();
         }
 
-        const parent = await Parent.findOne({
-            _id: parentId,
-            school_id
-        }).lean();
+        if (!parent && userId) {
+            const user = await User.findById(userId).lean();
+
+            if (user?.parent_id) {
+                parent = await Parent.findById(user.parent_id).lean();
+            }
+        }
 
         if (!parent) {
             return res.status(404).json({
@@ -419,15 +228,20 @@ exports.getParentProfile = async (req, res) => {
 };
 
 // ============================================================
-// UPDATE PARENT PROFILE
+// UPDATE PARENT PROFILE (NEW)
 // ============================================================
 exports.updateParentProfile = async (req, res) => {
     try {
-        const parentId = req.user?.parent_id;
-        const school_id = req.user?.school_id;
+        const userId = req.user?.id || req.user?._id;
+        let parentId = req.user?.parent_id;
+
+        if (!parentId && userId) {
+            const user = await User.findById(userId).lean();
+            parentId = user?.parent_id;
+        }
 
         if (!parentId) {
-            return res.status(403).json({
+            return res.status(404).json({
                 success: false,
                 message: "Parent profile reference not found."
             });
@@ -458,18 +272,11 @@ exports.updateParentProfile = async (req, res) => {
         if (occupation !== undefined) updateFields.occupation = occupation.trim();
         if (passport !== undefined) updateFields.passport = passport;
 
-        const updatedParent = await Parent.findOneAndUpdate(
-            { _id: parentId, school_id },
+        const updatedParent = await Parent.findByIdAndUpdate(
+            parentId,
             { $set: updateFields },
             { new: true, runValidators: true }
         ).lean();
-
-        if (!updatedParent) {
-            return res.status(404).json({
-                success: false,
-                message: "Parent profile not found or unauthorized to update."
-            });
-        }
 
         return res.status(200).json({
             success: true,
@@ -488,7 +295,7 @@ exports.updateParentProfile = async (req, res) => {
 };
 
 // ============================================================
-// GET ALL PARENTS (FOR SCHOOL ADMIN/STAFF)
+// GET ALL PARENTS
 // ============================================================
 exports.getParents = async (req, res) => {
     try {
@@ -522,7 +329,7 @@ exports.getParents = async (req, res) => {
 };
 
 // ============================================================
-// GET ONE PARENT BY ID (FOR SCHOOL ADMIN/STAFF)
+// GET ONE PARENT
 // ============================================================
 exports.getParentById = async (req, res) => {
     try {
@@ -563,7 +370,7 @@ exports.getParentById = async (req, res) => {
 };
 
 // ============================================================
-// UPDATE PARENT BY ID (FOR SCHOOL ADMIN/STAFF)
+// UPDATE PARENT BY ID (FOR SCHOOL ADMIN/STAFF) (NEW)
 // ============================================================
 exports.updateParentById = async (req, res) => {
     try {
@@ -610,8 +417,13 @@ exports.updateParentById = async (req, res) => {
 // ============================================================
 exports.getParentDashboard = async (req, res) => {
     try {
-        const parentId = req.user?.parent_id;
-        const school_id = req.user?.school_id;
+        let parentId = req.user?.parent_id;
+        const userId = req.user?.id || req.user?._id;
+
+        if (!parentId && userId) {
+            const user = await User.findById(userId).lean();
+            parentId = user?.parent_id;
+        }
 
         if (!parentId) {
             return res.status(403).json({
@@ -620,10 +432,7 @@ exports.getParentDashboard = async (req, res) => {
             });
         }
 
-        const parent = await Parent.findOne({
-            _id: parentId,
-            school_id
-        }).lean();
+        const parent = await Parent.findById(parentId).lean();
 
         if (!parent) {
             return res.status(404).json({
