@@ -4,9 +4,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const Parent = require("../models/Parent");
-const Student = require("../models/student");
+const Student = require("../models/Student");
 const User = require("../models/User");
-const School = require("../models/school");
+const School = require("../models/School");
+
 // ============================================================
 // REGISTER PARENT
 // ============================================================
@@ -143,7 +144,7 @@ exports.registerParent = async (req, res) => {
         // --------------------------------------------------
 
         const parent = await Parent.create({
-            school_id,
+            school_id: school._id,
 
             first_name: first_name.trim(),
             last_name: last_name.trim(),
@@ -154,17 +155,10 @@ exports.registerParent = async (req, res) => {
             email: cleanEmail,
             phone: cleanPhone,
 
-            alternate_phone:
-                alternate_phone?.trim() || "",
-
-            home_address:
-                home_address?.trim() || "",
-
-            occupation:
-                occupation?.trim() || "",
-
-            passport:
-                passport || "",
+            alternate_phone: alternate_phone?.trim() || "",
+            home_address: home_address?.trim() || "",
+            occupation: occupation?.trim() || "",
+            passport: passport || "",
 
             status: "Active"
         });
@@ -194,7 +188,6 @@ exports.registerParent = async (req, res) => {
             role: "Parent",
             status: "Active",
 
-            // THIS IS THE IMPORTANT PART
             school_id: school._id,
             parent_id: parent._id
         });
@@ -269,15 +262,9 @@ exports.searchSchools = async (req, res) => {
 // ============================================================
 exports.loginParent = async (req, res) => {
     try {
-        const {
-            phone,
-            email,
-            password
-        } = req.body;
+        const { phone, email, password } = req.body;
 
-        const identifier =
-            phone?.trim() ||
-            email?.trim();
+        const identifier = phone?.trim() || email?.trim();
 
         if (!identifier) {
             return res.status(400).json({
@@ -297,16 +284,10 @@ exports.loginParent = async (req, res) => {
         // FIND PARENT USER ACCOUNT
         // --------------------------------------------------
 
-        const conditions = [
-            {
-                phone: identifier
-            }
-        ];
+        const conditions = [{ phone: identifier }];
 
         if (identifier.includes("@")) {
-            conditions.push({
-                email: identifier.toLowerCase()
-            });
+            conditions.push({ email: identifier.toLowerCase() });
         }
 
         const user = await User.findOne({
@@ -323,22 +304,20 @@ exports.loginParent = async (req, res) => {
         }
 
         // --------------------------------------------------
-        // MAKE SURE USER IS LINKED TO PARENT
+        // CHECK PARENT AND SCHOOL REFS
         // --------------------------------------------------
 
         if (!user.parent_id) {
             return res.status(403).json({
                 success: false,
-                message:
-                    "This parent account is not linked to a parent profile."
+                message: "This parent account is not linked to a parent profile."
             });
         }
 
         if (!user.school_id) {
             return res.status(403).json({
                 success: false,
-                message:
-                    "This parent account is not linked to a school."
+                message: "This parent account is not linked to a school."
             });
         }
 
@@ -346,11 +325,7 @@ exports.loginParent = async (req, res) => {
         // CHECK PASSWORD
         // --------------------------------------------------
 
-        const passwordMatches =
-            await bcrypt.compare(
-                password,
-                user.password
-            );
+        const passwordMatches = await bcrypt.compare(password, user.password);
 
         if (!passwordMatches) {
             return res.status(401).json({
@@ -360,25 +335,18 @@ exports.loginParent = async (req, res) => {
         }
 
         // --------------------------------------------------
-        // CREATE ONE AUTH TOKEN
+        // CREATE ONE UNIFIED AUTH TOKEN
         // --------------------------------------------------
 
         const token = jwt.sign(
             {
                 id: user._id,
                 role: user.role,
-
-                // These are useful immediately,
-                // but the middleware will also read them
-                // from the User document.
                 school_id: user.school_id,
                 parent_id: user.parent_id
             },
-            process.env.JWT_SECRET ||
-                "edutrust_fallback_secret_key",
-            {
-                expiresIn: "7d"
-            }
+            process.env.JWT_SECRET || "edutrust_fallback_secret_key",
+            { expiresIn: "7d" }
         );
 
         // --------------------------------------------------
@@ -388,11 +356,8 @@ exports.loginParent = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Parent login successful.",
-
             token,
-
-            redirectUrl:
-                "/parent-dashboard.html"
+            redirectUrl: "/parent-dashboard.html"
         });
 
     } catch (error) {
@@ -411,22 +376,20 @@ exports.loginParent = async (req, res) => {
 // ============================================================
 exports.getParentProfile = async (req, res) => {
     try {
-        const userId = req.user?.id || req.user?._id;
         const parentId = req.user?.parent_id;
+        const school_id = req.user?.school_id;
 
-        let parent = null;
-
-        if (parentId) {
-            parent = await Parent.findById(parentId).lean();
+        if (!parentId) {
+            return res.status(403).json({
+                success: false,
+                message: "This account is not linked to a parent profile."
+            });
         }
 
-        if (!parent && userId) {
-            const user = await User.findById(userId).lean();
-
-            if (user?.parent_id) {
-                parent = await Parent.findById(user.parent_id).lean();
-            }
-        }
+        const parent = await Parent.findOne({
+            _id: parentId,
+            school_id
+        }).lean();
 
         if (!parent) {
             return res.status(404).json({
@@ -451,20 +414,15 @@ exports.getParentProfile = async (req, res) => {
 };
 
 // ============================================================
-// UPDATE PARENT PROFILE (NEW)
+// UPDATE PARENT PROFILE
 // ============================================================
 exports.updateParentProfile = async (req, res) => {
     try {
-        const userId = req.user?.id || req.user?._id;
-        let parentId = req.user?.parent_id;
-
-        if (!parentId && userId) {
-            const user = await User.findById(userId).lean();
-            parentId = user?.parent_id;
-        }
+        const parentId = req.user?.parent_id;
+        const school_id = req.user?.school_id;
 
         if (!parentId) {
-            return res.status(404).json({
+            return res.status(403).json({
                 success: false,
                 message: "Parent profile reference not found."
             });
@@ -495,11 +453,18 @@ exports.updateParentProfile = async (req, res) => {
         if (occupation !== undefined) updateFields.occupation = occupation.trim();
         if (passport !== undefined) updateFields.passport = passport;
 
-        const updatedParent = await Parent.findByIdAndUpdate(
-            parentId,
+        const updatedParent = await Parent.findOneAndUpdate(
+            { _id: parentId, school_id },
             { $set: updateFields },
             { new: true, runValidators: true }
         ).lean();
+
+        if (!updatedParent) {
+            return res.status(404).json({
+                success: false,
+                message: "Parent profile not found or unauthorized to update."
+            });
+        }
 
         return res.status(200).json({
             success: true,
@@ -518,7 +483,7 @@ exports.updateParentProfile = async (req, res) => {
 };
 
 // ============================================================
-// GET ALL PARENTS
+// GET ALL PARENTS (FOR SCHOOL ADMIN/STAFF)
 // ============================================================
 exports.getParents = async (req, res) => {
     try {
@@ -552,7 +517,7 @@ exports.getParents = async (req, res) => {
 };
 
 // ============================================================
-// GET ONE PARENT
+// GET ONE PARENT BY ID (FOR SCHOOL ADMIN/STAFF)
 // ============================================================
 exports.getParentById = async (req, res) => {
     try {
@@ -593,7 +558,7 @@ exports.getParentById = async (req, res) => {
 };
 
 // ============================================================
-// UPDATE PARENT BY ID (FOR SCHOOL ADMIN/STAFF) (NEW)
+// UPDATE PARENT BY ID (FOR SCHOOL ADMIN/STAFF)
 // ============================================================
 exports.updateParentById = async (req, res) => {
     try {
@@ -640,13 +605,8 @@ exports.updateParentById = async (req, res) => {
 // ============================================================
 exports.getParentDashboard = async (req, res) => {
     try {
-        let parentId = req.user?.parent_id;
-        const userId = req.user?.id || req.user?._id;
-
-        if (!parentId && userId) {
-            const user = await User.findById(userId).lean();
-            parentId = user?.parent_id;
-        }
+        const parentId = req.user?.parent_id;
+        const school_id = req.user?.school_id;
 
         if (!parentId) {
             return res.status(403).json({
@@ -655,7 +615,10 @@ exports.getParentDashboard = async (req, res) => {
             });
         }
 
-        const parent = await Parent.findById(parentId).lean();
+        const parent = await Parent.findOne({
+            _id: parentId,
+            school_id
+        }).lean();
 
         if (!parent) {
             return res.status(404).json({
