@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="/logo-icon.png">
-    <title>EduTrust Parent Login</title>
+    <title>Parent Dashboard | EduTrust</title>
+
     <style>
         * {
             box-sizing: border-box;
@@ -13,229 +12,345 @@
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background: #f4f7fb;
+            color: #172033;
+        }
+
+        button {
+            font-family: inherit;
         }
 
         .topbar {
-            height: 70px;
-            background: white;
-            border-bottom: 1px solid #ddd;
+            min-height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             padding: 0 30px;
+            gap: 20px;
         }
 
         .logo {
+            color: #1769e0;
             font-size: 23px;
             font-weight: 800;
-            color: #1769e0;
+            text-decoration: none;
         }
 
-        .back {
-            color: #1769e0;
-            text-decoration: none;
-            font-weight: 600;
+        .logo span {
+            color: #172033;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .parent-name {
+            font-weight: 700;
+        }
+
+        .logout {
+            border: 0;
+            background: #ef4444;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .logout:hover {
+            background: #dc2626;
         }
 
         .container {
-            max-width: 480px;
-            margin: 60px auto;
-            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 35px 20px 60px;
         }
 
-        .card {
-            background: white;
-            border-radius: 14px;
-            padding: 35px 30px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        .welcome {
+            margin-bottom: 25px;
         }
 
-        h1 {
-            margin-top: 0;
-            margin-bottom: 8px;
-            font-size: 26px;
-            color: #101828;
+        .welcome h1 {
+            margin: 0 0 7px;
+            font-size: 30px;
         }
 
-        .subtitle {
-            color: #667085;
-            margin-bottom: 28px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .form-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: 700;
-            color: #344054;
-        }
-
-        .password-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d0d5dd;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .password-wrapper input {
-            padding-right: 42px;
-        }
-
-        input:focus {
-            border-color: #1769e0;
-            box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.12);
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
+        .welcome p {
             margin: 0;
             color: #667085;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: auto;
-        }
-
-        .toggle-password:hover {
-            color: #1769e0;
-            background: transparent;
-        }
-
-        .toggle-password svg {
-            width: 20px;
-            height: 20px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            margin-top: 2px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #475467;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .remember-me input {
-            width: auto;
-            cursor: pointer;
-        }
-
-        .forgot-password {
-            color: #1769e0;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-
-        #submitButton {
-            width: 100%;
-            margin-top: 25px;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            background: #1769e0;
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        #submitButton:hover {
-            background: #1254b7;
-        }
-
-        #submitButton:disabled {
-            opacity: .6;
-            cursor: not-allowed;
-        }
-
-        .message {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .success {
-            background: #e9f9ef;
-            color: #18794e;
         }
 
         .error {
             background: #fff0f0;
+            border: 1px solid #f5b5b5;
             color: #b42318;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
         }
 
-        .auth-footer {
-            margin-top: 24px;
+        .loading {
             text-align: center;
-            font-size: 14px;
+            padding: 40px;
             color: #667085;
         }
 
-        .auth-footer a {
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 22px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-title {
+            color: #667085;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .section {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .children {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .child-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .child-card h3 {
+            margin: 0 0 18px;
+            font-size: 18px;
+        }
+
+        .child-passport {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }
+
+        .child-placeholder {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #eef4ff;
             color: #1769e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .child-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .child-row span:first-child {
+            color: #667085;
+        }
+
+        .child-row strong {
+            text-align: right;
+        }
+
+        .child-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
             text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #1769e0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1355b8;
+        }
+
+        .btn-secondary {
+            background: #eef4ff;
+            color: #1769e0;
+        }
+
+        .btn-secondary:hover {
+            background: #dbe7ff;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #e8f7ee;
+            color: #18794e;
+            font-size: 12px;
             font-weight: 700;
         }
 
-        .auth-footer a:hover {
-            text-decoration: underline;
+        .status.pending {
+            background: #fff7e6;
+            color: #b54708;
         }
 
-        @media(max-width: 500px) {
+        .status.suspended {
+            background: #fff0f0;
+            color: #b42318;
+        }
+
+        .status.graduated {
+            background: #eef4ff;
+            color: #1769e0;
+        }
+
+        .status.archived {
+            background: #f2f4f7;
+            color: #667085;
+        }
+
+        .empty {
+            color: #667085;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .profile-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            padding: 15px;
+        }
+
+        .profile-label {
+            display: block;
+            color: #667085;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .profile-value {
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .school-info {
+            color: #667085;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .children {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
             .topbar {
                 padding: 0 15px;
             }
 
-            .card {
-                padding: 25px 20px;
+            .parent-name {
+                display: none;
+            }
+
+            .container {
+                padding: 25px 15px 50px;
+            }
+
+            .stats,
+            .children,
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+
+            .section {
+                padding: 18px;
             }
         }
     </style>
@@ -244,201 +359,505 @@
 <body>
 
 <header class="topbar">
-    <div class="logo">
-        EduTrust
+
+    <!-- FIXED: Changed href="/" to "index.html" to prevent 404 errors on GitHub Pages -->
+    <a href="index.html" class="logo">
+        Edu<span>Trust</span>
+    </a>
+
+    <div class="top-right">
+
+        <span
+            id="parentName"
+            class="parent-name"
+        >
+            Loading...
+        </span>
+
+        <button
+            class="logout"
+            id="logoutButton"
+            type="button"
+        >
+            Logout
+        </button>
+
     </div>
 
-    <a href="/" class="back">
-        ← Back
-    </a>
 </header>
 
-<div class="container">
 
-    <div class="card">
+<main class="container">
 
-        <h1>Parent Portal Login</h1>
+    <section class="welcome">
 
-        <p class="subtitle">
-            Welcome back! Access your children's performance, grades, and attendance records.
+        <h1 id="welcomeTitle">
+            Parent Dashboard
+        </h1>
+
+        <p>
+            Manage your children and monitor their school
+            information from one place.
         </p>
 
-        <form id="parentLoginForm">
+    </section>
 
-            <div class="form-grid">
 
-                <!-- Primary Identification: Phone or Email -->
-                <div class="field">
-                    <label for="phone">
-                        Phone Number or Email *
-                    </label>
-                    <input
-                        type="text"
-                        id="phone"
-                        placeholder="e.g. 08012345678 or parent@gmail.com"
-                        required
-                    >
-                </div>
+    <div
+        id="error"
+        class="error"
+    ></div>
 
-                <!-- Password with Toggle Visibility -->
-                <div class="field">
-                    <label for="password">
-                        Password *
-                    </label>
-                    <div class="password-wrapper">
-                        <input
-                            type="password"
-                            id="password"
-                            placeholder="••••••••"
-                            required
-                        >
-                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
-                            <svg id="eyeIcon" viewBox="0 0 24 24">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
 
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox" id="rememberMe">
-                        Remember me
-                    </label>
-                    <a href="/parent/forgot-password" class="forgot-password">
-                        Forgot Password?
-                    </a>
-                </div>
+    <section class="stats">
 
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Children
             </div>
 
-            <button type="submit" id="submitButton">
-                Log In to Portal
-            </button>
+            <div
+                class="stat-value"
+                id="childrenCount"
+            >
+                0
+            </div>
 
-            <div id="message" class="message"></div>
-
-        </form>
-
-        <div class="auth-footer">
-            Don't have a parent account yet? 
-            <a href="/parent-register.html">Register Here</a>
         </div>
 
-    </div>
 
-</div>
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Active
+            </div>
+
+            <div
+                class="stat-value"
+                id="activeCount"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Pending
+            </div>
+
+            <div
+                class="stat-value"
+                id="pendingCount"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Suspended
+            </div>
+
+            <div
+                class="stat-value"
+                id="suspendedCount"
+            >
+                0
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <h2>
+                My Children
+            </h2>
+
+        </div>
+
+
+        <div
+            id="children"
+            class="children"
+        >
+
+            <div class="loading">
+                Loading children...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <h2>
+                Parent Information
+            </h2>
+
+        </div>
+
+
+        <div
+            id="profile"
+            class="profile-grid"
+        >
+
+            <div class="loading">
+                Loading profile...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <h2>
+                School
+            </h2>
+
+        </div>
+
+        <div
+            id="schoolInfo"
+            class="school-info"
+        >
+            Loading school information...
+        </div>
+
+    </section>
+
+</main>
+
 
 <script>
-// Dynamic API Endpoint Switcher (Local Host vs Live Server)
-const API_BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "http://localhost:5000/api/parents"
-    : "https://edutrust-15ii.onrender.com/api/parents";
 
-// Pre-fill credentials if 'Remember Me' was checked previously
-window.addEventListener("DOMContentLoaded", () => {
-    const savedPhone = localStorage.getItem("edutrust_remember_phone");
-    if (savedPhone) {
-        document.getElementById("phone").value = savedPhone;
-        document.getElementById("rememberMe").checked = true;
-    }
-});
+(function () {
 
-// Password Show/Hide Toggle Logic
-const togglePasswordBtn = document.getElementById("togglePassword");
-const passwordInput = document.getElementById("password");
-const eyeIcon = document.getElementById("eyeIcon");
+    "use strict";
 
-togglePasswordBtn.addEventListener("click", () => {
-    const isPassword = passwordInput.getAttribute("type") === "password";
-    passwordInput.setAttribute("type", isPassword ? "text" : "password");
-    
-    // Switch SVG Icon state
-    if (isPassword) {
-        eyeIcon.innerHTML = `
-            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-            <line x1="1" y1="1" x2="23" y2="23"></line>
-        `;
-    } else {
-        eyeIcon.innerHTML = `
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-        `;
-    }
-});
+    // =========================================================
+    // CONFIGURATION
+    // =========================================================
 
-// Helper function to display status messages
-function showMessage(text, isSuccess) {
-    const messageDiv = document.getElementById("message");
-    messageDiv.textContent = text;
-    messageDiv.style.display = "block";
-    messageDiv.className = `message ${isSuccess ? "success" : "error"}`;
-}
+    const API_BASE =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000/api"
+            : "https://edutrust-15ii.onrender.com/api";
 
-// Form Submission Handling
-document.getElementById("parentLoginForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
+    const DASHBOARD_URL = `${API_BASE}/parents/dashboard`;
 
-    const button = document.getElementById("submitButton");
-    const phoneInput = document.getElementById("phone").value.trim();
-    const passwordInputValue = passwordInput.value;
-    const rememberMeChecked = document.getElementById("rememberMe").checked;
-    const messageDiv = document.getElementById("message");
+    // =========================================================
+    // ELEMENTS
+    // =========================================================
 
-    // Reset message
-    messageDiv.style.display = "none";
+    const parentName = document.getElementById("parentName");
+    const welcomeTitle = document.getElementById("welcomeTitle");
+    const childrenCount = document.getElementById("childrenCount");
+    const activeCount = document.getElementById("activeCount");
+    const pendingCount = document.getElementById("pendingCount");
+    const suspendedCount = document.getElementById("suspendedCount");
+    const childrenContainer = document.getElementById("children");
+    const profileContainer = document.getElementById("profile");
+    const schoolInfo = document.getElementById("schoolInfo");
+    const errorContainer = document.getElementById("error");
+    const logoutButton = document.getElementById("logoutButton");
 
-    button.disabled = true;
-    button.textContent = "Logging in...";
+    // =========================================================
+    // TOKEN
+    // =========================================================
 
-    // Handle Remember Me feature
-    if (rememberMeChecked) {
-        localStorage.setItem("edutrust_remember_phone", phoneInput);
-    } else {
-        localStorage.removeItem("edutrust_remember_phone");
+    const token =
+        localStorage.getItem("parent_token") ||
+        localStorage.getItem("edutrust_token") ||
+        localStorage.getItem("token");
+
+    if (!token) {
+        window.location.href = "parent-login.html";
+        return;
     }
 
-    const payload = {
-        phone: phoneInput,
-        email: phoneInput,
-        password: passwordInputValue
-    };
+    // =========================================================
+    // LOGOUT
+    // =========================================================
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
+    logoutButton.addEventListener("click", function () {
+        localStorage.removeItem("parent_token");
+        localStorage.removeItem("edutrust_token");
+        localStorage.removeItem("token");
+        window.location.href = "parent-login.html";
+    });
+
+    // =========================================================
+    // HELPERS
+    // =========================================================
+
+    function showError(message) {
+        errorContainer.textContent = message || "Something went wrong.";
+        errorContainer.style.display = "block";
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function formatDate(value) {
+        if (!value) return "-";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "-";
+        return date.toLocaleDateString("en-NG", {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
         });
+    }
 
-        const data = await response.json();
+    function getStatusClass(status) {
+        switch (status) {
+            case "Pending": return "pending";
+            case "Suspended": return "suspended";
+            case "Graduated": return "graduated";
+            case "Archived": return "archived";
+            default: return "";
+        }
+    }
 
-        if (response.ok && data.success) {
-            // Save token for authenticated dashboard queries
-            localStorage.setItem("edutrust_token", data.token);
+    function getInitials(name) {
+        const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return "?";
+        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
 
-            showMessage("Login successful! Redirecting...", true);
+    // =========================================================
+    // RENDER FUNCTIONS
+    // =========================================================
 
-            setTimeout(() => {
-                window.location.href = data.redirectUrl || "/parent-dashboard.html";
-            }, 1200);
-
-        } else {
-            showMessage(data.message || "Login failed. Please check your details.", false);
-            button.disabled = false;
-            button.textContent = "Log In to Portal";
+    function renderChildren(children) {
+        if (!Array.isArray(children) || children.length === 0) {
+            childrenContainer.innerHTML = `
+                <div class="empty">
+                    No children are currently linked to this parent account.
+                </div>
+            `;
+            return;
         }
 
-    } catch (error) {
-        console.error("LOGIN REQUEST ERROR:", error);
-        showMessage("Unable to connect to server. Please check your connection.", false);
-        button.disabled = false;
-        button.textContent = "Log In to Portal";
+        childrenContainer.innerHTML = children.map(function (child) {
+            const name = child.fullName ||
+                [child.first_name, child.other_name, child.last_name]
+                    .filter(Boolean)
+                    .join(" ") || "Unnamed Student";
+
+            const status = child.status || "Pending";
+            const statusClass = getStatusClass(status);
+            const passport = child.passport;
+            const childId = child._id || child.id || "";
+            const admissionNo = child.admissionNumber || "";
+
+            const avatar = passport
+                ? `<img class="child-passport" loading="lazy" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                   <div class="child-placeholder" style="display:none;">${escapeHtml(getInitials(name))}</div>`
+                : `<div class="child-placeholder">${escapeHtml(getInitials(name))}</div>`;
+
+            return `
+                <article class="child-card">
+                    ${avatar}
+                    <h3>${escapeHtml(name)}</h3>
+
+                    <div class="child-row">
+                        <span>Admission No.</span>
+                        <strong>${escapeHtml(admissionNo || "-")}</strong>
+                    </div>
+
+                    <div class="child-row">
+                        <span>Class</span>
+                        <strong>${escapeHtml(child.className || "-")}</strong>
+                    </div>
+
+                    <div class="child-row">
+                        <span>Arm</span>
+                        <strong>${escapeHtml(child.arm || "-")}</strong>
+                    </div>
+
+                    <div class="child-row">
+                        <span>Gender</span>
+                        <strong>${escapeHtml(child.gender || "-")}</strong>
+                    </div>
+
+                    <div class="child-row">
+                        <span>Date of Birth</span>
+                        <strong>${escapeHtml(formatDate(child.dateOfBirth))}</strong>
+                    </div>
+
+                    <div class="child-row">
+                        <span>Admission Date</span>
+                        <strong>${escapeHtml(formatDate(child.admissionDate))}</strong>
+                    </div>
+
+                    <div class="child-row">
+                        <span>Status</span>
+                        <span class="status ${statusClass}">${escapeHtml(status)}</span>
+                    </div>
+
+                    <div class="child-actions">
+                        <a href="check-result.html?studentId=${encodeURIComponent(childId)}&admissionNo=${encodeURIComponent(admissionNo)}" class="btn-action btn-primary">
+                            Check Exam Result
+                        </a>
+                        <a href="report-card.html?studentId=${encodeURIComponent(childId)}" class="btn-action btn-secondary">
+                            View Report Sheet
+                        </a>
+                    </div>
+                </article>
+            `;
+        }).join("");
     }
-});
+
+    function renderProfile(parent) {
+        profileContainer.innerHTML = `
+            <div class="profile-item">
+                <span class="profile-label">Full Name</span>
+                <div class="profile-value">${escapeHtml(parent.fullName || "-")}</div>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Relationship</span>
+                <div class="profile-value">${escapeHtml(parent.relationship || "-")}</div>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Phone</span>
+                <div class="profile-value">${escapeHtml(parent.phone || "-")}</div>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Alternate Phone</span>
+                <div class="profile-value">${escapeHtml(parent.alternatePhone || "-")}</div>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Email</span>
+                <div class="profile-value">${escapeHtml(parent.email || "-")}</div>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Occupation</span>
+                <div class="profile-value">${escapeHtml(parent.occupation || "-")}</div>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Home Address</span>
+                <div class="profile-value">${escapeHtml(parent.homeAddress || "-")}</div>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Account Status</span>
+                <div class="profile-value">
+                    <span class="status ${getStatusClass(parent.status)}">
+                        ${escapeHtml(parent.status || "-")}
+                    </span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderSchool(parent) {
+        schoolInfo.innerHTML = `
+            <p>
+                Your parent account is connected to school ID:
+                <strong>${escapeHtml(parent.schoolId || "-")}</strong>
+            </p>
+        `;
+    }
+
+    // =========================================================
+    // LOAD DASHBOARD
+    // =========================================================
+
+    async function loadDashboard() {
+        errorContainer.style.display = "none";
+
+        try {
+            const response = await fetch(DASHBOARD_URL, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            let data = null;
+            try {
+                data = await response.json();
+            } catch (jsonError) {
+                throw new Error("Server returned an invalid response.");
+            }
+
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("parent_token");
+                localStorage.removeItem("edutrust_token");
+                localStorage.removeItem("token");
+                window.location.href = "parent-login.html";
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(data?.message || "Unable to load parent dashboard.");
+            }
+
+            if (!data || !data.success || !data.dashboard) {
+                throw new Error("Parent dashboard data was not returned.");
+            }
+
+            const dashboard = data.dashboard;
+            const parent = dashboard.parent || {};
+            const statistics = dashboard.statistics || {};
+            const children = Array.isArray(dashboard.children) ? dashboard.children : [];
+
+            const name = parent.fullName || "Parent";
+            parentName.textContent = name;
+            welcomeTitle.textContent = `Welcome, ${name}`;
+
+            childrenCount.textContent = Number(statistics.totalChildren || 0);
+            activeCount.textContent = Number(statistics.activeChildren || 0);
+            pendingCount.textContent = Number(statistics.pendingChildren || 0);
+            suspendedCount.textContent = Number(statistics.suspendedChildren || 0);
+
+            renderChildren(children);
+            renderProfile(parent);
+            renderSchool(parent);
+
+        } catch (error) {
+            console.error("PARENT DASHBOARD ERROR:", error);
+            showError(error.message || "Failed to load parent dashboard.");
+
+            childrenContainer.innerHTML = `<div class="empty">Unable to load children.</div>`;
+            profileContainer.innerHTML = `<div class="empty">Unable to load parent profile.</div>`;
+            schoolInfo.textContent = "Unable to load school information.";
+        }
+    }
+
+    loadDashboard();
+
+})();
 </script>
 
 </body>
