@@ -1,9 +1,10 @@
 // controllers/parentController.js
 
 const Parent = require("../models/Parent");
-const Student = require("../models/student");
+const Student = require("../models/Student"); // Case-sensitive fix for Render
 const User = require("../models/User");
 const School = require("../models/school");
+const bcrypt = require("bcryptjs");
 
 // ============================================================
 // REGISTER PARENT
@@ -21,7 +22,8 @@ exports.registerParent = async (req, res) => {
             home_address,
             occupation,
             passport,
-            school_id
+            school_id,
+            password
         } = req.body;
 
         if (
@@ -33,7 +35,7 @@ exports.registerParent = async (req, res) => {
         ) {
             return res.status(400).json({
                 success: false,
-                message: "First name, last name, relationship, phone and school are required."
+                message: "First name, last name, relationship, phone, and school are required."
             });
         }
 
@@ -49,10 +51,13 @@ exports.registerParent = async (req, res) => {
             });
         }
 
-        // Check if parent already exists by phone or email in this school
-        const duplicateConditions = [{ school_id, phone: phone.trim() }];
-        if (email?.trim()) {
-            duplicateConditions.push({ school_id, email: email.trim().toLowerCase() });
+        const cleanPhone = phone.trim();
+        const cleanEmail = email?.trim().toLowerCase() || "";
+
+        // Check duplicate parent
+        const duplicateConditions = [{ school_id, phone: cleanPhone }];
+        if (cleanEmail) {
+            duplicateConditions.push({ school_id, email: cleanEmail });
         }
 
         const existingParent = await Parent.findOne({ $or: duplicateConditions });
@@ -64,20 +69,39 @@ exports.registerParent = async (req, res) => {
             });
         }
 
+        // Create Parent record
         const parent = await Parent.create({
             school_id,
             first_name: first_name.trim(),
             last_name: last_name.trim(),
             other_name: other_name?.trim() || "",
             relationship: relationship.trim(),
-            email: email?.trim().toLowerCase() || "",
-            phone: phone.trim(),
+            email: cleanEmail,
+            phone: cleanPhone,
             alternate_phone: alternate_phone?.trim() || "",
             home_address: home_address?.trim() || "",
             occupation: occupation?.trim() || "",
             passport: passport || "",
             status: "Active"
         });
+
+        // Create User account for authentication if password provided
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await User.create({
+                first_name: first_name.trim(),
+                last_name: last_name.trim(),
+                other_name: other_name?.trim() || "",
+                full_name: [first_name.trim(), other_name?.trim(), last_name.trim()].filter(Boolean).join(" "),
+                email: cleanEmail,
+                phone: cleanPhone,
+                password: hashedPassword,
+                role: "Parent",
+                status: "Active",
+                school_id,
+                parent_id: parent._id
+            });
+        }
 
         return res.status(201).json({
             success: true,
@@ -228,7 +252,7 @@ exports.getParentProfile = async (req, res) => {
 };
 
 // ============================================================
-// UPDATE PARENT PROFILE (NEW)
+// UPDATE PARENT PROFILE
 // ============================================================
 exports.updateParentProfile = async (req, res) => {
     try {
@@ -241,9 +265,9 @@ exports.updateParentProfile = async (req, res) => {
         }
 
         if (!parentId) {
-            return res.status(404).json({
+            return res.status(400).json({
                 success: false,
-                message: "Parent profile reference not found."
+                message: "Parent profile reference not found or invalid account context."
             });
         }
 
@@ -277,6 +301,13 @@ exports.updateParentProfile = async (req, res) => {
             { $set: updateFields },
             { new: true, runValidators: true }
         ).lean();
+
+        if (!updatedParent) {
+            return res.status(404).json({
+                success: false,
+                message: "Parent record not found."
+            });
+        }
 
         return res.status(200).json({
             success: true,
@@ -370,7 +401,7 @@ exports.getParentById = async (req, res) => {
 };
 
 // ============================================================
-// UPDATE PARENT BY ID (FOR SCHOOL ADMIN/STAFF) (NEW)
+// UPDATE PARENT BY ID (FOR SCHOOL ADMIN/STAFF)
 // ============================================================
 exports.updateParentById = async (req, res) => {
     try {
