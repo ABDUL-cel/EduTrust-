@@ -1,4 +1,26 @@
-/* ================================
+:root {
+    --bg-color: #ffffff;
+    --card-bg: #f8fafc;
+    --text-color: #1e293b;
+    --border-color: #e2e8f0;
+}
+
+[data-theme="dark"] {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --text-color: #f8fafc;
+    --border-color: #334155;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.dashboard-card, .stat-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}/* ================================
    RESET
 ================================ */
 
@@ -12,7 +34,7 @@
 body {
 
     font-family: Arial, sans-serif;
-
+;
     background: #f1f3f6;
     font-weight: 500;
     color: #172033;
