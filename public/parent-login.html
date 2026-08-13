@@ -359,217 +359,87 @@
 <body>
 
 <header class="topbar">
-
-    <!-- FIXED: Changed href="/" to "index.html" to prevent 404 errors on GitHub Pages -->
     <a href="index.html" class="logo">
         Edu<span>Trust</span>
     </a>
 
     <div class="top-right">
-
-        <span
-            id="parentName"
-            class="parent-name"
-        >
-            Loading...
-        </span>
-
-        <button
-            class="logout"
-            id="logoutButton"
-            type="button"
-        >
-            Logout
-        </button>
-
+        <span id="parentName" class="parent-name">Loading...</span>
+        <button class="logout" id="logoutButton" type="button">Logout</button>
     </div>
-
 </header>
 
-
 <main class="container">
-
     <section class="welcome">
-
-        <h1 id="welcomeTitle">
-            Parent Dashboard
-        </h1>
-
-        <p>
-            Manage your children and monitor their school
-            information from one place.
-        </p>
-
+        <h1 id="welcomeTitle">Parent Dashboard</h1>
+        <p>Manage your children and monitor their school information from one place.</p>
     </section>
 
-
-    <div
-        id="error"
-        class="error"
-    ></div>
-
+    <div id="error" class="error"></div>
 
     <section class="stats">
-
         <div class="stat-card">
-
-            <div class="stat-title">
-                Children
-            </div>
-
-            <div
-                class="stat-value"
-                id="childrenCount"
-            >
-                0
-            </div>
-
+            <div class="stat-title">Children</div>
+            <div class="stat-value" id="childrenCount">0</div>
         </div>
 
-
         <div class="stat-card">
-
-            <div class="stat-title">
-                Active
-            </div>
-
-            <div
-                class="stat-value"
-                id="activeCount"
-            >
-                0
-            </div>
-
+            <div class="stat-title">Active</div>
+            <div class="stat-value" id="activeCount">0</div>
         </div>
 
-
         <div class="stat-card">
-
-            <div class="stat-title">
-                Pending
-            </div>
-
-            <div
-                class="stat-value"
-                id="pendingCount"
-            >
-                0
-            </div>
-
+            <div class="stat-title">Pending</div>
+            <div class="stat-value" id="pendingCount">0</div>
         </div>
 
-
         <div class="stat-card">
-
-            <div class="stat-title">
-                Suspended
-            </div>
-
-            <div
-                class="stat-value"
-                id="suspendedCount"
-            >
-                0
-            </div>
-
+            <div class="stat-title">Suspended</div>
+            <div class="stat-value" id="suspendedCount">0</div>
         </div>
-
     </section>
 
-
     <section class="section">
-
         <div class="section-header">
-
-            <h2>
-                My Children
-            </h2>
-
+            <h2>My Children</h2>
         </div>
 
-
-        <div
-            id="children"
-            class="children"
-        >
-
-            <div class="loading">
-                Loading children...
-            </div>
-
+        <div id="children" class="children">
+            <div class="loading">Loading children...</div>
         </div>
-
     </section>
 
-
     <section class="section">
-
         <div class="section-header">
-
-            <h2>
-                Parent Information
-            </h2>
-
+            <h2>Parent Information</h2>
         </div>
 
-
-        <div
-            id="profile"
-            class="profile-grid"
-        >
-
-            <div class="loading">
-                Loading profile...
-            </div>
-
+        <div id="profile" class="profile-grid">
+            <div class="loading">Loading profile...</div>
         </div>
-
     </section>
 
-
     <section class="section">
-
         <div class="section-header">
-
-            <h2>
-                School
-            </h2>
-
+            <h2>School</h2>
         </div>
 
-        <div
-            id="schoolInfo"
-            class="school-info"
-        >
+        <div id="schoolInfo" class="school-info">
             Loading school information...
         </div>
-
     </section>
-
 </main>
 
-
 <script>
-
 (function () {
-
     "use strict";
 
-    // =========================================================
-    // CONFIGURATION
-    // =========================================================
-
     const API_BASE =
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1"
+        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
             ? "http://localhost:5000/api"
             : "https://edutrust-15ii.onrender.com/api";
 
     const DASHBOARD_URL = `${API_BASE}/parents/dashboard`;
-
-    // =========================================================
-    // ELEMENTS
-    // =========================================================
 
     const parentName = document.getElementById("parentName");
     const welcomeTitle = document.getElementById("welcomeTitle");
@@ -583,34 +453,43 @@
     const errorContainer = document.getElementById("error");
     const logoutButton = document.getElementById("logoutButton");
 
-    // =========================================================
-    // TOKEN
-    // =========================================================
-
-    const token =
-        localStorage.getItem("parent_token") ||
-        localStorage.getItem("edutrust_token") ||
-        localStorage.getItem("token");
-
-    if (!token) {
-        window.location.href = "parent-login.html";
-        return;
-    }
-
-    // =========================================================
-    // LOGOUT
-    // =========================================================
-
-    logoutButton.addEventListener("click", function () {
+    // Clear all possible token storage names on explicit logout
+    function clearTokens() {
         localStorage.removeItem("parent_token");
         localStorage.removeItem("edutrust_token");
         localStorage.removeItem("token");
+        sessionStorage.removeItem("parent_token");
+        sessionStorage.removeItem("edutrust_token");
+        sessionStorage.removeItem("token");
+    }
+
+    // Retrieve token safely from localStorage or sessionStorage
+    function getToken() {
+        return (
+            localStorage.getItem("parent_token") ||
+            localStorage.getItem("edutrust_token") ||
+            localStorage.getItem("token") ||
+            sessionStorage.getItem("parent_token") ||
+            sessionStorage.getItem("edutrust_token") ||
+            sessionStorage.getItem("token")
+        );
+    }
+
+    const token = getToken();
+
+    // Prevent loop redirecting by rendering an error if no token is found
+    if (!token) {
+        showError("No active login session found. Please login to access your dashboard.");
+        setTimeout(() => {
+            window.location.href = "parent-login.html";
+        }, 2000);
+        return;
+    }
+
+    logoutButton.addEventListener("click", function () {
+        clearTokens();
         window.location.href = "parent-login.html";
     });
-
-    // =========================================================
-    // HELPERS
-    // =========================================================
 
     function showError(message) {
         errorContainer.textContent = message || "Something went wrong.";
@@ -653,10 +532,6 @@
         if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
-
-    // =========================================================
-    // RENDER FUNCTIONS
-    // =========================================================
 
     function renderChildren(children) {
         if (!Array.isArray(children) || children.length === 0) {
@@ -788,10 +663,6 @@
         `;
     }
 
-    // =========================================================
-    // LOAD DASHBOARD
-    // =========================================================
-
     async function loadDashboard() {
         errorContainer.style.display = "none";
 
@@ -812,10 +683,11 @@
             }
 
             if (response.status === 401 || response.status === 403) {
-                localStorage.removeItem("parent_token");
-                localStorage.removeItem("edutrust_token");
-                localStorage.removeItem("token");
-                window.location.href = "parent-login.html";
+                clearTokens();
+                showError("Session expired or unauthorized. Redirecting to login...");
+                setTimeout(() => {
+                    window.location.href = "parent-login.html";
+                }, 1500);
                 return;
             }
 
@@ -856,7 +728,6 @@
     }
 
     loadDashboard();
-
 })();
 </script>
 
