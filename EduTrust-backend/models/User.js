@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema(
         // ==================================================
         // BASIC USER INFORMATION
         // ==================================================
+
         first_name: {
             type: String,
             default: "",
@@ -52,6 +53,7 @@ const UserSchema = new mongoose.Schema(
         // ==================================================
         // ROLE
         // ==================================================
+
         role: {
             type: String,
             enum: [
@@ -69,6 +71,7 @@ const UserSchema = new mongoose.Schema(
         // ==================================================
         // ACCOUNT STATUS
         // ==================================================
+
         status: {
             type: String,
             enum: [
@@ -84,6 +87,7 @@ const UserSchema = new mongoose.Schema(
         // ==================================================
         // SCHOOL
         // ==================================================
+
         school_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "School",
@@ -92,8 +96,9 @@ const UserSchema = new mongoose.Schema(
         },
 
         // ==================================================
-        // STUDENT ACCOUNT LINK
+        // LINKED PROFILES
         // ==================================================
+
         student_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Student",
@@ -101,9 +106,6 @@ const UserSchema = new mongoose.Schema(
             index: true
         },
 
-        // ==================================================
-        // PARENT ACCOUNT LINK
-        // ==================================================
         parent_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Parent",
@@ -111,9 +113,6 @@ const UserSchema = new mongoose.Schema(
             index: true
         },
 
-        // ==================================================
-        // TEACHER ACCOUNT LINK
-        // ==================================================
         teacher_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Teacher",
@@ -121,9 +120,6 @@ const UserSchema = new mongoose.Schema(
             index: true
         },
 
-        // ==================================================
-        // STAFF ACCOUNT LINK
-        // ==================================================
         staff_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Staff",
@@ -138,7 +134,6 @@ const UserSchema = new mongoose.Schema(
         }
     }
 );
-
 
 // ======================================================
 // INDEXES
@@ -158,6 +153,5 @@ UserSchema.index({
     school_id: 1,
     phone: 1
 });
-
 
 module.exports = mongoose.model("User", UserSchema);
