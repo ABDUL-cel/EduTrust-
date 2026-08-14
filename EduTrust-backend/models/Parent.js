@@ -66,12 +66,16 @@ const ParentSchema = new mongoose.Schema(
 
         passport: {
             type: String,
-            default: ""
+            default: "",
+            trim: true
         },
 
         status: {
             type: String,
-            enum: ["Active", "Inactive"],
+            enum: [
+                "Active",
+                "Inactive"
+            ],
             default: "Active",
             index: true
         }
@@ -83,6 +87,10 @@ const ParentSchema = new mongoose.Schema(
         }
     }
 );
+
+// ======================================================
+// INDEXES
+// ======================================================
 
 ParentSchema.index({
     school_id: 1,
