@@ -57,14 +57,18 @@ const SchoolSchema = new mongoose.Schema(
             trim: true
         },
 
+        // ==================================================
+        // UNIQUE SCHOOL CODE
+        // ==================================================
         school_code: {
-    type: String,
-    required: true,
-    unique: true,
-    uppercase: true,
-    trim: true,
-    index: true
-},
+            type: String,
+            required: true,
+            unique: true,
+            uppercase: true,
+            trim: true,
+            index: true
+        },
+
         logo: {
             type: String,
             default: "",
@@ -84,7 +88,8 @@ const SchoolSchema = new mongoose.Schema(
                 "Inactive",
                 "Suspended"
             ],
-            default: "Active"
+            default: "Active",
+            index: true
         }
     },
     {
@@ -95,8 +100,16 @@ const SchoolSchema = new mongoose.Schema(
     }
 );
 
+// ======================================================
+// INDEXES
+// ======================================================
+
 SchoolSchema.index({
     email: 1
+});
+
+SchoolSchema.index({
+    school_code: 1
 });
 
 module.exports = mongoose.model("School", SchoolSchema);
