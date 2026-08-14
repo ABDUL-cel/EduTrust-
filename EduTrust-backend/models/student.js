@@ -12,7 +12,8 @@ const StudentSchema = new mongoose.Schema(
         parent_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Parent",
-            default: null
+            default: null,
+            index: true
         },
 
         admission_number: {
@@ -41,7 +42,10 @@ const StudentSchema = new mongoose.Schema(
 
         gender: {
             type: String,
-            enum: ["Male", "Female"],
+            enum: [
+                "Male",
+                "Female"
+            ],
             required: true
         },
 
@@ -141,11 +145,27 @@ const StudentSchema = new mongoose.Schema(
     }
 );
 
-// Admission numbers must be unique within each school,
-// not globally across every school.
+// ======================================================
+// UNIQUE ADMISSION NUMBER PER SCHOOL
+// ======================================================
+
 StudentSchema.index(
-    { school_id: 1, admission_number: 1 },
-    { unique: true }
+    {
+        school_id: 1,
+        admission_number: 1
+    },
+    {
+        unique: true
+    }
 );
+
+// ======================================================
+// PARENT LOOKUP
+// ======================================================
+
+StudentSchema.index({
+    school_id: 1,
+    parent_id: 1
+});
 
 module.exports = mongoose.model("Student", StudentSchema);
