@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 getValue("website");
 
             const logo =
-                getValue("logo");
+                getValue("school-logo");
 
             const password =
                 getValue("password");
