@@ -1,425 +1,4 @@
-
-const navItems =
-    document.querySelectorAll(
-        ".nav-item[data-page], .submenu-item[data-page]"
-    );
-
-
-
-const sidebar =
-    document.getElementById("sidebar");
-
-const menuToggle =
-    document.getElementById("menu-toggle");
-
-const logoutButton =
-    document.getElementById("logoutButton");
-
-const themeToggle =
-    document.getElementById("theme-toggle");
-
-const notificationButton =
-    document.getElementById("notification-button");
-
-const notificationDropdown =
-    document.getElementById("notification-dropdown");
-
-const toast =
-    document.getElementById("toast");
-
-
-
-
-/* ================================
-   MAIN NAVIGATION
-================================ */
-
-navItems.forEach(function (item) {
-
-    item.addEventListener("click", function () {
-
-        const page =
-            item.getAttribute("data-page");
-
-
-        navItems.forEach(function (nav) {
-
-            nav.classList.remove("active");
-
-        });
-
-
-        item.classList.add("active");
-
-
-        if (page === "overview") {
-
-            showOverview();
-
-        }
-
-        else if (page === "school") {
-
-            showSchoolManagement();
-
-        }
-
-        else if (page === "classes") {
-
-            showClasses();
-
-        }
-
-        else if (page === "sessions") {
-
-            showAcademicSessions();
-
-        }
-
-        else if (page === "fees") {
-
-            showSchoolFees();
-
-        }
-
-        else if (page === "fee-structures") {
-
-            showFeeStructures();
-
-        }
-
-        else if (page === "payments") {
-
-            showParentPayments();
-
-        }
-
-        else if (page === "outstanding") {
-
-            showOutstandingFees();
-
-        }
-
-        else if (page === "students") {
-
-            showStudents();
-
-        }
-
-        else if (page === "parents") {
-
-            showParents();
-
-        }
-
-        else if (page === "staff") {
-
-            showStaff();
-
-        }
-
-        else if (page === "announcements") {
-
-            showAnnouncements();
-
-        }
-
-        else if (page === "messages") {
-
-            showMessages();
-
-        }
-
-        else if (page === "notifications") {
-
-            showNotifications();
-
-        }
-
-        else if (page === "school-profile") {
-
-            showSchoolProfile();
-
-        }
-
-        else if (page === "user-roles") {
-
-            showUserRoles();
-
-        }
-
-        else if (page === "payment-settings") {
-
-            showPaymentSettings();
-
-        }
-
-        else if (page === "security") {
-
-            showSecurity();
-
-        }
-
-        else if (page === "email-settings") {
-
-            showEmailSettings();
-
-        }
-
-        else if (page === "backup") {
-
-            showBackup();
-
-        }
-
-        else {
-
-            showComingSoon(
-                item.textContent.trim()
-            );
-
-        }
-
-
-        if (window.innerWidth <= 768 && sidebar) {
-
-            sidebar.classList.remove("show");
-
-        }
-
-    });
-
-});
-
-
-
-/* ================================
-   REPORTS DROPDOWN
-================================ */
-
-const reportsToggle =
-    document.querySelector(".reports-toggle");
-
-if (reportsToggle) {
-    const reportsGroup =
-        reportsToggle.closest(".nav-group");
-
-    reportsToggle.addEventListener("click", function () {
-
-        reportsGroup.classList.toggle("open");
-
-    });
-}
-
-
-
-/* ================================
-   SETTINGS DROPDOWN
-================================ */
-
-const settingsToggle =
-    document.querySelector(".settings-toggle");
-
-if (settingsToggle) {
-    const settingsGroup =
-        settingsToggle.closest(".nav-group");
-
-    settingsToggle.addEventListener("click", function () {
-
-        settingsGroup.classList.toggle("open");
-
-    });
-}
-
-// ============================================================
-// TOAST
-// ============================================================
-
-function showToast(
-    message,
-    type = "success"
-) {
-
-    if (!toast) {
-        alert(message);
-        return;
-    }
-
-    toast.textContent = message;
-
-    toast.className =
-        `toast ${type}`;
-
-    toast.classList.add("show");
-
-    setTimeout(() => {
-
-        toast.classList.remove("show");
-
-    }, 3500);
-}
-
-
-
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-
-if (notificationButton) {
-
-    notificationButton.addEventListener(
-        "click",
-        event => {
-
-            event.stopPropagation();
-
-            notificationDropdown?.classList.toggle(
-                "show"
-            );
-
-        }
-    );
-}
-
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            notificationDropdown &&
-            !notificationDropdown.contains(
-                event.target
-            ) &&
-            !notificationButton?.contains(
-                event.target
-            )
-        ) {
-
-            notificationDropdown.classList.remove(
-                "show"
-            );
-        }
-
-    }
-);
-
-// ============================================================
-// MOBILE SIDEBAR
-// ============================================================
-
-if (menuToggle) {
-
-    menuToggle.addEventListener(
-        "click",
-        () => {
-
-            sidebar?.classList.toggle(
-                "open"
-            );
-
-        }
-    );
-}
-
-// ============================================================
-// THEME
-// ============================================================
-
-const savedTheme =
-    localStorage.getItem(
-        "edutrust_theme"
-    );
-
-if (savedTheme === "dark") {
-
-    document.body.classList.add(
-        "dark-mode"
-    );
-
-    if (themeToggle) {
-        themeToggle.textContent = "☀️";
-    }
-}
-
-
-if (themeToggle) {
-
-    themeToggle.addEventListener(
-        "click",
-        () => {
-
-            document.body.classList.toggle(
-                "dark-mode"
-            );
-
-            const dark =
-                document.body.classList.contains(
-                    "dark-mode"
-                );
-
-            localStorage.setItem(
-                "edutrust_theme",
-                dark
-                    ? "dark"
-                    : "light"
-            );
-
-            themeToggle.textContent =
-                dark
-                    ? "☀️"
-                    : "🌙";
-        }
-    );
-}
-
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-
-if (notificationButton) {
-
-    notificationButton.addEventListener(
-        "click",
-        event => {
-
-            event.stopPropagation();
-
-            notificationDropdown?.classList.toggle(
-                "show"
-            );
-
-        }
-    );
-}
-
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            notificationDropdown &&
-            !notificationDropdown.contains(
-                event.target
-            ) &&
-            !notificationButton?.contains(
-                event.target
-            )
-        ) {
-
-            notificationDropdown.classList.remove(
-                "show"
-            );
-        }
-
-    }
-);
-
-// dashboard.js
-
 "use strict";
-
 
 // ============================================================
 // CONFIGURATION
@@ -427,6 +6,17 @@ document.addEventListener(
 
 const API_BASE_URL = "https://edutrust-15ii.onrender.com/api";
 
+// ============================================================
+// DOM ELEMENTS
+// ============================================================
+
+const sidebar = document.getElementById("sidebar");
+const menuToggle = document.getElementById("menu-toggle");
+const logoutButton = document.getElementById("logoutButton");
+const themeToggle = document.getElementById("theme-toggle");
+const notificationButton = document.getElementById("notification-button");
+const notificationDropdown = document.getElementById("notification-dropdown");
+const toast = document.getElementById("toast");
 
 // ============================================================
 // AUTHENTICATION
@@ -436,6578 +26,812 @@ const token =
     localStorage.getItem("token") ||
     sessionStorage.getItem("token");
 
-
 if (!token) {
     window.location.href = "login.html";
 }
-
 
 // ============================================================
 // API HELPER
 // ============================================================
 
-async function apiRequest(
-    endpoint,
-    options = {}
-) {
-
-    const response = await fetch(
-        `${API_BASE_URL}${endpoint}`,
-        {
+async function apiRequest(endpoint, options = {}) {
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             ...options,
-
             headers: {
                 "Content-Type": "application/json",
-
-                "Authorization":
-                    `Bearer ${token}`,
-
+                "Authorization": `Bearer ${token}`,
                 ...(options.headers || {})
             }
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch {
+            data = {};
         }
-    );
 
-    let data = {};
+        if (response.status === 401) {
+            localStorage.removeItem("token");
+            sessionStorage.removeItem("token");
+            window.location.href = "login.html";
+            throw new Error("Authentication expired.");
+        }
 
-    try {
-        data = await response.json();
-    } catch {
-        data = {};
+        if (!response.ok) {
+            throw new Error(data.message || "Request failed.");
+        }
+
+        return data;
+    } catch (error) {
+        console.error(`API Request Error [${endpoint}]:`, error);
+        throw error;
     }
-
-    if (
-        response.status === 401
-    ) {
-
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token");
-
-        window.location.href = "login.html";
-
-        throw new Error(
-            "Authentication expired."
-        );
-    }
-
-    if (!response.ok) {
-
-        throw new Error(
-            data.message ||
-            "Request failed."
-        );
-    }
-
-    return data;
 }
 
-
-
-
-
 // ============================================================
-// SCHOOL DATA
+// SCHOOL & USER STATE
 // ============================================================
 
 let currentSchool = null;
 let currentUser = null;
 
-
 // ============================================================
-// LOAD PROFILE
+// LOAD & RENDER PROFILE
 // ============================================================
 
 async function loadProfile() {
-
     try {
+        const data = await apiRequest("/auth/profile");
 
-        const data =
-            await apiRequest(
-                "/auth/profile"
-            );
-
-        if (!data.success) {
-
-            throw new Error(
-                data.message ||
-                "Unable to load profile."
-            );
+        if (data.success || data.user) {
+            currentUser = data.user || null;
+            currentSchool = data.school || null;
+            renderProfile();
+            populateSchoolForm();
         }
-
-        currentUser =
-            data.user;
-
-        currentSchool =
-            data.school;
-
-        renderProfile();
-
-        populateSchoolForm();
-
     } catch (error) {
-
-        console.error(
-            "LOAD PROFILE ERROR:",
-            error
-        );
-
-        showToast(
-            error.message ||
-            "Unable to load school profile.",
-            "error"
-        );
+        showToast(error.message || "Unable to load profile details.", "error");
     }
 }
-
-
-// ============================================================
-// RENDER PROFILE
-// ============================================================
 
 function renderProfile() {
+    if (!currentSchool && !currentUser) return;
 
-    if (!currentSchool) {
-        return;
-    }
+    const schoolName = currentSchool?.name || "School Overview";
+    const userRole = currentUser?.role || "Administrator";
 
-    const schoolName =
-        currentSchool.name ||
-        "School";
+    updateElementText("sidebarSchoolName", schoolName);
+    updateElementText("sidebarUserRole", userRole);
 
-    const userRole =
-        currentUser?.role ||
-        "Administrator";
-
-    const sidebarSchoolName =
-        document.getElementById(
-            "sidebarSchoolName"
-        );
-
-    const sidebarUserRole =
-        document.getElementById(
-            "sidebarUserRole"
-        );
-
-    const schoolAvatar =
-        document.getElementById(
-            "schoolAvatar"
-        );
-
-    if (sidebarSchoolName) {
-
-        sidebarSchoolName.textContent =
-            schoolName;
-    }
-
-    if (sidebarUserRole) {
-
-        sidebarUserRole.textContent =
-            userRole;
-    }
-
+    const schoolAvatar = document.getElementById("schoolAvatar");
     if (schoolAvatar) {
-
-        schoolAvatar.textContent =
-            getInitials(schoolName);
+        schoolAvatar.textContent = getInitials(schoolName);
     }
 }
 
-
-// ============================================================
-// INITIALS
-// ============================================================
-
-function getInitials(
-    name
-) {
-
+function getInitials(name) {
     return String(name || "School")
         .trim()
         .split(/\s+/)
         .slice(0, 2)
-        .map(
-            word =>
-                word.charAt(0)
-                    .toUpperCase()
-        )
+        .map(word => word.charAt(0).toUpperCase())
         .join("");
 }
 
-
-// ============================================================
-// POPULATE SCHOOL FORM
-// ============================================================
-
 function populateSchoolForm() {
+    if (!currentSchool) return;
 
-    if (!currentSchool) {
-        return;
-    }
+    setValue("schoolName", currentSchool.name);
+    setValue("schoolCode", currentSchool.school_code);
+    setValue("schoolPhone", currentSchool.phone);
+    setValue("schoolEmail", currentSchool.email);
+    setValue("schoolType", currentSchool.school_type);
+    setValue("schoolAddress", currentSchool.address);
+    setValue("academicSession", currentSchool.academic_session);
+    setValue("currentTerm", currentSchool.current_term);
+    setValue("schoolMotto", currentSchool.motto);
+    setValue("schoolWebsite", currentSchool.website);
 
-    setValue(
-        "schoolName",
-        currentSchool.name
-    );
-
-    setValue(
-        "schoolCode",
-        currentSchool.school_code
-    );
-
-    setValue(
-        "schoolPhone",
-        currentSchool.phone
-    );
-
-    setValue(
-        "schoolEmail",
-        currentSchool.email
-    );
-
-    setValue(
-        "schoolType",
-        currentSchool.school_type
-    );
-
-    setValue(
-        "schoolAddress",
-        currentSchool.address
-    );
-
-    setValue(
-        "academicSession",
-        currentSchool.academic_session
-    );
-
-    setValue(
-        "currentTerm",
-        currentSchool.current_term
-    );
-
-    setValue(
-        "schoolMotto",
-        currentSchool.motto
-    );
-
-    setValue(
-        "schoolWebsite",
-        currentSchool.website
-    );
-
-
-    const principalInput =
-        document.getElementById(
-            "schoolPrincipal"
-        );
-
+    const principalInput = document.getElementById("schoolPrincipal");
     if (principalInput) {
-
-        principalInput.value =
-            currentUser?.full_name ||
-            "Principal";
+        principalInput.value = currentUser?.full_name || currentUser?.name || "Principal";
     }
 }
 
-
-// ============================================================
-// SET VALUE
-// ============================================================
-
-function setValue(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(id);
-
-    if (!element) {
-        return;
+function setValue(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.value = value || "";
     }
-
-    element.value =
-        value || "";
 }
 
+function updateElementText(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = value;
+    }
+}
 
 // ============================================================
-// NAVIGATION
+// NAVIGATION SYSTEM
 // ============================================================
 
-function showPage(
-    page
-) {
-
-    document
-        .querySelectorAll(
-            ".page-content"
-        )
-        .forEach(
-            element => {
-
-                element.classList.add(
-                    "hidden"
-                );
-
-            }
-        );
-
-
-    const pageElement =
-        document.getElementById(
-            `${page}Page`
-        );
-
-    if (pageElement) {
-
-        pageElement.classList.remove(
-            "hidden"
-        );
-    }
-
-
-    document
-        .querySelectorAll(
-            ".nav-item[data-page], .submenu-item[data-page]"
-        )
-        .forEach(
-            button => {
-
-                button.classList.remove(
-                    "active"
-                );
-
-                if (
-                    button.dataset.page ===
-                    page
-                ) {
-
-                    button.classList.add(
-                        "active"
-                    );
-                }
-            }
-        );
-
-
-    if (window.innerWidth <= 900) {
-
-        sidebar?.classList.remove(
-            "open"
-        );
-    }
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+function showPage(page) {
+    document.querySelectorAll(".page-content").forEach(element => {
+        element.classList.add("hidden");
     });
+
+    const pageElement = document.getElementById(`${page}Page`);
+    if (pageElement) {
+        pageElement.classList.remove("hidden");
+    }
+
+    document.querySelectorAll(".nav-item[data-page], .submenu-item[data-page]").forEach(button => {
+        button.classList.remove("active");
+        if (button.dataset.page === page) {
+            button.classList.add("active");
+        }
+    });
+
+    if (window.innerWidth <= 768 && sidebar) {
+        sidebar.classList.remove("open");
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Execute section specific loading handlers
+    switch (page) {
+        case "overview":
+            loadOverviewData();
+            break;
+        case "students":
+            loadStudents();
+            break;
+        case "parents":
+            loadParents();
+            break;
+        case "staff":
+            loadStaff();
+            break;
+        case "fees":
+            loadFees();
+            break;
+        case "fee-structures":
+            loadFeeStructures();
+            break;
+        case "payments":
+            loadPayments();
+            break;
+        case "outstanding":
+            loadOutstandingFees();
+            break;
+        case "announcements":
+            loadAnnouncements();
+            break;
+        case "messages":
+            loadMessages();
+            break;
+        case "notifications":
+            loadNotifications();
+            break;
+    }
 }
 
-
-// ============================================================
-// NAV BUTTONS
-// ============================================================
-
-document
-    .querySelectorAll(
-        "[data-page]"
-    )
-    .forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const page =
-                        button.dataset.page;
-
-                    if (page) {
-
-                        showPage(page);
-                    }
-
-                }
-            );
-
+// Global Nav Handler Click Registration
+document.addEventListener("click", function(e) {
+    const btn = e.target.closest("[data-page]");
+    if (btn) {
+        const page = btn.dataset.page;
+        if (page) {
+            showPage(page);
         }
-    );
-
-
-// ============================================================
-// REPORTS TOGGLE
-// ============================================================
-
-document
-    .querySelectorAll(
-        ".reports-toggle, .settings-toggle"
-    )
-    .forEach(
-        toggle => {
-
-            toggle.addEventListener(
-                "click",
-                () => {
-
-                    const group =
-                        toggle.closest(
-                            ".nav-group"
-                        );
-
-                    if (!group) {
-                        return;
-                    }
-
-                    group.classList.toggle(
-                        "open"
-                    );
-
-                }
-            );
-
-        }
-    );
-
-
-
-
-     
-
-
-
-
+    }
+});
 
 // ============================================================
-// SCHOOL UPDATE
+// OVERVIEW METRICS & LIVE DATA
 // ============================================================
 
-const schoolForm =
-    document.getElementById(
-        "schoolForm"
-    );
+async function loadOverviewData() {
+    try {
+        const data = await apiRequest("/dashboard/overview-stats");
+        
+        if (data) {
+            updateElementText("totalStudents", data.totalStudents || "0");
+            updateElementText("feesCollected", data.feesCollected || "₦0");
+            updateElementText("outstandingFees", data.outstandingFees || "₦0");
+            updateElementText("totalParents", data.totalParents || "0");
 
-
-if (schoolForm) {
-
-    schoolForm.addEventListener(
-        "submit",
-        async event => {
-
-            event.preventDefault();
-
-            if (!currentSchool?._id) {
-
-                showToast(
-                    "School information is not loaded.",
-                    "error"
-                );
-
-                return;
+            if (data.outstandingStudentsCount !== undefined) {
+                updateElementText("outstandingStudents", `${data.outstandingStudentsCount} students with balances`);
             }
 
-
-            const saveButton =
-                document.getElementById(
-                    "saveSchoolButton"
-                );
-
-
-            const payload = {
-
-                name:
-                    document.getElementById(
-                        "schoolName"
-                    )?.value.trim(),
-
-                phone:
-                    document.getElementById(
-                        "schoolPhone"
-                    )?.value.trim(),
-
-                email:
-                    document.getElementById(
-                        "schoolEmail"
-                    )?.value.trim()
-                        .toLowerCase(),
-
-                address:
-                    document.getElementById(
-                        "schoolAddress"
-                    )?.value.trim(),
-
-                school_type:
-                    document.getElementById(
-                        "schoolType"
-                    )?.value.trim(),
-
-                academic_session:
-                    document.getElementById(
-                        "academicSession"
-                    )?.value.trim(),
-
-                current_term:
-                    document.getElementById(
-                        "currentTerm"
-                    )?.value,
-
-                motto:
-                    document.getElementById(
-                        "schoolMotto"
-                    )?.value.trim(),
-
-                website:
-                    document.getElementById(
-                        "schoolWebsite"
-                    )?.value.trim()
-            };
-
-
-            try {
-
-                if (saveButton) {
-
-                    saveButton.disabled =
-                        true;
-
-                    saveButton.textContent =
-                        "Saving...";
-                }
-
-
-                const data =
-                    await apiRequest(
-                        `/schools/${currentSchool._id}`,
-                        {
-                            method: "PUT",
-                            body:
-                                JSON.stringify(
-                                    payload
-                                )
-                        }
-                    );
-
-
-                if (!data.success) {
-
-                    throw new Error(
-                        data.message ||
-                        "Failed to update school."
-                    );
-                }
-
-
-                currentSchool =
-                    data.school;
-
-                renderProfile();
-
-                populateSchoolForm();
-
-                showToast(
-                    "School profile updated successfully."
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "UPDATE SCHOOL ERROR:",
-                    error
-                );
-
-                showToast(
-                    error.message ||
-                    "Failed to update school.",
-                    "error"
-                );
-
-
-            } finally {
-
-                if (saveButton) {
-
-                    saveButton.disabled =
-                        false;
-
-                    saveButton.textContent =
-                        "Save School Profile";
-                }
-
+            if (data.collectionPercentage) {
+                updateElementText("collectionPercentage", `${data.collectionPercentage}%`);
             }
-
+            if (data.feesCollected) {
+                updateElementText("collectionCollected", data.feesCollected);
+            }
+            if (data.outstandingFees) {
+                updateElementText("collectionOutstanding", data.outstandingFees);
+            }
         }
-    );
+    } catch (e) {
+        console.warn("Using active data states for overview metrics.");
+    }
+
+    loadRecentPayments();
 }
 
+async function loadRecentPayments() {
+    const table = document.getElementById("recentPaymentsTable");
+    if (!table) return;
+
+    try {
+        const data = await apiRequest("/payments/recent");
+        const payments = data.payments || [];
+
+        if (!payments.length) {
+            table.innerHTML = `<tr><td colspan="4">No payment records available.</td></tr>`;
+            return;
+        }
+
+        table.innerHTML = payments.map(p => `
+            <tr>
+                <td>${escapeHtml(p.parentName || p.parent || "N/A")}</td>
+                <td>${escapeHtml(p.studentName || p.student || "N/A")}</td>
+                <td>${escapeHtml(p.amount || "₦0")}</td>
+                <td><span class="status ${getStatusClass(p.status)}">${escapeHtml(p.status || "Paid")}</span></td>
+            </tr>
+        `).join("");
+    } catch (e) {
+        table.innerHTML = `<tr><td colspan="4">No recent payment records found.</td></tr>`;
+    }
+}
 
 // ============================================================
-// LOAD STUDENTS
+// STUDENTS DATA
 // ============================================================
 
 async function loadStudents() {
-
-    const table =
-        document.getElementById(
-            "studentsTable"
-        );
-
-    if (!table) {
-        return;
-    }
-
+    const table = document.getElementById("studentsTable");
+    if (!table) return;
 
     try {
-
-        const data =
-            await apiRequest(
-                "/students"
-            );
-
-
-        const students =
-            data.students || [];
-
+        const data = await apiRequest("/students");
+        const students = data.students || [];
 
         if (!students.length) {
-
-            table.innerHTML = `
-                <tr>
-                    <td colspan="5">
-                        No students found.
-                    </td>
-                </tr>
-            `;
-
-            updateElement(
-                "totalStudents",
-                "0"
-            );
-
+            table.innerHTML = `<tr><td colspan="5">No students found.</td></tr>`;
+            updateElementText("totalStudents", "0");
             return;
         }
 
+        updateElementText("totalStudents", students.length.toLocaleString());
 
-        updateElement(
-            "totalStudents",
-            students.length.toLocaleString()
-        );
+        table.innerHTML = students.map(student => {
+            const fullName = [student.first_name || student.firstName, student.other_name, student.last_name || student.lastName]
+                .filter(Boolean)
+                .join(" ");
 
-
-        table.innerHTML =
-            students
-                .map(
-                    student => {
-
-                        const fullName =
-                            [
-                                student.first_name,
-                                student.other_name,
-                                student.last_name
-                            ]
-                                .filter(Boolean)
-                                .join(" ");
-
-
-                        return `
-                            <tr>
-
-                                <td>
-                                    ${escapeHtml(
-                                        student.admission_number ||
-                                        ""
-                                    )}
-                                </td>
-
-                                <td>
-                                    ${escapeHtml(
-                                        fullName
-                                    )}
-                                </td>
-
-                                <td>
-                                    ${escapeHtml(
-                                        student.gender ||
-                                        ""
-                                    )}
-                                </td>
-
-                                <td>
-                                    ${escapeHtml(
-                                        student.class_name ||
-                                        ""
-                                    )}
-                                </td>
-
-                                <td>
-                                    <span class="status ${getStatusClass(
-                                        student.status
-                                    )}">
-                                        ${escapeHtml(
-                                            student.status ||
-                                            ""
-                                        )}
-                                    </span>
-                                </td>
-
-                            </tr>
-                        `;
-
-                    }
-                )
-                .join("");
-
-
+            return `
+                <tr>
+                    <td>${escapeHtml(student.admission_number || student.admissionNo || "N/A")}</td>
+                    <td>${escapeHtml(fullName || "Unnamed Student")}</td>
+                    <td>${escapeHtml(student.gender || "N/A")}</td>
+                    <td>${escapeHtml(student.class_name || student.class || "N/A")}</td>
+                    <td>
+                        <span class="status ${getStatusClass(student.status)}">
+                            ${escapeHtml(student.status || "Active")}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join("");
     } catch (error) {
-
-        console.error(
-            "LOAD STUDENTS ERROR:",
-            error
-        );
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    Unable to load students.
-                </td>
-            </tr>
-        `;
+        table.innerHTML = `<tr><td colspan="5">Unable to load students from server.</td></tr>`;
     }
 }
 
-
 // ============================================================
-// LOAD PARENTS
+// PARENTS DATA
 // ============================================================
 
 async function loadParents() {
-
-    const table =
-        document.getElementById(
-            "parentsTable"
-        );
-
-    if (!table) {
-        return;
-    }
-
+    const table = document.getElementById("parentsTable");
+    if (!table) return;
 
     try {
+        const data = await apiRequest("/parents");
+        const parents = data.parents || [];
 
-        const data =
-            await apiRequest(
-                "/parents"
-            );
-
-
-        const parents =
-            data.parents || [];
-
-
-        updateElement(
-            "totalParents",
-            parents.length.toLocaleString()
-        );
-
+        updateElementText("totalParents", parents.length.toLocaleString());
 
         if (!parents.length) {
-
-            table.innerHTML = `
-                <tr>
-                    <td colspan="5">
-                        No parents found.
-                    </td>
-                </tr>
-            `;
-
+            table.innerHTML = `<tr><td colspan="5">No parents found.</td></tr>`;
             return;
         }
 
+        table.innerHTML = parents.map(parent => {
+            const fullName = [parent.first_name || parent.firstName, parent.other_name, parent.last_name || parent.lastName]
+                .filter(Boolean)
+                .join(" ");
 
-        table.innerHTML =
-            parents
-                .map(
-                    parent => {
-
-                        const fullName =
-                            [
-                                parent.first_name,
-                                parent.other_name,
-                                parent.last_name
-                            ]
-                                .filter(Boolean)
-                                .join(" ");
-
-
-                        return `
-                            <tr>
-
-                                <td>
-                                    ${escapeHtml(
-                                        fullName
-                                    )}
-                                </td>
-
-                                <td>
-                                    ${escapeHtml(
-                                        parent.relationship ||
-                                        ""
-                                    )}
-                                </td>
-
-                                <td>
-                                    ${escapeHtml(
-                                        parent.phone ||
-                                        ""
-                                    )}
-                                </td>
-
-                                <td>
-                                    ${escapeHtml(
-                                        parent.email ||
-                                        ""
-                                    )}
-                                </td>
-
-                                <td>
-                                    <span class="status ${getStatusClass(
-                                        parent.status
-                                    )}">
-                                        ${escapeHtml(
-                                            parent.status ||
-                                            ""
-                                        )}
-                                    </span>
-                                </td>
-
-                            </tr>
-                        `;
-
-                    }
-                )
-                .join("");
-
-
+            return `
+                <tr>
+                    <td>${escapeHtml(fullName || parent.name || "N/A")}</td>
+                    <td>${escapeHtml(parent.relationship || "Parent")}</td>
+                    <td>${escapeHtml(parent.phone || "N/A")}</td>
+                    <td>${escapeHtml(parent.email || "N/A")}</td>
+                    <td>
+                        <span class="status ${getStatusClass(parent.status)}">
+                            ${escapeHtml(parent.status || "Active")}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join("");
     } catch (error) {
-
-        console.error(
-            "LOAD PARENTS ERROR:",
-            error
-        );
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    Unable to load parents.
-                </td>
-            </tr>
-        `;
+        table.innerHTML = `<tr><td colspan="5">Unable to load parents.</td></tr>`;
     }
 }
 
+// ============================================================
+// STAFF DATA
+// ============================================================
+
+async function loadStaff() {
+    const table = document.getElementById("staffTable");
+    if (!table) return;
+
+    try {
+        const data = await apiRequest("/staff");
+        const staffList = data.staff || [];
+
+        if (!staffList.length) {
+            table.innerHTML = `<tr><td colspan="5">No staff records found.</td></tr>`;
+            return;
+        }
+
+        table.innerHTML = staffList.map(member => `
+            <tr>
+                <td>${escapeHtml(member.name || member.full_name || "N/A")}</td>
+                <td>${escapeHtml(member.role || "Teacher")}</td>
+                <td>${escapeHtml(member.email || "N/A")}</td>
+                <td>${escapeHtml(member.phone || "N/A")}</td>
+                <td><span class="status ${getStatusClass(member.status)}">${escapeHtml(member.status || "Active")}</span></td>
+            </tr>
+        `).join("");
+    } catch (e) {
+        table.innerHTML = `<tr><td colspan="5">Unable to load staff directory.</td></tr>`;
+    }
+}
 
 // ============================================================
-// STATUS CLASS
+// SCHOOL FEES & FEE STRUCTURES
 // ============================================================
 
-function getStatusClass(
-    status
-) {
+async function loadFees() {
+    const table = document.getElementById("feesTable");
+    if (!table) return;
 
-    switch (
-        String(status || "")
-            .toLowerCase()
-    ) {
+    try {
+        const data = await apiRequest("/fees");
+        const fees = data.fees || [];
 
+        if (!fees.length) {
+            table.innerHTML = `<tr><td colspan="5">No fee records recorded.</td></tr>`;
+            return;
+        }
+
+        table.innerHTML = fees.map(f => `
+            <tr>
+                <td>${escapeHtml(f.studentName || "N/A")}</td>
+                <td>${escapeHtml(f.class || "N/A")}</td>
+                <td>${escapeHtml(f.expectedAmount || "₦0")}</td>
+                <td>${escapeHtml(f.paidAmount || "₦0")}</td>
+                <td><span class="status ${getStatusClass(f.status)}">${escapeHtml(f.status || "Pending")}</span></td>
+            </tr>
+        `).join("");
+    } catch (e) {
+        table.innerHTML = `<tr><td colspan="5">Unable to load fee collections.</td></tr>`;
+    }
+}
+
+async function loadFeeStructures() {
+    const table = document.getElementById("feeStructuresTable");
+    if (!table) return;
+
+    try {
+        const data = await apiRequest("/fees/structures");
+        const structures = data.structures || [];
+
+        if (!structures.length) {
+            table.innerHTML = `<tr><td colspan="5">No fee structures defined yet.</td></tr>`;
+            return;
+        }
+
+        table.innerHTML = structures.map(s => `
+            <tr>
+                <td>${escapeHtml(s.name || "Standard Fee")}</td>
+                <td>${escapeHtml(s.classes || s.class || "All Classes")}</td>
+                <td>${escapeHtml(s.term || "Current Term")}</td>
+                <td>${escapeHtml(s.amount || "₦0")}</td>
+                <td><span class="status ${getStatusClass(s.status)}">${escapeHtml(s.status || "Active")}</span></td>
+            </tr>
+        `).join("");
+    } catch (e) {
+        table.innerHTML = `<tr><td colspan="5">Unable to fetch fee structures.</td></tr>`;
+    }
+}
+
+// ============================================================
+// PAYMENTS & OUTSTANDING
+// ============================================================
+
+async function loadPayments() {
+    const table = document.getElementById("paymentsTable");
+    if (!table) return;
+
+    try {
+        const data = await apiRequest("/payments/parent-payments");
+        const payments = data.payments || [];
+
+        if (!payments.length) {
+            table.innerHTML = `<tr><td colspan="5">No parent payment records available.</td></tr>`;
+            return;
+        }
+
+        table.innerHTML = payments.map(p => `
+            <tr>
+                <td>${escapeHtml(p.parentName || "N/A")}</td>
+                <td>${escapeHtml(p.studentName || "N/A")}</td>
+                <td>${escapeHtml(p.amount || "₦0")}</td>
+                <td>${escapeHtml(p.date || "N/A")}</td>
+                <td><span class="status ${getStatusClass(p.status)}">${escapeHtml(p.status || "Paid")}</span></td>
+            </tr>
+        `).join("");
+    } catch (e) {
+        table.innerHTML = `<tr><td colspan="5">Unable to load payment history.</td></tr>`;
+    }
+}
+
+async function loadOutstandingFees() {
+    const table = document.getElementById("outstandingTable");
+    if (!table) return;
+
+    try {
+        const data = await apiRequest("/fees/outstanding");
+        const list = data.outstanding || [];
+
+        if (!list.length) {
+            table.innerHTML = `<tr><td colspan="6">No outstanding balance records found.</td></tr>`;
+            return;
+        }
+
+        table.innerHTML = list.map(item => `
+            <tr>
+                <td>${escapeHtml(item.studentName || "N/A")}</td>
+                <td>${escapeHtml(item.parentName || "N/A")}</td>
+                <td>${escapeHtml(item.class || "N/A")}</td>
+                <td>${escapeHtml(item.totalFee || "₦0")}</td>
+                <td>${escapeHtml(item.balance || "₦0")}</td>
+                <td><span class="status warning">${escapeHtml(item.status || "Unpaid")}</span></td>
+            </tr>
+        `).join("");
+    } catch (e) {
+        table.innerHTML = `<tr><td colspan="6">Unable to load outstanding records.</td></tr>`;
+    }
+}
+
+// ============================================================
+// ANNOUNCEMENTS, MESSAGES & NOTIFICATIONS
+// ============================================================
+
+async function loadAnnouncements() {
+    const container = document.getElementById("announcementsListContainer");
+    if (!container) return;
+
+    try {
+        const data = await apiRequest("/announcements");
+        const list = data.announcements || [];
+
+        if (!list.length) {
+            container.innerHTML = `<p>No announcements available at this time.</p>`;
+            return;
+        }
+
+        container.innerHTML = list.map(a => `
+            <div class="announcement-item" style="padding: 12px 0; border-bottom: 1px solid #eee;">
+                <h4>${escapeHtml(a.title)}</h4>
+                <p>${escapeHtml(a.content)}</p>
+                <small>${escapeHtml(a.meta || a.date || "")}</small>
+            </div>
+        `).join("");
+    } catch (e) {
+        container.innerHTML = `<p>No active announcements.</p>`;
+    }
+}
+
+async function loadMessages() {
+    const container = document.getElementById("messagesListContainer");
+    if (!container) return;
+
+    try {
+        const data = await apiRequest("/messages");
+        const messages = data.messages || [];
+
+        if (!messages.length) {
+            container.innerHTML = `<p>No message history found.</p>`;
+            return;
+        }
+
+        container.innerHTML = messages.map(m => `
+            <div class="message-item" style="padding: 12px 0; border-bottom: 1px solid #eee;">
+                <strong>${escapeHtml(m.senderName || m.sender)}</strong>
+                <p>${escapeHtml(m.text || m.content)}</p>
+                <small>${escapeHtml(m.time || "")}</small>
+            </div>
+        `).join("");
+    } catch (e) {
+        container.innerHTML = `<p>No messages found.</p>`;
+    }
+}
+
+async function loadNotifications() {
+    const container = document.getElementById("notificationsPageList");
+    if (!container) return;
+
+    try {
+        const data = await apiRequest("/notifications");
+        const list = data.notifications || [];
+
+        if (!list.length) {
+            container.innerHTML = `<p>You have no notifications.</p>`;
+            return;
+        }
+
+        container.innerHTML = list.map(n => `
+            <div class="notification-item" style="padding: 12px 0; border-bottom: 1px solid #eee;">
+                <h4>${escapeHtml(n.title)}</h4>
+                <p>${escapeHtml(n.message)}</p>
+                <small>${escapeHtml(n.timeAgo || n.date || "")}</small>
+            </div>
+        `).join("");
+    } catch (e) {
+        container.innerHTML = `<p>No notifications available.</p>`;
+    }
+}
+
+// ============================================================
+// SCHOOL PROFILE FORM SUBMISSION
+// ============================================================
+
+const schoolForm = document.getElementById("schoolForm");
+
+if (schoolForm) {
+    schoolForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        if (!currentSchool?._id) {
+            showToast("School ID is missing. Please reload page.", "error");
+            return;
+        }
+
+        const saveButton = document.getElementById("saveSchoolButton");
+
+        const payload = {
+            name: document.getElementById("schoolName")?.value.trim(),
+            phone: document.getElementById("schoolPhone")?.value.trim(),
+            email: document.getElementById("schoolEmail")?.value.trim().toLowerCase(),
+            address: document.getElementById("schoolAddress")?.value.trim(),
+            school_type: document.getElementById("schoolType")?.value.trim(),
+            academic_session: document.getElementById("academicSession")?.value.trim(),
+            current_term: document.getElementById("currentTerm")?.value,
+            motto: document.getElementById("schoolMotto")?.value.trim(),
+            website: document.getElementById("schoolWebsite")?.value.trim()
+        };
+
+        try {
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.textContent = "Saving...";
+            }
+
+            const data = await apiRequest(`/schools/${currentSchool._id}`, {
+                method: "PUT",
+                body: JSON.stringify(payload)
+            });
+
+            if (!data.success && !data.school) {
+                throw new Error(data.message || "Failed to update school profile.");
+            }
+
+            currentSchool = data.school || { ...currentSchool, ...payload };
+            renderProfile();
+            populateSchoolForm();
+            showToast("School profile updated successfully!");
+        } catch (error) {
+            showToast(error.message || "Failed to update school.", "error");
+        } finally {
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.textContent = "Save School Profile";
+            }
+        }
+    });
+}
+
+// ============================================================
+// ADD STUDENT MODAL & FORM
+// ============================================================
+
+const addStudentButton = document.getElementById("add-student-button");
+const studentModal = document.getElementById("student-modal");
+const closeStudentModal = document.getElementById("close-student-modal");
+const cancelStudentModal = document.getElementById("cancel-student-modal");
+const studentForm = document.getElementById("student-form");
+
+if (addStudentButton && studentModal) {
+    addStudentButton.addEventListener("click", () => {
+        studentModal.style.display = "flex";
+    });
+}
+
+if (closeStudentModal && studentModal) {
+    closeStudentModal.addEventListener("click", () => {
+        studentModal.style.display = "none";
+    });
+}
+
+if (cancelStudentModal && studentModal) {
+    cancelStudentModal.addEventListener("click", () => {
+        studentModal.style.display = "none";
+    });
+}
+
+if (studentForm) {
+    studentForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const payload = {
+            first_name: document.getElementById("student-first-name").value.trim(),
+            last_name: document.getElementById("student-last-name").value.trim(),
+            gender: document.getElementById("student-gender").value,
+            class_name: document.getElementById("student-class").value,
+            email: document.getElementById("student-email").value.trim(),
+            phone: document.getElementById("student-phone").value.trim()
+        };
+
+        try {
+            const response = await apiRequest('/students', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            showToast("Student added successfully!");
+            studentForm.reset();
+            if (studentModal) studentModal.style.display = "none";
+            loadStudents();
+        } catch (error) {
+            showToast(error.message || "Failed to add student.", "error");
+        }
+    });
+}
+
+// ============================================================
+// UTILITIES & HELPERS
+// ============================================================
+
+function getStatusClass(status) {
+    switch (String(status || "").toLowerCase()) {
         case "active":
         case "paid":
+        case "published":
             return "paid";
-
         case "pending":
+        case "partial":
+        case "draft":
             return "pending";
-
         case "suspended":
         case "inactive":
+        case "unpaid":
+        case "warning":
             return "warning";
-
         default:
-            return "";
+            return "paid";
     }
 }
 
-
-// ============================================================
-// UPDATE ELEMENT
-// ============================================================
-
-function updateElement(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(id);
-
-    if (element) {
-
-        element.textContent =
-            value;
-    }
-}
-
-
-// ============================================================
-// ESCAPE HTML
-// ============================================================
-
-function escapeHtml(
-    value
-) {
-
+function escapeHtml(value) {
     return String(value ?? "")
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
+function showToast(message, type = "success") {
+    if (!toast) {
+        alert(message);
+        return;
+    }
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    toast.classList.add("show");
 
-// ============================================================
-// LOGOUT
-// ============================================================
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3500);
+}
+
+// UI Toggles & Dropdowns
+const reportsToggle = document.querySelector(".reports-toggle");
+if (reportsToggle) {
+    reportsToggle.addEventListener("click", () => {
+        reportsToggle.closest(".nav-group")?.classList.toggle("open");
+    });
+}
+
+const settingsToggle = document.querySelector(".settings-toggle");
+if (settingsToggle) {
+    settingsToggle.addEventListener("click", () => {
+        settingsToggle.closest(".nav-group")?.classList.toggle("open");
+    });
+}
+
+if (menuToggle && sidebar) {
+    menuToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+    });
+}
+
+if (notificationButton && notificationDropdown) {
+    notificationButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+        notificationDropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!notificationDropdown.contains(e.target) && !notificationButton.contains(e.target)) {
+            notificationDropdown.classList.remove("show");
+        }
+    });
+}
+
+if (themeToggle) {
+    const savedTheme = localStorage.getItem("edutrust_theme");
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        themeToggle.textContent = "☀️";
+    }
+
+    themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        const dark = document.body.classList.contains("dark-mode");
+        localStorage.setItem("edutrust_theme", dark ? "dark" : "light");
+        themeToggle.textContent = dark ? "☀️" : "🌙";
+    });
+}
 
 if (logoutButton) {
-
-    logoutButton.addEventListener(
-        "click",
-        () => {
-
-            localStorage.removeItem(
-                "token"
-            );
-
-            sessionStorage.removeItem(
-                "token"
-            );
-
-            window.location.href =
-                "login.html";
-
-        }
-    );
+    logoutButton.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        window.location.href = "login.html";
+    });
 }
 
-
 // ============================================================
-// INITIAL LOAD
+// INITIALIZATION
 // ============================================================
 
 async function initializeDashboard() {
-
     await loadProfile();
-
-    await Promise.allSettled([
-        loadStudents(),
-        loadParents()
-    ]);
-
+    await loadOverviewData();
 }
-
 
 initializeDashboard();
-/* ================================
-   SETTINGS PAGES
-================================ */
-
-async function showSchoolProfile() {
-    let profile = { name: '', email: '', phone: '', address: '' };
-    try {
-        const res = await fetch('/api/school/profile');
-        if (res.ok) profile = await res.json();
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-header">
-
-            <h1>School Profile</h1>
-
-            <p>
-                Manage your school's information and profile details.
-            </p>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <h2>School Information</h2>
-
-            <form class="settings-form" id="schoolProfileForm">
-
-                <div class="form-group">
-
-                    <label>School Name</label>
-
-                    <input
-                        type="text"
-                        value="${profile.name || ''}"
-                        placeholder="Enter school name"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>School Email</label>
-
-                    <input
-                        type="email"
-                        value="${profile.email || ''}"
-                        placeholder="school@example.com"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>School Phone</label>
-
-                    <input
-                        type="tel"
-                        value="${profile.phone || ''}"
-                        placeholder="08012345678"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>School Address</label>
-
-                    <textarea
-                        placeholder="Enter school address"
-                    >${profile.address || ''}</textarea>
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    class="primary-button"
-                >
-                    Save Changes
-                </button>
-
-            </form>
-
-        </div>
-
-    `;
-
-}
-
-async function showUserRoles() {
-    let roles = [];
-    try {
-        const res = await fetch('/api/settings/roles');
-        if (res.ok) roles = await res.json();
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-header">
-
-            <h1>User Roles</h1>
-
-            <p>
-                Manage administrators, staff, teachers and access permissions.
-            </p>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <div class="section-heading">
-
-                <h2>System Users</h2>
-
-                <button class="primary-button">
-                    + Add User
-                </button>
-
-            </div>
-
-
-            <div class="user-role-list">
-
-                ${roles.length > 0 ? roles.map(role => `
-                <div class="role-item">
-
-                    <div>
-
-                        <strong>${role.title}</strong>
-
-                        <p>${role.description}</p>
-
-                    </div>
-
-                    <span class="role-badge">
-                        ${role.accessLevel}
-                    </span>
-
-                </div>
-                `).join('') : `
-                <div class="role-item">
-
-                    <div>
-
-                        <strong>Administrator</strong>
-
-                        <p>Full access to the EduTrust system</p>
-
-                    </div>
-
-                    <span class="role-badge">
-                        Full Access
-                    </span>
-
-                </div>
-
-
-                <div class="role-item">
-
-                    <div>
-
-                        <strong>Teacher</strong>
-
-                        <p>Access to students and academic records</p>
-
-                    </div>
-
-                    <span class="role-badge">
-                        Limited Access
-                    </span>
-
-                </div>
-
-
-                <div class="role-item">
-
-                    <div>
-
-                        <strong>Accountant</strong>
-
-                        <p>Access to school fees and payment records</p>
-
-                    </div>
-
-                    <span class="role-badge">
-                        Finance Access
-                    </span>
-
-                </div>
-                `}
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-function showPaymentSettings() {
-
-    contentArea.innerHTML = `
-
-        <div class="page-header">
-
-            <h1>Payment Settings</h1>
-
-            <p>
-                Configure how your school receives and manages payments.
-            </p>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <h2>Payment Configuration</h2>
-
-
-            <div class="settings-option">
-
-                <div>
-
-                    <strong>Online Payments</strong>
-
-                    <p>
-                        Allow parents to pay school fees online.
-                    </p>
-
-                </div>
-
-
-                <label class="switch">
-
-                    <input type="checkbox">
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-
-            <div class="settings-option">
-
-                <div>
-
-                    <strong>Payment Notifications</strong>
-
-                    <p>
-                        Receive notifications when payments are made.
-                    </p>
-
-                </div>
-
-
-                <label class="switch">
-
-                    <input type="checkbox">
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-function showSecurity() {
-
-    contentArea.innerHTML = `
-
-        <div class="page-header">
-
-            <h1>Security</h1>
-
-            <p>
-                Manage your account security and password settings.
-            </p>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <h2>Security Settings</h2>
-
-
-            <div class="settings-option">
-
-                <div>
-
-                    <strong>Two-Factor Authentication</strong>
-
-                    <p>
-                        Add an extra layer of security to your account.
-                    </p>
-
-                </div>
-
-
-                <label class="switch">
-
-                    <input type="checkbox">
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-
-            <button
-                type="button"
-                class="primary-button"
-            >
-                Change Password
-            </button>
-
-        </div>
-
-    `;
-
-}
-
-function showEmailSettings() {
-
-    contentArea.innerHTML = `
-
-        <div class="page-header">
-
-            <h1>Email Settings</h1>
-
-            <p>
-                Manage school email notifications and communication preferences.
-            </p>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <h2>Email Notifications</h2>
-
-
-            <div class="settings-option">
-
-                <div>
-
-                    <strong>Payment Notifications</strong>
-
-                    <p>
-                        Send email alerts when payments are received.
-                    </p>
-
-                </div>
-
-                <input type="checkbox">
-
-            </div>
-
-
-            <div class="settings-option">
-
-                <div>
-
-                    <strong>New Student Notifications</strong>
-
-                    <p>
-                        Receive alerts when a new student is registered.
-                    </p>
-
-                </div>
-
-                <input type="checkbox">
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-function showBackup() {
-
-    contentArea.innerHTML = `
-
-        <div class="page-header">
-
-            <h1>Backup</h1>
-
-            <p>
-                Protect your school's important information.
-            </p>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <h2>Data Backup</h2>
-
-            <p>
-                Create a backup of your school records and important data.
-            </p>
-
-
-            <button
-                type="button"
-                class="primary-button"
-            >
-                Create Backup
-            </button>
-
-        </div>
-
-    `;
-
-}
-
-async function showNotifications() {
-    let stats = { total: 0, unread: 0, payments: 0, updates: 0 };
-    let list = [];
-    try {
-        const res = await fetch('/api/notifications');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.notifications || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Notifications
-                    </h2>
-
-                    <p>
-                        Stay updated with important activities across your school.
-                    </p>
-
-                </div>
-
-                <button class="text-button">
-
-                    Mark All As Read
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Notifications
-                    </p>
-
-                    <h3>
-                        ${stats.total}
-                    </h3>
-
-                    <small>
-                        All recent activities
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Unread
-                    </p>
-
-                    <h3>
-                        ${stats.unread}
-                    </h3>
-
-                    <small>
-                        Require attention
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Payments
-                    </p>
-
-                    <h3>
-                        ${stats.payments}
-                    </h3>
-
-                    <small>
-                        Payment updates
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        System Updates
-                    </p>
-
-                    <h3>
-                        ${stats.updates}
-                    </h3>
-
-                    <small>
-                        Recent system activities
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Recent Notifications
-                        </h3>
-
-                        <p>
-                            Your latest system and school activities.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="notification-list">
-
-                    ${list.length > 0 ? list.map(item => `
-                    <div class="notification-item ${item.isUnread ? 'unread' : ''}">
-
-                        <div class="notification-icon ${item.type}">
-                            ${item.icon || '🔔'}
-                        </div>
-
-                        <div class="notification-content">
-
-                            <h4>
-                                ${item.title}
-                            </h4>
-
-                            <p>
-                                ${item.message}
-                            </p>
-
-                            <small>
-                                ${item.timeAgo}
-                            </small>
-
-                        </div>
-
-                    </div>
-                    `).join('') : `
-                    <div class="notification-item unread">
-
-                        <div class="notification-icon payment">
-                            💰
-                        </div>
-
-                        <div class="notification-content">
-
-                            <h4>
-                                Payment Received
-                            </h4>
-
-                            <p>
-                                Amina Yusuf completed a school fee payment of ₦150,000.
-                            </p>
-
-                            <small>
-                                10 minutes ago
-                            </small>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="notification-item unread">
-
-                        <div class="notification-icon announcement">
-                            📢
-                        </div>
-
-                        <div class="notification-content">
-
-                            <h4>
-                                New Announcement Published
-                            </h4>
-
-                            <p>
-                                First Term Examination Schedule was published successfully.
-                            </p>
-
-                            <small>
-                                2 hours ago
-                            </small>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="notification-item">
-
-                        <div class="notification-icon user">
-                            👤
-                        </div>
-
-                        <div class="notification-content">
-
-                            <h4>
-                                New Parent Account
-                            </h4>
-
-                            <p>
-                                A new parent account has been successfully activated.
-                            </p>
-
-                            <small>
-                                Yesterday
-                            </small>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="notification-item">
-
-                        <div class="notification-icon warning">
-                            ⚠️
-                        </div>
-
-                        <div class="notification-content">
-
-                            <h4>
-                                Outstanding Fees Reminder
-                            </h4>
-
-                            <p>
-                                186 students currently have outstanding fee balances.
-                            </p>
-
-                            <small>
-                                2 days ago
-                            </small>
-
-                        </div>
-
-                    </div>
-                    `}
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-async function showMessages() {
-    let stats = { total: 0, unread: 0, parents: 0, staff: 0 };
-    let list = [];
-    try {
-        const res = await fetch('/api/messages');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.messages || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Messages
-                    </h2>
-
-                    <p>
-                        Communicate directly with parents, staff, and students.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    + Compose Message
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Messages
-                    </p>
-
-                    <h3>
-                        ${stats.total}
-                    </h3>
-
-                    <small>
-                        All conversations
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Unread Messages
-                    </p>
-
-                    <h3>
-                        ${stats.unread}
-                    </h3>
-
-                    <small>
-                        Require attention
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Parents
-                    </p>
-
-                    <h3>
-                        ${stats.parents}
-                    </h3>
-
-                    <small>
-                        Conversations
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Staff
-                    </p>
-
-                    <h3>
-                        ${stats.staff}
-                    </h3>
-
-                    <small>
-                        Conversations
-                    </small>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Recent Conversations
-                        </h3>
-
-                        <p>
-                            Your latest direct messages.
-                        </p>
-
-                    </div>
-
-
-                    <button class="text-button">
-
-                        View All
-
-                    </button>
-
-                </div>
-
-
-                <div class="message-list">
-
-                    ${list.length > 0 ? list.map(item => `
-                    <div class="message-item">
-
-
-                        <div class="message-avatar">
-                            ${item.initials}
-                        </div>
-
-
-                        <div class="message-content">
-
-                            <div class="message-top">
-
-                                <h4>
-                                    ${item.senderName}
-                                </h4>
-
-                                <small>
-                                    ${item.time}
-                                </small>
-
-                            </div>
-
-
-                            <p>
-                                ${item.text}
-                            </p>
-
-
-                            <span class="message-role">
-                                ${item.role}
-                            </span>
-
-                        </div>
-
-
-                        ${item.isUnread ? '<span class="unread-dot"></span>' : ''}
-
-                    </div>
-                    `).join('') : `
-                    <div class="message-item">
-
-
-                        <div class="message-avatar">
-                            AY
-                        </div>
-
-
-                        <div class="message-content">
-
-                            <div class="message-top">
-
-                                <h4>
-                                    Amina Yusuf
-                                </h4>
-
-                                <small>
-                                    10:45 AM
-                                </small>
-
-                            </div>
-
-
-                            <p>
-                                I would like to confirm the outstanding fee balance for my child.
-                            </p>
-
-
-                            <span class="message-role">
-                                Parent
-                            </span>
-
-                        </div>
-
-
-                        <span class="unread-dot"></span>
-
-                    </div>
-
-
-                    <div class="message-item">
-
-
-                        <div class="message-avatar">
-                            MI
-                        </div>
-
-
-                        <div class="message-content">
-
-                            <div class="message-top">
-
-                                <h4>
-                                    Mr. Ibrahim
-                                </h4>
-
-                                <small>
-                                    Yesterday
-                                </small>
-
-                            </div>
-
-
-                            <p>
-                                The updated class attendance records are ready.
-                            </p>
-
-
-                            <span class="message-role">
-                                Teacher
-                            </span>
-
-                        </div>
-
-
-                    </div>
-
-
-                    <div class="message-item">
-
-
-                        <div class="message-avatar">
-                            ZB
-                        </div>
-
-
-                        <div class="message-content">
-
-                            <div class="message-top">
-
-                                <h4>
-                                    Zainab Bello
-                                </h4>
-
-                                <small>
-                                    2 days ago
-                                </small>
-
-                            </div>
-
-
-                            <p>
-                                Thank you for the payment reminder.
-                            </p>
-
-
-                            <span class="message-role">
-                                Parent
-                            </span>
-
-                        </div>
-
-
-                    </div>
-                    `}
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-    `;
-
-}
-
-async function showAnnouncements() {
-    let stats = { total: 0, published: 0, drafts: 0, audience: '0' };
-    let list = [];
-    try {
-        const res = await fetch('/api/announcements');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.announcements || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Announcements
-                    </h2>
-
-                    <p>
-                        Share important updates and information with your school community.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    + Create Announcement
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Announcements
-                    </p>
-
-                    <h3>
-                        ${stats.total}
-                    </h3>
-
-                    <small>
-                        This academic session
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Published
-                    </p>
-
-                    <h3>
-                        ${stats.published}
-                    </h3>
-
-                    <small>
-                        Currently visible
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Drafts
-                    </p>
-
-                    <h3>
-                        ${stats.drafts}
-                    </h3>
-
-                    <small>
-                        Not yet published
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Audience
-                    </p>
-
-                    <h3>
-                        ${stats.audience}
-                    </h3>
-
-                    <small>
-                        School community
-                    </small>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Recent Announcements
-                        </h3>
-
-                        <p>
-                            Manage your school's latest announcements.
-                        </p>
-
-                    </div>
-
-
-                    <button class="text-button">
-
-                        View All
-
-                    </button>
-
-                </div>
-
-
-                <div class="announcement-list">
-
-                    ${list.length > 0 ? list.map(item => `
-                    <div class="announcement-item">
-
-
-                        <div class="announcement-icon">
-                            ${item.icon || '📢'}
-                        </div>
-
-
-                        <div class="announcement-content">
-
-                            <h4>
-                                ${item.title}
-                            </h4>
-
-                            <p>
-                                ${item.content}
-                            </p>
-
-                            <small>
-                                ${item.meta}
-                            </small>
-
-                        </div>
-
-
-                        <span class="status ${item.status === 'Published' ? 'paid' : 'pending'}">
-                            ${item.status}
-                        </span>
-
-                    </div>
-                    `).join('') : `
-                    <div class="announcement-item">
-
-
-                        <div class="announcement-icon">
-                            📢
-                        </div>
-
-
-                        <div class="announcement-content">
-
-                            <h4>
-                                First Term Examination Schedule
-                            </h4>
-
-                            <p>
-                                The first term examination will begin on Monday.
-                            </p>
-
-                            <small>
-                                Published 2 days ago • Parents & Students
-                            </small>
-
-                        </div>
-
-
-                        <span class="status paid">
-                            Published
-                        </span>
-
-                    </div>
-
-
-                    <div class="announcement-item">
-
-
-                        <div class="announcement-icon">
-                            💰
-                        </div>
-
-
-                        <div class="announcement-content">
-
-                            <h4>
-                                School Fee Payment Reminder
-                            </h4>
-
-                            <p>
-                                Parents are reminded to complete outstanding school fee payments.
-                            </p>
-
-                            <small>
-                                Published 5 days ago • Parents
-                            </small>
-
-                        </div>
-
-
-                        <span class="status paid">
-                            Published
-                        </span>
-
-                    </div>
-
-
-                    <div class="announcement-item">
-
-
-                        <div class="announcement-icon">
-                            📅
-                        </div>
-
-
-                        <div class="announcement-content">
-
-                            <h4>
-                                Upcoming School Holiday
-                            </h4>
-
-                            <p>
-                                The school will be closed for the upcoming holiday.
-                            </p>
-
-                            <small>
-                                Draft • Staff & Parents
-                            </small>
-
-                        </div>
-
-
-                        <span class="status pending">
-                            Draft
-                        </span>
-
-                    </div>
-                    `}
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-    `;
-
-}
-
-async function showParents() {
-    let stats = { total: 0, active: 0, linkedStudents: 0, pending: 0 };
-    let list = [];
-    try {
-        const res = await fetch('/api/parents');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.parents || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Parents & Guardians
-                    </h2>
-
-                    <p>
-                        Manage parents and guardians connected to students.
-                    </p>
-
-                </div>
-
-                <button class="primary-button">
-
-                    + Add Parent
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Parents
-                    </p>
-
-                    <h3>
-                        ${stats.total}
-                    </h3>
-
-                    <small>
-                        Registered parents
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Active Accounts
-                    </p>
-
-                    <h3>
-                        ${stats.active}
-                    </h3>
-
-                    <small>
-                        Currently active
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Linked Students
-                    </p>
-
-                    <h3>
-                        ${stats.linkedStudents}
-                    </h3>
-
-                    <small>
-                        Connected to parents
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Pending Invitations
-                    </p>
-
-                    <h3>
-                        ${stats.pending}
-                    </h3>
-
-                    <small>
-                        Awaiting account activation
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Parents Directory
-                        </h3>
-
-                        <p>
-                            View and manage registered parents and guardians.
-                        </p>
-
-                    </div>
-
-                    <button class="text-button">
-
-                        View All
-
-                    </button>
-
-                </div>
-
-
-                <div class="table-container">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Parent / Guardian
-                                </th>
-
-                                <th>
-                                    Phone
-                                </th>
-
-                                <th>
-                                    Email
-                                </th>
-
-                                <th>
-                                    Students
-                                </th>
-
-                                <th>
-                                    Account Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            ${list.length > 0 ? list.map(item => `
-                            <tr>
-
-                                <td>
-                                    ${item.name}
-                                </td>
-
-                                <td>
-                                    ${item.phone}
-                                </td>
-
-                                <td>
-                                    ${item.email}
-                                </td>
-
-                                <td>
-                                    ${item.studentCount} Students
-                                </td>
-
-                                <td>
-
-                                    <span class="status ${item.status === 'Active' ? 'paid' : 'pending'}">
-                                        ${item.status}
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `).join('') : `
-                            <tr>
-
-                                <td>
-                                    Amina Yusuf
-                                </td>
-
-                                <td>
-                                    08012345678
-                                </td>
-
-                                <td>
-                                    amina@example.com
-                                </td>
-
-                                <td>
-                                    2 Students
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Ibrahim Musa
-                                </td>
-
-                                <td>
-                                    08023456789
-                                </td>
-
-                                <td>
-                                    ibrahim@example.com
-                                </td>
-
-                                <td>
-                                    1 Student
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Zainab Bello
-                                </td>
-
-                                <td>
-                                    08034567890
-                                </td>
-
-                                <td>
-                                    zainab@example.com
-                                </td>
-
-                                <td>
-                                    1 Student
-                                </td>
-
-                                <td>
-
-                                    <span class="status pending">
-                                        Pending
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-async function showStaff() {
-    let stats = { total: 0, teachers: 0, admin: 0, support: 0 };
-    let list = [];
-    try {
-        const res = await fetch('/api/staff');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.staff || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Staff & Teachers
-                    </h2>
-
-                    <p>
-                        Manage teachers, administrators, and other school staff.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    + Add Staff Member
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Staff
-                    </p>
-
-                    <h3>
-                        ${stats.total}
-                    </h3>
-
-                    <small>
-                        All school staff
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Teachers
-                    </p>
-
-                    <h3>
-                        ${stats.teachers}
-                    </h3>
-
-                    <small>
-                        Teaching staff
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Administrative Staff
-                    </p>
-
-                    <h3>
-                        ${stats.admin}
-                    </h3>
-
-                    <small>
-                        School administration
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Support Staff
-                    </p>
-
-                    <h3>
-                        ${stats.support}
-                    </h3>
-
-                    <small>
-                        Other school staff
-                    </small>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Staff Directory
-                        </h3>
-
-                        <p>
-                            View and manage all school staff.
-                        </p>
-
-                    </div>
-
-
-                    <button class="text-button">
-
-                        View All
-
-                    </button>
-
-                </div>
-
-
-                <div class="table-container">
-
-
-                    <table>
-
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Name
-                                </th>
-
-                                <th>
-                                    Role
-                                </th>
-
-                                <th>
-                                    Department
-                                </th>
-
-                                <th>
-                                    Phone
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            ${list.length > 0 ? list.map(item => `
-                            <tr>
-
-                                <td>
-                                    ${item.name}
-                                </td>
-
-                                <td>
-                                    ${item.role}
-                                </td>
-
-                                <td>
-                                    ${item.department}
-                                </td>
-
-                                <td>
-                                    ${item.phone}
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        ${item.status}
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `).join('') : `
-                            <tr>
-
-                                <td>
-                                    Mr. Ibrahim
-                                </td>
-
-                                <td>
-                                    Teacher
-                                </td>
-
-                                <td>
-                                    Mathematics
-                                </td>
-
-                                <td>
-                                    08012345678
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Mrs. Aisha
-                                </td>
-
-                                <td>
-                                    Teacher
-                                </td>
-
-                                <td>
-                                    English
-                                </td>
-
-                                <td>
-                                    08023456789
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Mr. Musa
-                                </td>
-
-                                <td>
-                                    Accountant
-                                </td>
-
-                                <td>
-                                    Finance
-                                </td>
-
-                                <td>
-                                    08034567890
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Mrs. Fatima
-                                </td>
-
-                                <td>
-                                    Administrator
-                                </td>
-
-                                <td>
-                                    Administration
-                                </td>
-
-                                <td>
-                                    08045678901
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `}
-
-                        </tbody>
-
-
-                    </table>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    `;
-
-}
-
-
-
-async function showStudents() {
-    let stats = { total: 0, active: 0, inactive: 0 };
-    let list = [];
-    try {
-        const res = await fetch('/api/students');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.students || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-header">
-
-            <div>
-
-                <h1>Students</h1>
-
-                <p>
-                    Manage all students registered in your school.
-                </p>
-
-            </div>
-
-
-            <button
-                class="primary-button"
-                id="add-student-button"
-            >
-                + Add Student
-            </button>
-
-        </div>
-
-
-        <div class="stats-grid">
-
-            <div class="stat-card">
-
-                <span class="stat-icon">
-                    👨‍🎓
-                </span>
-
-                <div>
-
-                    <p>Total Students</p>
-
-                    <h2>${stats.total}</h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <span class="stat-icon">
-                    🟢
-                </span>
-
-                <div>
-
-                    <p>Active Students</p>
-
-                    <h2>${stats.active}</h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <span class="stat-icon">
-                    🔴
-                </span>
-
-                <div>
-
-                    <p>Inactive Students</p>
-
-                    <h2>${stats.inactive}</h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="content-card students-card">
-
-
-            <div class="table-header">
-
-                <div>
-
-                    <h2>Student List</h2>
-
-                    <p>
-                        View and manage registered students.
-                    </p>
-
-                </div>
-
-
-                <div class="table-actions">
-
-                    <input
-                        type="search"
-                        id="student-search"
-                        placeholder="Search students..."
-                    >
-
-
-                    <select
-                        id="student-class-filter"
-                    >
-
-                        <option value="all">
-                            All Classes
-                        </option>
-
-                        <option value="nursery">
-                            Nursery
-                        </option>
-
-                        <option value="primary">
-                            Primary
-                        </option>
-
-                        <option value="jss">
-                            JSS
-                        </option>
-
-                        <option value="ss">
-                            SS
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <div class="table-wrapper">
-
-                <table class="data-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Student</th>
-
-                            <th>Admission No.</th>
-
-                            <th>Class</th>
-
-                            <th>Gender</th>
-
-                            <th>Status</th>
-
-                            <th>Action</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="students-table-body"
-                    >
-
-                        ${list.length > 0 ? list.map(item => `
-                        <tr>
-
-                            <td>
-
-                                <div class="student-info">
-
-                                    <span
-                                        class="student-avatar"
-                                    >
-                                        ${item.initials}
-                                    </span>
-
-
-                                    <div>
-
-                                        <strong>
-                                            ${item.name}
-                                        </strong>
-
-                                        <small>
-                                            ${item.email}
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-
-                            <td>
-                                ${item.admissionNo}
-                            </td>
-
-
-                            <td>
-                                ${item.class}
-                            </td>
-
-
-                            <td>
-                                ${item.gender}
-                            </td>
-
-
-                            <td>
-
-                                <span
-                                    class="status-badge ${item.status === 'Active' ? 'active' : 'inactive'}"
-                                >
-                                    ${item.status}
-                                </span>
-
-                            </td>
-
-
-                            <td>
-
-                                <button
-                                    class="table-action-button"
-                                >
-                                    View
-                                </button>
-
-                            </td>
-
-                        </tr>
-                        `).join('') : `
-                        <tr>
-
-                            <td>
-
-                                <div class="student-info">
-
-                                    <span
-                                        class="student-avatar"
-                                    >
-                                        AM
-                                    </span>
-
-
-                                    <div>
-
-                                        <strong>
-                                            Aisha Mohammed
-                                        </strong>
-
-                                        <small>
-                                            aisha@example.com
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-
-                            <td>
-                                EDU-2026-001
-                            </td>
-
-
-                            <td>
-                                JSS 1
-                            </td>
-
-
-                            <td>
-                                Female
-                            </td>
-
-
-                            <td>
-
-                                <span
-                                    class="status-badge active"
-                                >
-                                    Active
-                                </span>
-
-                            </td>
-
-
-                            <td>
-
-                                <button
-                                    class="table-action-button"
-                                >
-                                    View
-                                </button>
-
-                            </td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td>
-
-                                <div class="student-info">
-
-                                    <span
-                                        class="student-avatar"
-                                    >
-                                        YA
-                                    </span>
-
-
-                                    <div>
-
-                                        <strong>
-                                            Yusuf Abdullahi
-                                        </strong>
-
-                                        <small>
-                                            yusuf@example.com
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-
-                            <td>
-                                EDU-2026-002
-                            </td>
-
-
-                            <td>
-                                SS 2
-                            </td>
-
-
-                            <td>
-                                Male
-                            </td>
-
-
-                            <td>
-
-                                <span
-                                    class="status-badge active"
-                                >
-                                    Active
-                                </span>
-
-                            </td>
-
-
-                            <td>
-
-                                <button
-                                    class="table-action-button"
-                                >
-                                    View
-                                </button>
-
-                            </td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td>
-
-                                <div class="student-info">
-
-                                    <span
-                                        class="student-avatar"
-                                    >
-                                        FK
-                                    </span>
-
-
-                                    <div>
-
-                                        <strong>
-                                            Fatima Khalid
-                                        </strong>
-
-                                        <small>
-                                            fatima@example.com
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-
-                            <td>
-                                EDU-2026-003
-                            </td>
-
-
-                            <td>
-                                Primary 5
-                            </td>
-
-
-                            <td>
-                                Female
-                            </td>
-
-
-                            <td>
-
-                                <span
-                                    class="status-badge inactive"
-                                >
-                                    Inactive
-                                </span>
-
-                            </td>
-
-
-                            <td>
-
-                                <button
-                                    class="table-action-button"
-                                >
-                                    View
-                                </button>
-
-                            </td>
-
-                        </tr>
-                        `}
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-
-        <!-- ADD STUDENT MODAL -->
-
-        <div
-            class="student-modal"
-            id="student-modal"
-            style="display: none;"
-        >
-
-            <div
-                class="student-modal-content"
-            >
-
-
-                <div class="modal-header">
-
-                    <div>
-
-                        <h2>
-                            Add New Student
-                        </h2>
-
-                        <p>
-                            Register a new student in your school.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="close-modal"
-                        id="close-student-modal"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-
-                <form
-                    id="student-form"
-                >
-
-
-                    <div class="form-row">
-
-
-                        <div class="form-group">
-
-                            <label
-                                for="student-first-name"
-                            >
-                                First Name
-                            </label>
-
-
-                            <input
-                                type="text"
-                                id="student-first-name"
-                                placeholder="Enter first name"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label
-                                for="student-last-name"
-                            >
-                                Last Name
-                            </label>
-
-
-                            <input
-                                type="text"
-                                id="student-last-name"
-                                placeholder="Enter last name"
-                                required
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="form-row">
-
-
-                        <div class="form-group">
-
-                            <label
-                                for="student-gender"
-                            >
-                                Gender
-                            </label>
-
-
-                            <select
-                                id="student-gender"
-                                required
-                            >
-
-                                <option value="">
-                                    Select gender
-                                </option>
-
-
-                                <option value="Male">
-                                    Male
-                                </option>
-
-
-                                <option value="Female">
-                                    Female
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label
-                                for="student-class"
-                            >
-                                Class
-                            </label>
-
-
-                            <select
-                                id="student-class"
-                                required
-                            >
-
-                                <option value="">
-                                    Select class
-                                </option>
-
-
-                                <optgroup
-                                    label="Nursery"
-                                >
-
-                                    <option>
-                                        Nursery 1
-                                    </option>
-
-                                    <option>
-                                        Nursery 2
-                                    </option>
-
-                                    <option>
-                                        Nursery 3
-                                    </option>
-
-                                </optgroup>
-
-
-                                <optgroup
-                                    label="Primary"
-                                >
-
-                                    <option>
-                                        Primary 1
-                                    </option>
-
-                                    <option>
-                                        Primary 2
-                                    </option>
-
-                                    <option>
-                                        Primary 3
-                                    </option>
-
-                                    <option>
-                                        Primary 4
-                                    </option>
-
-                                    <option>
-                                        Primary 5
-                                    </option>
-
-                                    <option>
-                                        Primary 6
-                                    </option>
-
-                                </optgroup>
-
-
-                                <optgroup
-                                    label="Junior Secondary School"
-                                >
-
-                                    <option>
-                                        JSS 1
-                                    </option>
-
-                                    <option>
-                                        JSS 2
-                                    </option>
-
-                                    <option>
-                                        JSS 3
-                                    </option>
-
-                                </optgroup>
-
-
-                                <optgroup
-                                    label="Senior Secondary School"
-                                >
-
-                                    <option>
-                                        SS 1
-                                    </option>
-
-                                    <option>
-                                        SS 2
-                                    </option>
-
-                                    <option>
-                                        SS 3
-                                    </option>
-
-                                </optgroup>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label
-                            for="student-email"
-                        >
-                            Email Address
-                        </label>
-
-
-                        <input
-                            type="email"
-                            id="student-email"
-                            placeholder="student@example.com"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label
-                            for="student-phone"
-                        >
-                            Phone Number
-                        </label>
-
-
-                        <input
-                            type="tel"
-                            id="student-phone"
-                            placeholder="Enter phone number"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="modal-actions">
-
-
-                        <button
-                            type="button"
-                            class="cancel-button"
-                            id="cancel-student-modal"
-                        >
-                            Cancel
-                        </button>
-
-
-                        <button
-                            type="submit"
-                            class="primary-button"
-                        >
-                            Add Student
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    `;
-    const addStudentButton =
-    document.getElementById("add-student-button");
-
-const studentModal =
-    document.getElementById("student-modal");
-
-const closeStudentModal =
-    document.getElementById("close-student-modal");
-
-const cancelStudentModal =
-    document.getElementById("cancel-student-modal");
-
-const studentForm =
-    document.getElementById("student-form");
-
-
-if (
-    addStudentButton &&
-    studentModal &&
-    closeStudentModal &&
-    cancelStudentModal &&
-    studentForm
-) {
-
-    addStudentButton.addEventListener(
-        "click",
-        function () {
-
-            studentModal.style.display = "flex";
-
-        }
-    );
-
-
-    closeStudentModal.addEventListener(
-        "click",
-        function () {
-
-            studentModal.style.display = "none";
-
-        }
-    );
-
-
-    cancelStudentModal.addEventListener(
-        "click",
-        function () {
-
-            studentModal.style.display = "none";
-
-        }
-    );
-
-
-    studentForm.addEventListener(
-        "submit",
-        async function (event) {
-
-            event.preventDefault();
-
-            // Submit new student payload directly to backend
-            const payload = {
-                firstName: document.getElementById("student-first-name").value,
-                lastName: document.getElementById("student-last-name").value,
-                gender: document.getElementById("student-gender").value,
-                class: document.getElementById("student-class").value,
-                email: document.getElementById("student-email").value,
-                phone: document.getElementById("student-phone").value,
-            };
-
-            try {
-                const response = await fetch('/api/students', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    alert("Student added successfully!");
-                    studentForm.reset();
-                    studentModal.style.display = "none";
-                    showStudents(); // Refresh live view
-                } else {
-                    alert("Failed to add student. Please check backend connection.");
-                }
-            } catch (error) {
-                alert("Student added locally!");
-                studentForm.reset();
-                studentModal.style.display = "none";
-            }
-
-        }
-    );
-
-}
-}
-
-
-
-async function showOutstandingFees() {
-    let stats = { totalOutstanding: '₦0', studentsCount: 0, partialCount: 0, rate: '0%' };
-    let list = [];
-    try {
-        const res = await fetch('/api/fees/outstanding');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.outstanding || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Outstanding Fees
-                    </h2>
-
-                    <p>
-                        Monitor unpaid and partially paid school fees.
-                    </p>
-
-                </div>
-
-                <button class="primary-button">
-                    Send Fee Reminder
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Outstanding
-                    </p>
-
-                    <h3>
-                        ${stats.totalOutstanding}
-                    </h3>
-
-                    <small>
-                        Awaiting payment
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Students With Balance
-                    </p>
-
-                    <h3>
-                        ${stats.studentsCount}
-                    </h3>
-
-                    <small>
-                        Require attention
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Partially Paid
-                    </p>
-
-                    <h3>
-                        ${stats.partialCount}
-                    </h3>
-
-                    <small>
-                        Incomplete payments
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Payment Rate
-                    </p>
-
-                    <h3>
-                        ${stats.rate}
-                    </h3>
-
-                    <small>
-                        Current session
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Outstanding Payments
-                        </h3>
-
-                        <p>
-                            Students with unpaid or incomplete fees.
-                        </p>
-
-                    </div>
-
-                    <button class="text-button">
-                        Filter
-                    </button>
-
-                </div>
-
-
-                <div class="table-container">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Student
-                                </th>
-
-                                <th>
-                                    Parent / Guardian
-                                </th>
-
-                                <th>
-                                    Class
-                                </th>
-
-                                <th>
-                                    Total Fee
-                                </th>
-
-                                <th>
-                                    Paid
-                                </th>
-
-                                <th>
-                                    Balance
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            ${list.length > 0 ? list.map(item => `
-                            <tr>
-
-                                <td>
-                                    ${item.studentName}
-                                </td>
-
-                                <td>
-                                    ${item.parentName}
-                                </td>
-
-                                <td>
-                                    ${item.class}
-                                </td>
-
-                                <td>
-                                    ${item.totalFee}
-                                </td>
-
-                                <td>
-                                    ${item.paid}
-                                </td>
-
-                                <td>
-                                    ${item.balance}
-                                </td>
-
-                                <td>
-
-                                    <span class="status ${item.status === 'Unpaid' ? 'unpaid' : 'pending'}">
-                                        ${item.status}
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `).join('') : `
-                            <tr>
-
-                                <td>
-                                    Maryam Bello
-                                </td>
-
-                                <td>
-                                    Zainab Bello
-                                </td>
-
-                                <td>
-                                    Primary 5
-                                </td>
-
-                                <td>
-                                    ₦180,000
-                                </td>
-
-                                <td>
-                                    ₦120,000
-                                </td>
-
-                                <td>
-                                    ₦60,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status pending">
-                                        Partial
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Ahmad Musa
-                                </td>
-
-                                <td>
-                                    Ibrahim Musa
-                                </td>
-
-                                <td>
-                                    JSS 1
-                                </td>
-
-                                <td>
-                                    ₦210,000
-                                </td>
-
-                                <td>
-                                    ₦95,000
-                                </td>
-
-                                <td>
-                                    ₦115,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status pending">
-                                        Partial
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Fatima Yusuf
-                                </td>
-
-                                <td>
-                                    Amina Yusuf
-                                </td>
-
-                                <td>
-                                    Primary 4
-                                </td>
-
-                                <td>
-                                    ₦150,000
-                                </td>
-
-                                <td>
-                                    ₦0
-                                </td>
-
-                                <td>
-                                    ₦150,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status unpaid">
-                                        Unpaid
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-async function showParentPayments() {
-    let stats = { totalCount: 0, amountCollected: '₦0', pendingCount: 0, rate: '0%' };
-    let list = [];
-    try {
-        const res = await fetch('/api/payments/parent-payments');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.payments || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Parent Payments
-                    </h2>
-
-                    <p>
-                        View and monitor payments made by parents.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    Export Payments
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <div class="stat-card-top">
-
-                        <span class="stat-icon blue">
-                            💳
-                        </span>
-
-                    </div>
-
-
-                    <p>
-                        Total Payments
-                    </p>
-
-
-                    <h3>
-                        ${stats.totalCount}
-                    </h3>
-
-
-                    <small>
-                        This academic session
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-card-top">
-
-                        <span class="stat-icon green">
-                            💰
-                        </span>
-
-                    </div>
-
-
-                    <p>
-                        Amount Collected
-                    </p>
-
-
-                    <h3>
-                        ${stats.amountCollected}
-                    </h3>
-
-
-                    <small>
-                        Successfully received
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-card-top">
-
-                        <span class="stat-icon orange">
-                            ⏳
-                        </span>
-
-                    </div>
-
-
-                    <p>
-                        Pending Payments
-                    </p>
-
-
-                    <h3>
-                        ${stats.pendingCount}
-                    </h3>
-
-
-                    <small>
-                        Awaiting payment
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-card-top">
-
-                        <span class="stat-icon purple">
-                            📈
-                        </span>
-
-                    </div>
-
-
-                    <p>
-                        Collection Rate
-                    </p>
-
-
-                    <h3>
-                        ${stats.rate}
-                    </h3>
-
-
-                    <small>
-                        Current academic session
-                    </small>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-
-                    <div>
-
-                        <h3>
-                            Payment History
-                        </h3>
-
-
-                        <p>
-                            Recent payments made by parents.
-                        </p>
-
-                    </div>
-
-
-                    <button class="text-button">
-
-                        View All
-
-                    </button>
-
-                </div>
-
-
-                <div class="table-container">
-
-
-                    <table>
-
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Parent
-                                </th>
-
-                                <th>
-                                    Student
-                                </th>
-
-                                <th>
-                                    Class
-                                </th>
-
-                                <th>
-                                    Amount
-                                </th>
-
-                                <th>
-                                    Date
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            ${list.length > 0 ? list.map(item => `
-                            <tr>
-
-                                <td>
-                                    ${item.parentName}
-                                </td>
-
-                                <td>
-                                    ${item.studentName}
-                                </td>
-
-                                <td>
-                                    ${item.class}
-                                </td>
-
-                                <td>
-                                    ${item.amount}
-                                </td>
-
-                                <td>
-                                    ${item.date}
-                                </td>
-
-                                <td>
-
-                                    <span class="status ${item.status === 'Paid' ? 'paid' : 'pending'}">
-                                        ${item.status}
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `).join('') : `
-                            <tr>
-
-                                <td>
-                                    Amina Yusuf
-                                </td>
-
-                                <td>
-                                    Fatima Yusuf
-                                </td>
-
-                                <td>
-                                    Primary 4
-                                </td>
-
-                                <td>
-                                    ₦150,000
-                                </td>
-
-                                <td>
-                                    24 Jul 2026
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Paid
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Ibrahim Musa
-                                </td>
-
-                                <td>
-                                    Ahmad Musa
-                                </td>
-
-                                <td>
-                                    JSS 1
-                                </td>
-
-                                <td>
-                                    ₦95,000
-                                </td>
-
-                                <td>
-                                    23 Jul 2026
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Paid
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Zainab Bello
-                                </td>
-
-                                <td>
-                                    Maryam Bello
-                                </td>
-
-                                <td>
-                                    Primary 5
-                                </td>
-
-                                <td>
-                                    ₦120,000
-                                </td>
-
-                                <td>
-                                    22 Jul 2026
-                                </td>
-
-                                <td>
-
-                                    <span class="status pending">
-                                        Pending
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Yusuf Abdullahi
-                                </td>
-
-                                <td>
-                                    Hassan Abdullahi
-                                </td>
-
-                                <td>
-                                    SS 2
-                                </td>
-
-                                <td>
-                                    ₦200,000
-                                </td>
-
-                                <td>
-                                    21 Jul 2026
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Paid
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `}
-
-                        </tbody>
-
-
-                    </table>
-
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    `;
-
-}
-
-async function showFeeStructures() {
-    let stats = { activeStructures: 0, primaryCount: 0, secondaryCount: 0, session: '2025/26' };
-    let list = [];
-    try {
-        const res = await fetch('/api/fees/structures');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.structures || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Fee Structures
-                    </h2>
-
-                    <p>
-                        Create and manage fees for different classes and academic terms.
-                    </p>
-
-                </div>
-
-                <button class="primary-button">
-
-                    + Create Fee Structure
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <p>
-                        Active Structures
-                    </p>
-
-                    <h3>
-                        ${stats.activeStructures}
-                    </h3>
-
-                    <small>
-                        Current academic session
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Primary Section
-                    </p>
-
-                    <h3>
-                        ${stats.primaryCount}
-                    </h3>
-
-                    <small>
-                        Active fee structures
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Secondary Section
-                    </p>
-
-                    <h3>
-                        ${stats.secondaryCount}
-                    </h3>
-
-                    <small>
-                        Active fee structures
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Academic Session
-                    </p>
-
-                    <h3>
-                        ${stats.session}
-                    </h3>
-
-                    <small>
-                        Current session
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Active Fee Structures
-                        </h3>
-
-                        <p>
-                            Fees currently assigned to school classes.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="table-container">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Structure Name
-                                </th>
-
-                                <th>
-                                    Class
-                                </th>
-
-                                <th>
-                                    Term
-                                </th>
-
-                                <th>
-                                    Total Amount
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            ${list.length > 0 ? list.map(item => `
-                            <tr>
-
-                                <td>
-                                    ${item.name}
-                                </td>
-
-                                <td>
-                                    ${item.classes}
-                                </td>
-
-                                <td>
-                                    ${item.term}
-                                </td>
-
-                                <td>
-                                    ${item.amount}
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        ${item.status}
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `).join('') : `
-                            <tr>
-
-                                <td>
-                                    Primary Basic Fees
-                                </td>
-
-                                <td>
-                                    Primary 1 - 6
-                                </td>
-
-                                <td>
-                                    First Term
-                                </td>
-
-                                <td>
-                                    ₦180,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Junior Secondary Fees
-                                </td>
-
-                                <td>
-                                    JSS 1 - 3
-                                </td>
-
-                                <td>
-                                    First Term
-                                </td>
-
-                                <td>
-                                    ₦210,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Senior Secondary Fees
-                                </td>
-
-                                <td>
-                                    SS 1 - 3
-                                </td>
-
-                                <td>
-                                    First Term
-                                </td>
-
-                                <td>
-                                    ₦230,000
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Fee Breakdown
-                        </h3>
-
-                        <p>
-                            Example breakdown for Primary 1 - 6.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="school-details">
-
-                    <div class="detail-item">
-
-                        <span>
-                            Tuition Fee
-                        </span>
-
-                        <strong>
-                            ₦150,000
-                        </strong>
-
-                    </div>
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Examination Fee
-                        </span>
-
-                        <strong>
-                            ₦10,000
-                        </strong>
-
-                    </div>
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Development Fee
-                        </span>
-
-                        <strong>
-                            ₦20,000
-                        </strong>
-
-                    </div>
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Total
-                        </span>
-
-                        <strong>
-                            ₦180,000
-                        </strong>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-async function showOverview() {
-    let stats = { totalStudents: '1,248', feesCollected: '₦8.4M', outstandingFees: '₦2.1M', activeParents: '936' };
-    try {
-        const response = await fetch('/api/dashboard/overview-stats');
-        if (response.ok) {
-            const data = await response.json();
-            stats = { ...stats, ...data };
-        }
-    } catch (error) {
-        console.error("Using local overview data:", error);
-    }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        School Overview
-                    </h2>
-
-                    <p>
-                        Here's what's happening in your school today.
-                    </p>
-
-                </div>
-
-                <button class="primary-button">
-                    + Add Student
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Students
-                    </p>
-
-                    <h3>
-                        ${stats.totalStudents}
-                    </h3>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Fees Collected
-                    </p>
-
-                    <h3>
-                        ${stats.feesCollected}
-                    </h3>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Outstanding Fees
-                    </p>
-
-                    <h3>
-                        ${stats.outstandingFees}
-                    </h3>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Active Parents
-                    </p>
-
-                    <h3>
-                        ${stats.activeParents}
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-async function showSchoolManagement() {
-    let details = {
-        name: 'Greenfield School',
-        email: 'info@greenfieldschool.com',
-        phone: '+234 801 234 5678',
-        address: 'Ilorin, Kwara State, Nigeria',
-        type: 'Private School',
-        established: '2010',
-        accountCreated: 'July 2026',
-        currentSession: '2025/2026',
-        principal: 'Mr. Principal',
-        term: 'Second Term'
-    };
-
-    try {
-        const response = await fetch('/api/school/info');
-        if (response.ok) {
-            const data = await response.json();
-            details = { ...details, ...data };
-        }
-    } catch (e) {
-        console.error("Using default school management details:", e);
-    }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        School Management
-                    </h2>
-
-                    <p>
-                        Manage your school's basic information and details.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    Edit School Information
-
-                </button>
-
-            </div>
-
-
-            <div class="school-management-grid">
-
-
-                <div class="dashboard-card school-information-card">
-
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <h3>
-                                School Information
-                            </h3>
-
-                            <p>
-                                Your school's basic information
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="school-details">
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                School Name
-                            </span>
-
-                            <strong>
-                                ${details.name}
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                School Email
-                            </span>
-
-                            <strong>
-                                ${details.email}
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                Phone Number
-                            </span>
-
-                            <strong>
-                                ${details.phone}
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                School Address
-                            </span>
-
-                            <strong>
-                                ${details.address}
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                School Type
-                            </span>
-
-                            <strong>
-                                ${details.type}
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                Established
-                            </span>
-
-                            <strong>
-                                ${details.established}
-                            </strong>
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-                <div class="dashboard-card school-status-card">
-
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <h3>
-                                School Status
-                            </h3>
-
-                            <p>
-                                Current school account status
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="status-overview">
-
-
-                        <div class="large-status-icon">
-                            ✓
-                        </div>
-
-
-                        <h3>
-                            Active
-                        </h3>
-
-
-                        <p>
-                            Your school account is active
-                            and fully operational.
-                        </p>
-
-
-                    </div>
-
-
-                    <div class="status-information">
-
-
-                        <div>
-
-                            <span>
-                                Account Created
-                            </span>
-
-                            <strong>
-                                ${details.accountCreated}
-                            </strong>
-
-                        </div>
-
-
-                        <div>
-
-                            <span>
-                                Current Session
-                            </span>
-
-                            <strong>
-                                ${details.currentSession}
-                            </strong>
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-                <!-- SCHOOL MANAGEMENT PAGE -->
-
-<div
-    class="page-content hidden"
-    id="schoolPage"
->
-
-    <div class="page-introduction">
-
-        <div>
-
-            <h2>
-                School Management
-            </h2>
-
-            <p>
-                Manage your school profile and academic information.
-            </p>
-
-        </div>
-
-        <button class="primary-button">
-            Save Changes
-        </button>
-
-    </div>
-
-    <div class="dashboard-card">
-
-        <div class="card-header">
-
-            <div>
-                <h3>School Profile</h3>
-                <p>Update your school's basic information.</p>
-            </div>
-
-        </div>
-
-        <form class="school-form" id="schoolFormSubmit">
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>School Name</label>
-                    <input type="text" value="${details.name}">
-                </div>
-
-                <div class="form-group">
-                    <label>Principal / Owner</label>
-                    <input type="text" value="${details.principal}">
-                </div>
-
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="text" value="${details.phone}">
-                </div>
-
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" value="${details.email}">
-                </div>
-
-                <div class="form-group full-width">
-                    <label>School Address</label>
-                    <textarea rows="3">${details.address}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Current Session</label>
-                    <input type="text" value="${details.currentSession}">
-                </div>
-
-                <div class="form-group">
-                    <label>Current Term</label>
-                    <select>
-                        <option ${details.term === 'First Term' ? 'selected' : ''}>First Term</option>
-                        <option ${details.term === 'Second Term' ? 'selected' : ''}>Second Term</option>
-                        <option ${details.term === 'Third Term' ? 'selected' : ''}>Third Term</option>
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="primary-button">
-                    Save School Profile
-                </button>
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-    `;
-
-}
-
-async function showClasses() {
-    let stats = { total: 0, primary: 0, secondary: 0, totalStudents: '0' };
-    let list = [];
-    try {
-        const res = await fetch('/api/classes');
-        if (res.ok) {
-            const data = await res.json();
-            stats = data.stats || stats;
-            list = data.classes || list;
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Classes
-                    </h2>
-
-                    <p>
-                        Manage your school's classes and class information.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    + Add New Class
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Classes
-                    </p>
-
-                    <h3>
-                        ${stats.total}
-                    </h3>
-
-                    <small>
-                        Across all levels
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Primary Classes
-                    </p>
-
-                    <h3>
-                        ${stats.primary}
-                    </h3>
-
-                    <small>
-                        Primary section
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Secondary Classes
-                    </p>
-
-                    <h3>
-                        ${stats.secondary}
-                    </h3>
-
-                    <small>
-                        Secondary section
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Total Students
-                    </p>
-
-                    <h3>
-                        ${stats.totalStudents}
-                    </h3>
-
-                    <small>
-                        Assigned to classes
-                    </small>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            All Classes
-                        </h3>
-
-                        <p>
-                            View and manage all school classes.
-                        </p>
-
-                    </div>
-
-
-                    <button class="text-button">
-
-                        View All
-
-                    </button>
-
-                </div>
-
-
-                <div class="table-container">
-
-
-                    <table>
-
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Class Name
-                                </th>
-
-                                <th>
-                                    Section
-                                </th>
-
-                                <th>
-                                    Students
-                                </th>
-
-                                <th>
-                                    Class Teacher
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            ${list.length > 0 ? list.map(item => `
-                            <tr>
-
-                                <td>
-                                    ${item.name}
-                                </td>
-
-                                <td>
-                                    ${item.section}
-                                </td>
-
-                                <td>
-                                    ${item.studentsCount}
-                                </td>
-
-                                <td>
-                                    ${item.teacher}
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        ${item.status}
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `).join('') : `
-                            <tr>
-
-                                <td>
-                                    Primary 1A
-                                </td>
-
-                                <td>
-                                    Primary
-                                </td>
-
-                                <td>
-                                    42
-                                </td>
-
-                                <td>
-                                    Mr. Ibrahim
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Primary 2A
-                                </td>
-
-                                <td>
-                                    Primary
-                                </td>
-
-                                <td>
-                                    38
-                                </td>
-
-                                <td>
-                                    Mrs. Aisha
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    JSS 1A
-                                </td>
-
-                                <td>
-                                    Junior Secondary
-                                </td>
-
-                                <td>
-                                    45
-                                </td>
-
-                                <td>
-                                    Mr. Musa
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    SS 2A
-                                </td>
-
-                                <td>
-                                    Senior Secondary
-                                </td>
-
-                                <td>
-                                    36
-                                </td>
-
-                                <td>
-                                    Mrs. Fatima
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-                            `}
-
-                        </tbody>
-
-
-                    </table>
-
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-    `;
-
-}
-
-async function showAcademicSessions() {
-    let details = {
-        sessionName: '2025/2026',
-        currentTerm: 'First Term',
-        completedTerms: 0,
-        status: 'Active',
-        startDate: 'September 8, 2025',
-        expectedEnd: 'July 24, 2026'
-    };
-
-    try {
-        const response = await fetch('/api/academic-sessions/current');
-        if (response.ok) {
-            const data = await response.json();
-            details = { ...details, ...data };
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        Academic Sessions
-                    </h2>
-
-                    <p>
-                        Manage academic sessions and school terms.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    + Create New Session
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Current Session
-                    </p>
-
-                    <h3>
-                        ${details.sessionName}
-                    </h3>
-
-                    <small>
-                        Active academic session
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Current Term
-                    </p>
-
-                    <h3>
-                        ${details.currentTerm}
-                    </h3>
-
-                    <small>
-                        Current school term
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Terms Completed
-                    </p>
-
-                    <h3>
-                        ${details.completedTerms}
-                    </h3>
-
-                    <small>
-                        This academic session
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <p>
-                        Session Status
-                    </p>
-
-                    <h3>
-                        ${details.status}
-                    </h3>
-
-                    <small>
-                        Currently running
-                    </small>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Current Academic Session
-                        </h3>
-
-                        <p>
-                            ${details.sessionName} academic year details.
-                        </p>
-
-                    </div>
-
-
-                    <span class="status paid">
-                        ${details.status}
-                    </span>
-
-                </div>
-
-
-                <div class="school-details">
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Session Name
-                        </span>
-
-                        <strong>
-                            ${details.sessionName}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Start Date
-                        </span>
-
-                        <strong>
-                            ${details.startDate}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Current Term
-                        </span>
-
-                        <strong>
-                            ${details.currentTerm}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="detail-item">
-
-                        <span>
-                            Expected End Date
-                        </span>
-
-                        <strong>
-                            ${details.expectedEnd}
-                        </strong>
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Academic Terms
-                        </h3>
-
-                        <p>
-                            Manage the terms within this academic session.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="table-container">
-
-
-                    <table>
-
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Term
-                                </th>
-
-                                <th>
-                                    Start Date
-                                </th>
-
-                                <th>
-                                    End Date
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-
-                            <tr>
-
-                                <td>
-                                    First Term
-                                </td>
-
-                                <td>
-                                    September 8, 2025
-                                </td>
-
-                                <td>
-                                    December 19, 2025
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Completed
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Second Term
-                                </td>
-
-                                <td>
-                                    January 12, 2026
-                                </td>
-
-                                <td>
-                                    April 3, 2026
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Completed
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Third Term
-                                </td>
-
-                                <td>
-                                    April 27, 2026
-                                </td>
-
-                                <td>
-                                    July 24, 2026
-                                </td>
-
-                                <td>
-
-                                    <span class="status pending">
-                                        Current
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                        </tbody>
-
-
-                    </table>
-
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-    `;
-
-}
-
-async function showSchoolFees() {
-    let stats = { expected: '₦10.5M', collected: '₦8.4M', outstanding: '₦2.1M', paidStudents: '1,062', totalStudents: '1,248', rate: '80%' };
-    try {
-        const response = await fetch('/api/fees/summary');
-        if (response.ok) {
-            const data = await response.json();
-            stats = { ...stats, ...data };
-        }
-    } catch (e) { console.error(e); }
-
-    contentArea.innerHTML = `
-
-        <div class="page-content">
-
-
-            <div class="page-introduction">
-
-                <div>
-
-                    <h2>
-                        School Fee Management
-                    </h2>
-
-                    <p>
-                        Create, manage, and monitor school fee payments.
-                    </p>
-
-                </div>
-
-
-                <button class="primary-button">
-
-                    + Create Fee Structure
-
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <div class="stat-card-top">
-
-                        <span class="stat-icon blue">
-                            💰
-                        </span>
-
-                        <span class="stat-change positive">
-                            +8.4%
-                        </span>
-
-                    </div>
-
-
-                    <p>
-                        Total Expected
-                    </p>
-
-
-                    <h3>
-                        ${stats.expected}
-                    </h3>
-
-
-                    <small>
-                        This academic session
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-card-top">
-
-                        <span class="stat-icon green">
-                            ✓
-                        </span>
-
-
-                        <span class="stat-change positive">
-                            ${stats.rate}
-                        </span>
-
-                    </div>
-
-
-                    <p>
-                        Total Collected
-                    </p>
-
-
-                    <h3>
-                        ${stats.collected}
-                    </h3>
-
-
-                    <small>
-                        Successfully paid
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-card-top">
-
-                        <span class="stat-icon orange">
-                            ⏳
-                        </span>
-
-
-                        <span class="stat-change warning">
-                            Attention
-                        </span>
-
-                    </div>
-
-
-                    <p>
-                        Outstanding
-                    </p>
-
-
-                    <h3>
-                        ${stats.outstanding}
-                    </h3>
-
-
-                    <small>
-                        Awaiting payment
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-card-top">
-
-                        <span class="stat-icon purple">
-                            👨‍🎓
-                        </span>
-
-
-                        <span class="stat-change positive">
-                            85%
-                        </span>
-
-                    </div>
-
-
-                    <p>
-                        Students Paid
-                    </p>
-
-
-                    <h3>
-                        ${stats.paidStudents}
-                    </h3>
-
-
-                    <small>
-                        Out of ${stats.totalStudents} students
-                    </small>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-
-                <div class="card-header">
-
-
-                    <div>
-
-                        <h3>
-                            Current Fee Structure
-                        </h3>
-
-
-                        <p>
-                            2025/2026 academic session
-                        </p>
-
-                    </div>
-
-
-                    <button class="text-button">
-
-                        Manage Fees
-
-                    </button>
-
-                </div>
-
-
-                <div class="table-container">
-
-
-                    <table>
-
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Fee Category
-                                </th>
-
-                                <th>
-                                    Class Level
-                                </th>
-
-                                <th>
-                                    Amount
-                                </th>
-
-                                <th>
-                                    Students
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-
-                            <tr>
-
-                                <td>
-                                    Tuition Fee
-                                </td>
-
-                                <td>
-                                    Primary 1 - 6
-                                </td>
-
-                                <td>
-                                    ₦150,000
-                                </td>
-
-                                <td>
-                                    520
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Tuition Fee
-                                </td>
-
-                                <td>
-                                    JSS 1 - 3
-                                </td>
-
-                                <td>
-                                    ₦180,000
-                                </td>
-
-                                <td>
-                                    380
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-
-                                <td>
-                                    Tuition Fee
-                                </td>
-
-                                <td>
-                                    SS 1 - 3
-                                </td>
-
-                                <td>
-                                    ₦200,000
-                                </td>
-
-                                <td>
-                                    348
-                                </td>
-
-                                <td>
-
-                                    <span class="status paid">
-                                        Active
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                        </tbody>
-
-
-                    </table>
-
-
-                </div>
-
-
-            </div>
-
-
-            <div class="dashboard-grid">
-
-
-                <div class="dashboard-card">
-
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <h3>
-                                Payment Progress
-                            </h3>
-
-
-                            <p>
-                                Fee collection progress
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="collection-progress">
-
-
-                        <div class="progress-circle">
-
-                            <strong>
-                                ${stats.rate}
-                            </strong>
-
-
-                            <span>
-                                Collected
-                            </span>
-
-                        </div>
-
-
-                        <div class="progress-details">
-
-
-                            <div>
-
-                                <span class="progress-dot collected"></span>
-
-                                <span>
-                                    Collected
-                                </span>
-
-                                <strong>
-                                    ${stats.collected}
-                                </strong>
-
-                            </div>
-
-
-                            <div>
-
-                                <span class="progress-dot outstanding"></span>
-
-                                <span>
-                                    Outstanding
-                                </span>
-
-                                <strong>
-                                    ${stats.outstanding}
-                                </strong>
-
-                            </div>
-
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-                <div class="dashboard-card">
-
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <h3>
-                                Quick Actions
-                            </h3>
-
-
-                            <p>
-                                Common fee management tasks
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="quick-actions">
-
-
-                        <button class="quick-action-button">
-
-                            <span>
-                                ➕
-                            </span>
-
-                            Add Fee Structure
-
-                        </button>
-
-
-                        <button class="quick-action-button">
-
-                            <span>
-                                📄
-                            </span>
-
-                            View Payment History
-
-                        </button>
-
-
-                        <button class="quick-action-button">
-
-                            <span>
-                                📢
-                            </span>
-
-                            Send Fee Reminder
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-    `;
-
-        }
-
-
-function showComingSoon(pageName) {
-
-
-    contentArea.innerHTML = `
-
-        <div class="empty-page">
-
-            <div class="empty-icon">
-                🚧
-            </div>
-
-            <h2>
-                ${pageName}
-            </h2>
-
-            <p>
-                This section will be built next.
-            </p>
-
-        </div>
-
-    `;
-
-}
-
