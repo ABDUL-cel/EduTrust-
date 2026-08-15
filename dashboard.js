@@ -5888,3 +5888,46 @@ if (logoutButton) {
 
     });
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Read the user saved by register.js or login.js
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (storedUser) {
+        // Fallbacks match payload keys: school_name / schoolName, principal_name / principalName
+        const schoolName = storedUser.school_name || storedUser.schoolName || "School Name";
+        const principalName = storedUser.principal_name || storedUser.principalName || "Principal Name";
+
+        // 1. Update Sidebar
+        const sidebarSchoolName = document.getElementById("sidebarSchoolName");
+        const schoolAvatar = document.getElementById("schoolAvatar");
+
+        if (sidebarSchoolName) {
+            sidebarSchoolName.textContent = schoolName;
+        }
+
+        // Generate Initials (e.g., "EduTrust Academy" -> "EA")
+        if (schoolAvatar && schoolName) {
+            const initials = schoolName
+                .split(" ")
+                .map(word => word[0])
+                .join("")
+                .substring(0, 2)
+                .toUpperCase();
+            schoolAvatar.textContent = initials;
+        }
+
+        // 2. Update Overview / Form Fields
+        const inputSchoolName = document.getElementById("inputSchoolName");
+        const inputPrincipalName = document.getElementById("inputPrincipalName");
+
+        if (inputSchoolName) {
+            inputSchoolName.value = schoolName;
+        }
+
+        if (inputPrincipalName) {
+            inputPrincipalName.value = principalName;
+        }
+    }
+});
