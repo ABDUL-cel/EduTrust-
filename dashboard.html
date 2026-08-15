@@ -2,53 +2,1486 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Dashboard | EduTrust</title>
-     <link rel="icon" type="image/png" href="logo-icon.png">
+
+    <link rel="icon" type="image/png" href="logo-icon.png">
     <link rel="stylesheet" href="dashboard.css">
-
 </head>
-
 
 <body>
 
+<div class="dashboard-layout">
 
-    <div class="dashboard-layout">
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-logo">
+            <a href="index.html">
+                Edu<span>Trust</span>
+            </a>
+        </div>
+
+        <div class="school-profile">
+
+            <div class="school-avatar" id="schoolAvatar">
+                GS
+            </div>
+
+            <div>
+                <h3 id="sidebarSchoolName">
+                    Loading...
+                </h3>
+
+                <p id="sidebarUserRole">
+                    Administrator
+                </p>
+            </div>
+
+        </div>
+
+        <nav class="sidebar-navigation">
+
+            <p class="menu-title">
+                MAIN MENU
+            </p>
+
+            <button class="nav-item active" data-page="overview">
+                <span class="nav-icon">📊</span>
+                <span>Overview</span>
+            </button>
+
+            <button class="nav-item" data-page="school">
+                <span class="nav-icon">🏫</span>
+                <span>School Management</span>
+            </button>
+
+            <button class="nav-item" data-page="fees">
+                <span class="nav-icon">💰</span>
+                <span>School Fees</span>
+            </button>
+
+            <button class="nav-item" data-page="fee-structures">
+                <span class="nav-icon">🧾</span>
+                <span>Fee Structures</span>
+            </button>
+
+            <button class="nav-item" data-page="payments">
+                <span class="nav-icon">💳</span>
+                <span>Parent Payments</span>
+            </button>
+
+            <button class="nav-item" data-page="outstanding">
+                <span class="nav-icon">⚠️</span>
+                <span>Outstanding Fees</span>
+            </button>
+
+            <p class="menu-title">
+                PEOPLE
+            </p>
+
+            <button class="nav-item" data-page="students">
+                <span class="nav-icon">👨‍🎓</span>
+                <span>Students</span>
+            </button>
+
+            <button class="nav-item" data-page="parents">
+                <span class="nav-icon">👨‍👩‍👧</span>
+                <span>Parents</span>
+            </button>
+
+            <button class="nav-item" data-page="staff">
+                <span class="nav-icon">👨‍🏫</span>
+                <span>Staff & Teachers</span>
+            </button>
+
+            <p class="menu-title">
+                SYSTEM
+            </p>
+
+            <!-- REPORTS -->
+
+            <div class="nav-group">
+
+                <button class="nav-item reports-toggle" type="button">
+
+                    <span class="nav-icon">
+                        📊
+                    </span>
+
+                    <span class="nav-text">
+                        Reports
+                    </span>
+
+                    <span class="reports-arrow">
+                        ▾
+                    </span>
+
+                </button>
+
+                <div class="submenu">
+
+                    <button class="submenu-item" data-page="announcements">
+                        <span>📢 Announcements</span>
+                    </button>
+
+                    <button class="submenu-item" data-page="messages">
+                        <span>💬 Messages</span>
+                    </button>
+
+                    <button class="submenu-item" data-page="notifications">
+                        <span>🔔 Notifications</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- SETTINGS -->
+
+            <div class="nav-group">
+
+                <button class="nav-item settings-toggle" type="button">
+
+                    <span class="nav-icon">
+                        ⚙️
+                    </span>
+
+                    <span class="nav-text">
+                        Settings
+                    </span>
+
+                    <span class="reports-arrow">
+                        ▾
+                    </span>
+
+                </button>
+
+                <div class="submenu">
+
+                    <button class="submenu-item" data-page="school-profile">
+                        <span>🏫 School Profile</span>
+                    </button>
+
+                    <button class="submenu-item" data-page="user-roles">
+                        <span>👤 User Roles</span>
+                    </button>
+
+                    <button class="submenu-item" data-page="payment-settings">
+                        <span>💰 Payment Settings</span>
+                    </button>
+
+                    <button class="submenu-item" data-page="security">
+                        <span>🔐 Security</span>
+                    </button>
+
+                    <button class="submenu-item" data-page="email-settings">
+                        <span>📧 Email & SMS</span>
+                    </button>
+
+                    <button class="submenu-item" data-page="backup">
+                        <span>💾 Backup</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <button
+                class="logout-button"
+                id="logoutButton"
+                type="button"
+            >
+                🚪
+                <span>
+                    Logout
+                </span>
+            </button>
+
+        </div>
+
+    </aside>
 
 
-        <!-- SIDEBAR -->
+    <!-- =========================================================
+         MAIN AREA
+    ========================================================== -->
 
-        <aside class="sidebar">
+    <main class="main-area">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <button
+                class="menu-toggle"
+                id="menu-toggle"
+                type="button"
+            >
+                ☰
+            </button>
+
+            <div class="topbar-search">
+
+                <span class="search-icon">
+                    🔍
+                </span>
+
+                <input
+                    type="text"
+                    id="global-search"
+                    placeholder="Search students, parents, payments..."
+                >
+
+            </div>
+
+            <div class="topbar-actions">
+
+                <button
+                    class="topbar-action"
+                    id="theme-toggle"
+                    title="Toggle theme"
+                    type="button"
+                >
+                    🌙
+                </button>
+
+                <div class="notification-wrapper">
+
+                    <button
+                        class="topbar-action notification-button"
+                        id="notification-button"
+                        type="button"
+                    >
+                        🔔
+
+                        <span
+                            class="notification-badge"
+                            id="notificationBadge"
+                        >
+                            0
+                        </span>
+
+                    </button>
+
+                    <div
+                        class="notification-dropdown"
+                        id="notification-dropdown"
+                    >
+
+                        <div class="dropdown-header">
+
+                            <strong>
+                                Notifications
+                            </strong>
+
+                            <span id="notificationCount">
+                                0 new
+                            </span>
+
+                        </div>
+
+                        <div id="notificationList">
+
+                            <div class="notification-item">
+
+                                <span class="notification-icon">
+                                    ℹ️
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        No notifications
+                                    </strong>
+
+                                    <small>
+                                        You are all caught up.
+                                    </small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <button
+                            class="view-all-notifications"
+                            type="button"
+                        >
+                            View All Notifications →
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
 
 
-            <div class="sidebar-logo">
+        <!-- =====================================================
+             CONTENT AREA
+        ====================================================== -->
 
-                <a href="index.html">
-                    Edu<span>Trust</span>
-                </a>
+        <section
+            class="content-area"
+            id="contentArea"
+        >
+
+            <!-- =================================================
+                 OVERVIEW
+            ================================================== -->
+
+            <div
+                class="page-content"
+                id="overviewPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            School Overview
+                        </h2>
+
+                        <p>
+                            Here's what's happening in your school today.
+                        </p>
+
+                    </div>
+
+                    <button
+                        class="primary-button"
+                        id="addStudentButton"
+                        type="button"
+                    >
+                        + Add Student
+                    </button>
+
+                </div>
+
+
+                <!-- STATISTICS -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+
+                        <div class="stat-card-top">
+
+                            <span class="stat-icon blue">
+                                👨‍🎓
+                            </span>
+
+                            <span class="stat-change positive">
+                                —
+                            </span>
+
+                        </div>
+
+                        <p>
+                            Total Students
+                        </p>
+
+                        <h3 id="totalStudents">
+                            0
+                        </h3>
+
+                        <small>
+                            Registered students
+                        </small>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-card-top">
+
+                            <span class="stat-icon green">
+                                💰
+                            </span>
+
+                            <span class="stat-change positive">
+                                —
+                            </span>
+
+                        </div>
+
+                        <p>
+                            Fees Collected
+                        </p>
+
+                        <h3 id="feesCollected">
+                            ₦0
+                        </h3>
+
+                        <small>
+                            Current academic session
+                        </small>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-card-top">
+
+                            <span class="stat-icon orange">
+                                ⏳
+                            </span>
+
+                            <span class="stat-change warning">
+                                —
+                            </span>
+
+                        </div>
+
+                        <p>
+                            Outstanding Fees
+                        </p>
+
+                        <h3 id="outstandingFees">
+                            ₦0
+                        </h3>
+
+                        <small id="outstandingStudents">
+                            No outstanding records
+                        </small>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-card-top">
+
+                            <span class="stat-icon purple">
+                                👨‍👩‍👧
+                            </span>
+
+                            <span class="stat-change positive">
+                                —
+                            </span>
+
+                        </div>
+
+                        <p>
+                            Active Parents
+                        </p>
+
+                        <h3 id="totalParents">
+                            0
+                        </h3>
+
+                        <small>
+                            Registered parent accounts
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DASHBOARD GRID -->
+
+                <div class="dashboard-grid">
+
+                    <!-- RECENT PAYMENTS -->
+
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <h3>
+                                    Recent Payments
+                                </h3>
+
+                                <p>
+                                    Latest fee payments from parents
+                                </p>
+
+                            </div>
+
+                            <button
+                                class="text-button"
+                                data-page="payments"
+                                type="button"
+                            >
+                                View all
+                            </button>
+
+                        </div>
+
+                        <div class="table-container">
+
+                            <table>
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Parent
+                                        </th>
+
+                                        <th>
+                                            Student
+                                        </th>
+
+                                        <th>
+                                            Amount
+                                        </th>
+
+                                        <th>
+                                            Status
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="recentPaymentsTable">
+
+                                    <tr>
+
+                                        <td colspan="4">
+                                            No payment records available.
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- FEE COLLECTION -->
+
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <h3>
+                                    Fee Collection
+                                </h3>
+
+                                <p>
+                                    Current academic session
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="collection-progress">
+
+                            <div class="progress-circle">
+
+                                <strong id="collectionPercentage">
+                                    0%
+                                </strong>
+
+                                <span>
+                                    Collected
+                                </span>
+
+                            </div>
+
+                            <div class="progress-details">
+
+                                <div>
+
+                                    <span class="progress-dot collected"></span>
+
+                                    <span>
+                                        Collected
+                                    </span>
+
+                                    <strong id="collectionCollected">
+                                        ₦0
+                                    </strong>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="progress-dot outstanding"></span>
+
+                                    <span>
+                                        Outstanding
+                                    </span>
+
+                                    <strong id="collectionOutstanding">
+                                        ₦0
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-            <div class="school-profile">
+            <!-- =================================================
+                 SCHOOL MANAGEMENT
+            ================================================== -->
 
-                <div class="school-avatar">
-                    GS
+            <div
+                class="page-content hidden"
+                id="schoolPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            School Management
+                        </h2>
+
+                        <p>
+                            Manage your school profile and academic information.
+                        </p>
+
+                    </div>
+
                 </div>
 
+                <div class="dashboard-card">
 
-                <div>
+                    <div class="card-header">
 
-                    <h3>
-                        Greenfield School
-                    </h3>
+                        <div>
+
+                            <h3>
+                                School Profile
+                            </h3>
+
+                            <p>
+                                Update your school's basic information.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <form
+                        class="school-form"
+                        id="schoolForm"
+                    >
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+
+                                <label for="schoolName">
+                                    School Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="schoolName"
+                                    name="name"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="schoolCode">
+                                    School Code
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="schoolCode"
+                                    name="school_code"
+                                    readonly
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="schoolPrincipal">
+                                    Principal / Owner
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="schoolPrincipal"
+                                    readonly
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="schoolPhone">
+                                    Phone Number
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="schoolPhone"
+                                    name="phone"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="schoolEmail">
+                                    Email Address
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="schoolEmail"
+                                    name="email"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="schoolType">
+                                    School Type
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="schoolType"
+                                    name="school_type"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group full-width">
+
+                                <label for="schoolAddress">
+                                    School Address
+                                </label>
+
+                                <textarea
+                                    rows="3"
+                                    id="schoolAddress"
+                                    name="address"
+                                ></textarea>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="academicSession">
+                                    Current Session
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="academicSession"
+                                    name="academic_session"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="currentTerm">
+                                    Current Term
+                                </label>
+
+                                <select
+                                    id="currentTerm"
+                                    name="current_term"
+                                >
+
+                                    <option value="">
+                                        Select term
+                                    </option>
+
+                                    <option value="First Term">
+                                        First Term
+                                    </option>
+
+                                    <option value="Second Term">
+                                        Second Term
+                                    </option>
+
+                                    <option value="Third Term">
+                                        Third Term
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="schoolMotto">
+                                    School Motto
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="schoolMotto"
+                                    name="motto"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="schoolWebsite">
+                                    Website
+                                </label>
+
+                                <input
+                                    type="url"
+                                    id="schoolWebsite"
+                                    name="website"
+                                    placeholder="https://example.com"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-actions">
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                                id="saveSchoolButton"
+                            >
+                                Save School Profile
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 STUDENTS
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="studentsPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Students
+                        </h2>
+
+                        <p>
+                            Manage students registered in your school.
+                        </p>
+
+                    </div>
+
+                    <button
+                        class="primary-button"
+                        id="studentsAddButton"
+                    >
+                        + Add Student
+                    </button>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Student Records
+                            </h3>
+
+                            <p>
+                                Students belonging to your school.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Admission No.
+                                    </th>
+
+                                    <th>
+                                        Student
+                                    </th>
+
+                                    <th>
+                                        Gender
+                                    </th>
+
+                                    <th>
+                                        Class
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="studentsTable">
+
+                                <tr>
+
+                                    <td colspan="5">
+                                        Loading students...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PARENTS
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="parentsPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Parents
+                        </h2>
+
+                        <p>
+                            Manage parents connected to your school.
+                        </p>
+
+                    </div>
+
+                    <button
+                        class="primary-button"
+                        id="addParentButton"
+                    >
+                        + Add Parent
+                    </button>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Parent Records
+                            </h3>
+
+                            <p>
+                                Registered parents in your school.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Parent
+                                    </th>
+
+                                    <th>
+                                        Relationship
+                                    </th>
+
+                                    <th>
+                                        Phone
+                                    </th>
+
+                                    <th>
+                                        Email
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="parentsTable">
+
+                                <tr>
+
+                                    <td colspan="5">
+                                        Loading parents...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 STAFF
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="staffPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Staff & Teachers
+                        </h2>
+
+                        <p>
+                            Manage teachers and staff members.
+                        </p>
+
+                    </div>
+
+                    <button class="primary-button">
+                        + Add Staff
+                    </button>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Staff Records
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Name
+                                    </th>
+
+                                    <th>
+                                        Role
+                                    </th>
+
+                                    <th>
+                                        Email
+                                    </th>
+
+                                    <th>
+                                        Phone
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+
+                                    <td colspan="5">
+                                        Staff management will appear here.
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FEES
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="feesPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            School Fees
+                        </h2>
+
+                        <p>
+                            Manage school fee collection.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Fee Management
+                            </h3>
+
+                            <p>
+                                Fee management data will be connected to the backend.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FEE STRUCTURES
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="fee-structuresPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Fee Structures
+                        </h2>
+
+                        <p>
+                            Configure fees for classes and academic terms.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    Fee structures will appear here.
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PAYMENTS
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="paymentsPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Parent Payments
+                        </h2>
+
+                        <p>
+                            View payments made by parents.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    Payment records will appear here.
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 OUTSTANDING
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="outstandingPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Outstanding Fees
+                        </h2>
+
+                        <p>
+                            Track unpaid school fees.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    Outstanding fee records will appear here.
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ANNOUNCEMENTS
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="announcementsPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Announcements
+                        </h2>
+
+                        <p>
+                            School announcements.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+                    No announcements yet.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 MESSAGES
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="messagesPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Messages
+                        </h2>
+
+                        <p>
+                            School communication.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+                    No messages yet.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 NOTIFICATIONS
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="notificationsPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Notifications
+                        </h2>
+
+                        <p>
+                            System notifications.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+                    No notifications yet.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SCHOOL PROFILE
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="school-profilePage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            School Profile
+                        </h2>
+
+                        <p>
+                            View and manage school information.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
 
                     <p>
-                        Administrator
+                        Use School Management to edit your school.
                     </p>
 
                 </div>
@@ -56,919 +1489,188 @@
             </div>
 
 
-            <nav class="sidebar-navigation">
-
-
-                <p class="menu-title">
-                    MAIN MENU
-                </p>
-
-<button class="nav-item active" data-page="overview">
-    <span class="nav-icon">📊</span>
-    <span>Overview</span>
-</button>
-
-<button class="nav-item" data-page="school">
-    <span class="nav-icon">🏫</span>
-    <span>School Management</span>
-</button>
-
-<button class="nav-item" data-page="fees">
-    <span class="nav-icon">💰</span>
-    <span>School Fees</span>
-</button>
-                <button
-                    class="nav-item"
-                    data-page="fee-structures"
-                >
-
-                    <span class="nav-icon">
-                        🧾
-                    </span>
-
-                    <span>
-                        Fee Structures
-                    </span>
-
-                </button>
-
-
-                <button
-                    class="nav-item"
-                    data-page="payments"
-                >
-
-                    <span class="nav-icon">
-                        💳
-                    </span>
-
-                    <span>
-                        Parent Payments
-                    </span>
-
-                </button>
-
-
-                <button
-                    class="nav-item"
-                    data-page="outstanding"
-                >
-
-                    <span class="nav-icon">
-                        ⚠️
-                    </span>
-
-                    <span>
-                        Outstanding Fees
-                    </span>
-
-                </button>
-
-
-                <p class="menu-title">
-                    PEOPLE
-                </p>
-
-
-                <button
-                    class="nav-item"
-                    data-page="students"
-                >
-
-                    <span class="nav-icon">
-                        👨‍🎓
-                    </span>
-
-                    <span>
-                        Students
-                    </span>
-
-                </button>
-
-
-                <button
-                    class="nav-item"
-                    data-page="parents"
-                >
-
-                    <span class="nav-icon">
-                        👨‍👩‍👧
-                    </span>
-
-                    <span>
-                        Parents
-                    </span>
-
-                </button>
-
-
-                <button
-                    class="nav-item"
-                    data-page="staff"
-                >
-
-                    <span class="nav-icon">
-                        👨‍🏫
-                    </span>
-
-                    <span>
-                        Staff & Teachers
-                    </span>
-
-                </button>
-
-
-                <p class="menu-title">
-                    SYSTEM
-                </p>
-
-
-              <div class="nav-group">
-
-    <button class="nav-item reports-toggle">
-
-        <span class="nav-icon">
-            📊
-        </span>
-
-        <span class="nav-text">
-            Reports
-        </span>
-
-        <span class="reports-arrow">
-            ▾
-        </span>
-
-    </button>
-
-
-    <div class="submenu">
-<button class="submenu-item" data-page="announcements">
-    <span>📢 Announcements</span>
-</button>
-
-<button class="submenu-item" data-page="messages">
-    <span>💬 Messages</span>
-</button>
-
-<button class="submenu-item" data-page="notifications">
-    <span>🔔 Notifications</span>
-</button>
-
-    </div>
-
-              </div>
-
-
-             <div class="nav-group">
-
-    <button class="nav-item settings-toggle">
-
-        <span class="nav-icon">⚙️</span>
-
-        <span class="nav-text">Settings</span>
-
-        <span class="reports-arrow">▾</span>
-
-    </button>
-
-
-    <div class="submenu">
-
-        <button class="submenu-item" data-page="school-profile">
-            <span>🏫 School Profile</span>
-        </button>
-
-        <button class="submenu-item" data-page="user-roles">
-            <span>👤 User Roles</span>
-        </button>
-
-        <button class="submenu-item" data-page="payment-settings">
-            <span>💰 Payment Settings</span>
-        </button>
-
-        <button class="submenu-item" data-page="security">
-            <span>🔐 Security</span>
-        </button>
-
-        <button class="submenu-item" data-page="email-settings">
-            <span>📧 Email & SMS</span>
-        </button>
-
-        <button class="submenu-item" data-page="backup">
-            <span>💾 Backup</span>
-        </button>
-
-    </div>
-
-             </div>
-            </nav>
-
-
-            <div class="sidebar-bottom">
-
-
-                <button
-                    class="logout-button"
-                    id="logoutButton"
-                >
-
-                    🚪
-
-                    <span>
-                        Logout
-                    </span>
-
-                </button>
-
-
-            </div>
-
-
-        </aside>
-
-
-        <!-- MAIN AREA -->
-
-        <main class="main-area">
-
-<header class="topbar">
-
-    <button
-        class="menu-toggle"
-        id="menu-toggle"
-    >
-        ☰
-    </button>
-
-
-    <div class="topbar-search">
-
-        <span class="search-icon">
-            🔍
-        </span>
-
-        <input
-            type="text"
-            id="global-search"
-            placeholder="Search students, parents, payments..."
-        >
-
-    </div>
-
-
-    <div class="topbar-actions">
-
-
-        <button
-            class="topbar-action"
-            id="theme-toggle"
-            title="Toggle theme"
-        >
-            🌙
-        </button>
-
-<div class="notification-wrapper">
-
-    <button
-        class="topbar-action notification-button"
-        id="notification-button"
-        type="button"
-    >
-        🔔
-
-        <span class="notification-badge">
-            3
-        </span>
-    </button>
-
-
-    <div
-        class="notification-dropdown"
-        id="notification-dropdown"
-    >
-
-        <div class="dropdown-header">
-
-            <strong>
-                Notifications
-            </strong>
-
-            <span>
-                3 new
-            </span>
-
-        </div>
-
-
-        <div class="notification-item">
-
-            <span class="notification-icon">
-                💰
-            </span>
-
-            <div>
-
-                <strong>
-                    Payment Received
-                </strong>
-
-                <small>
-                    A parent made a school fee payment
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <div class="notification-item">
-
-            <span class="notification-icon">
-                👨‍🎓
-            </span>
-
-            <div>
-
-                <strong>
-                    New Student Registered
-                </strong>
-
-                <small>
-                    A new student joined the school
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <div class="notification-item">
-
-            <span class="notification-icon">
-                📢
-            </span>
-
-            <div>
-
-                <strong>
-                    New Announcement
-                </strong>
-
-                <small>
-                    An announcement was published
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <button class="view-all-notifications">
-            View All Notifications →
-        </button>
-
-    </div>
-
-</div>
-
-</header>
-
-            <!-- CONTENT AREA -->
-
-            <section
-                class="content-area"
-                id="contentArea"
+            <!-- =================================================
+                 USER ROLES
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="user-rolesPage"
             >
 
+                <div class="page-introduction">
 
-                <!-- OVERVIEW PAGE -->
+                    <div>
 
+                        <h2>
+                            User Roles
+                        </h2>
 
-                <div
-                    class="page-content"
-                    id="overviewPage"
-                >
-
-
-                    <div class="page-introduction">
-
-
-                        <div>
-
-                            <h2>
-                                School Overview
-                            </h2>
-
-                            <p>
-                                Here's what's happening in your school today.
-                            </p>
-
-                        </div>
-
-
-                        <button class="primary-button">
-
-                            + Add Student
-
-                        </button>
-
+                        <p>
+                            Manage system roles and permissions.
+                        </p>
 
                     </div>
-
-
-                    <div class="stats-grid">
-
-
-                        <div class="stat-card">
-
-
-                            <div class="stat-card-top">
-
-                                <span class="stat-icon blue">
-                                    👨‍🎓
-                                </span>
-
-                                <span class="stat-change positive">
-                                    +12%
-                                </span>
-
-                            </div>
-
-
-                            <p>
-                                Total Students
-                            </p>
-
-                            <h3>
-                                1,248
-                            </h3>
-
-                            <small>
-                                Compared to last term
-                            </small>
-
-
-                        </div>
-
-
-                        <div class="stat-card">
-
-
-                            <div class="stat-card-top">
-
-                                <span class="stat-icon green">
-                                    💰
-                                </span>
-
-                                <span class="stat-change positive">
-                                    +8.4%
-                                </span>
-
-                            </div>
-
-
-                            <p>
-                                Fees Collected
-                            </p>
-
-                            <h3>
-                                ₦8.4M
-                            </h3>
-
-                            <small>
-                                This academic session
-                            </small>
-
-
-                        </div>
-
-
-                        <div class="stat-card">
-
-
-                            <div class="stat-card-top">
-
-                                <span class="stat-icon orange">
-                                    ⏳
-                                </span>
-
-                                <span class="stat-change warning">
-                                    Needs attention
-                                </span>
-
-                            </div>
-
-
-                            <p>
-                                Outstanding Fees
-                            </p>
-
-                            <h3>
-                                ₦2.1M
-                            </h3>
-
-                            <small>
-                                From 186 students
-                            </small>
-
-
-                        </div>
-
-
-                        <div class="stat-card">
-
-
-                            <div class="stat-card-top">
-
-                                <span class="stat-icon purple">
-                                    👨‍👩‍👧
-                                </span>
-
-                                <span class="stat-change positive">
-                                    +24
-                                </span>
-
-                            </div>
-
-
-                            <p>
-                                Active Parents
-                            </p>
-
-                            <h3>
-                                936
-                            </h3>
-
-                            <small>
-                                Registered accounts
-                            </small>
-
-
-                        </div>
-
-
-                    </div>
-
-
-                    <div class="dashboard-grid">
-
-
-                        <div class="dashboard-card">
-
-
-                            <div class="card-header">
-
-
-                                <div>
-
-                                    <h3>
-                                        Recent Payments
-                                    </h3>
-
-                                    <p>
-                                        Latest fee payments from parents
-                                    </p>
-
-                                </div>
-
-
-                                <button class="text-button">
-                                    View all
-                                </button>
-
-
-                            </div>
-
-
-                            <div class="table-container">
-
-
-                                <table>
-
-
-                                    <thead>
-
-                                        <tr>
-
-                                            <th>
-                                                Parent
-                                            </th>
-
-                                            <th>
-                                                Student
-                                            </th>
-
-                                            <th>
-                                                Amount
-                                            </th>
-
-                                            <th>
-                                                Status
-                                            </th>
-
-                                        </tr>
-
-                                    </thead>
-
-
-                                    <tbody>
-
-
-                                        <tr>
-
-                                            <td>
-                                                Amina Yusuf
-                                            </td>
-
-                                            <td>
-                                                Fatima Yusuf
-                                            </td>
-
-                                            <td>
-                                                ₦150,000
-                                            </td>
-
-                                            <td>
-                                                <span class="status paid">
-                                                    Paid
-                                                </span>
-                                            </td>
-
-                                        </tr>
-
-
-                                        <tr>
-
-                                            <td>
-                                                Ibrahim Musa
-                                            </td>
-
-                                            <td>
-                                                Ahmad Musa
-                                            </td>
-
-                                            <td>
-                                                ₦95,000
-                                            </td>
-
-                                            <td>
-                                                <span class="status paid">
-                                                    Paid
-                                                </span>
-                                            </td>
-
-                                        </tr>
-
-
-                                        <tr>
-
-                                            <td>
-                                                Zainab Bello
-                                            </td>
-
-                                            <td>
-                                                Maryam Bello
-                                            </td>
-
-                                            <td>
-                                                ₦120,000
-                                            </td>
-
-                                            <td>
-                                                <span class="status pending">
-                                                    Pending
-                                                </span>
-                                            </td>
-
-                                        </tr>
-
-
-                                    </tbody>
-
-
-                                </table>
-
-
-                            </div>
-
-
-                        </div>
-
-
-                        <div class="dashboard-card">
-
-
-                            <div class="card-header">
-
-                                <div>
-
-                                    <h3>
-                                        Fee Collection
-                                    </h3>
-
-                                    <p>
-                                        Current academic session
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="collection-progress">
-
-
-                                <div class="progress-circle">
-
-                                    <strong>
-                                        80%
-                                    </strong>
-
-                                    <span>
-                                        Collected
-                                    </span>
-
-                                </div>
-
-
-                                <div class="progress-details">
-
-
-                                    <div>
-
-                                        <span class="progress-dot collected"></span>
-
-                                        <span>
-                                            Collected
-                                        </span>
-
-                                        <strong>
-                                            ₦8.4M
-                                        </strong>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <span class="progress-dot outstanding"></span>
-
-                                        <span>
-                                            Outstanding
-                                        </span>
-
-                                        <strong>
-                                            ₦2.1M
-                                        </strong>
-
-                                    </div>
-
-
-                                </div>
-
-
-                            </div>
-
-
-                        </div>
-
-
-                    </div>
-
 
                 </div>
 
+                <div class="dashboard-card">
+                    User roles management will appear here.
+                </div>
+
+            </div>
 
 
-            </section>
+            <!-- =================================================
+                 PAYMENT SETTINGS
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="payment-settingsPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Payment Settings
+                        </h2>
+
+                        <p>
+                            Configure school payment options.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+                    Payment settings will appear here.
+                </div>
+
+            </div>
 
 
-        </main>
+            <!-- =================================================
+                 SECURITY
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="securityPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Security
+                        </h2>
+
+                        <p>
+                            Manage your account security.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+                    Security settings will appear here.
+                </div>
+
+            </div>
 
 
-    </div>
+            <!-- =================================================
+                 EMAIL SETTINGS
+            ================================================== -->
 
-<div id="schoolModal" class="modal">
+            <div
+                class="page-content hidden"
+                id="email-settingsPage"
+            >
 
-    <div class="modal-content">
+                <div class="page-introduction">
 
-        <div class="modal-header">
+                    <div>
 
-            <h2>Edit School Information</h2>
+                        <h2>
+                            Email & SMS
+                        </h2>
 
-            <span class="close-btn" onclick="closeSchoolModal()">&times;</span>
+                        <p>
+                            Configure school communication.
+                        </p>
 
-        </div>
+                    </div>
 
-        <div class="modal-body">
+                </div>
 
-            <!-- Paste your School Management Form HERE -->
-                <!-- SCHOOL MANAGEMENT PAGE -->
+                <div class="dashboard-card">
+                    Email and SMS settings will appear here.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 BACKUP
+            ================================================== -->
+
+            <div
+                class="page-content hidden"
+                id="backupPage"
+            >
+
+                <div class="page-introduction">
+
+                    <div>
+
+                        <h2>
+                            Backup
+                        </h2>
+
+                        <p>
+                            Manage school data backups.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+                    Backup management will appear here.
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =============================================================
+     TOAST
+============================================================= -->
 
 <div
-    class="page-content hidden"
-    id="schoolPage"
->
+    id="toast"
+    class="toast"
+></div>
 
-    <div class="page-introduction">
 
-        <div>
+<!-- =============================================================
+     DASHBOARD JAVASCRIPT
+============================================================= -->
 
-            <h2>
-                School Management
-            </h2>
+<script src="dashboard.js"></script>
 
-            <p>
-                Manage your school profile and academic information.
-            </p>
-
-        </div>
-
-        <button class="primary-button">
-            Save Changes
-        </button>
-
-    </div>
-
-    <div class="dashboard-card">
-
-        <div class="card-header">
-
-            <div>
-                <h3>School Profile</h3>
-                <p>Update your school's basic information.</p>
-            </div>
-
-        </div>
-
-        <form class="school-form">
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>School Name</label>
-                    <input type="text" value="Greenfield School">
-                </div>
-
-                <div class="form-group">
-                    <label>Principal / Owner</label>
-                    <input type="text" value="Mr. Principal">
-                </div>
-
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="text" value="+234 XXX XXX XXXX">
-                </div>
-
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" value="school@example.com">
-                </div>
-
-                <div class="form-group full-width">
-                    <label>School Address</label>
-                    <textarea rows="3">Ilorin, Kwara State, Nigeria</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Current Session</label>
-                    <input type="text" value="2025/2026">
-                </div>
-
-                <div class="form-group">
-                    <label>Current Term</label>
-                    <select>
-                        <option>First Term</option>
-                        <option selected>Second Term</option>
-                        <option>Third Term</option>
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="primary-button">
-                    Save School Profile
-                </button>
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-        </div>
-
-    </div>
-
-</div>
-    <script src="dashboard.js"></script>
-     <script src="parent-dashboard.js"></script>
-       <script>
-           alert('Welcome To Your Dashboard were you see All Your School Activity')
-       </script>
 </body>
 
-  </html>
+</html>
