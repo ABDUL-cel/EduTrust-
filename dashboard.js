@@ -557,17 +557,58 @@ function showFeeStructures() {
     `;
 }
 
-function showOverview() {
+async function showOverview() {
+    // 1. Keep your layout container and show a sleek loading state first
     contentArea.innerHTML = `
         <div class="page-content">
             <div class="page-introduction">
                 <div>
                     <h2>School Overview</h2>
-                    <p>Here's what's happening in your school today.</p>
+                    <p>Loading real-time data...</p>
                 </div>
             </div>
         </div>
     `;
+
+    try {
+        // 2. Fetch live data from your backend
+        const response = await fetch('/api/dashboard/overview-stats');
+        const data = await response.json();
+
+        // 3. Render your EXACT beautiful structure with live numbers inserted
+        contentArea.innerHTML = `
+            <div class="page-content">
+                <div class="page-introduction">
+                    <div>
+                        <h2>School Overview</h2>
+                        <p>Here's what's happening in your school today.</p>
+                    </div>
+                    <button class="primary-button">+ Add Student</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <p>Total Students</p>
+                        <h3>${data.totalStudents.toLocaleString()}</h3>
+                    </div>
+                    <div class="stat-card">
+                        <p>Fees Collected</p>
+                        <h3>₦${data.feesCollected.toLocaleString()}</h3>
+                    </div>
+                    <div class="stat-card">
+                        <p>Outstanding Fees</p>
+                        <h3>₦${data.outstandingFees.toLocaleString()}</h3>
+                    </div>
+                    <div class="stat-card">
+                        <p>Active Parents</p>
+                        <h3>${data.activeParents.toLocaleString()}</h3>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error("Error fetching overview data:", error);
+    }
 }
 
 function showSchoolManagement() {
