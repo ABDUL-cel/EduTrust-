@@ -1,6 +1,6 @@
 const express = require("express");
-
 const router = express.Router();
+const rateLimit = require("express-rate-limit");
 
 const {
     registerStudent,
@@ -22,35 +22,37 @@ const {
     getStudentDashboardData
 } = require("../controllers/studentController");
 
-const authMiddleware =
-    require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 
+// Rate limiter: Max 5 registrations per hour per IP address
+const registrationLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5,
+    message: {
+        success: false,
+        message: "Too many accounts created from this IP. Please try again after an hour."
+    },
+    standardHeaders: true,
+    legacyHeaders: false
+});
 
 // =====================================================
-// REGISTER STUDENT
+// REGISTER STUDENT (PUBLIC ACCESS + RATE LIMITED)
 // =====================================================
-
 router.post(
     "/",
-    authMiddleware,
+    registrationLimiter,
     registerStudent
 );
 
-
 // =====================================================
-// LOGGED-IN STUDENT PROFILE
+// LOGGED-IN STUDENT PROFILE & DASHBOARD
 // =====================================================
-
 router.get(
     "/me/profile",
     authMiddleware,
     getStudentProfile
 );
-
-
-// =====================================================
-// LOGGED-IN STUDENT DASHBOARD
-// =====================================================
 
 router.get(
     "/me/dashboard",
@@ -58,21 +60,14 @@ router.get(
     getStudentDashboardData
 );
 
-
 // =====================================================
-// GET ALL STUDENTS
+// FILTERED & BULK STUDENT LISTS
 // =====================================================
-
 router.get(
     "/",
     authMiddleware,
     getStudents
 );
-
-
-// =====================================================
-// GET PENDING STUDENTS
-// =====================================================
 
 router.get(
     "/pending",
@@ -80,33 +75,20 @@ router.get(
     getPendingStudents
 );
 
-
-// =====================================================
-// GET ACTIVE STUDENTS
-// =====================================================
-
 router.get(
     "/active",
     authMiddleware,
     getActiveStudents
 );
 
-
 // =====================================================
-// GET STUDENT'S PARENT
-// IMPORTANT: BEFORE /:id
+// PARENT-STUDENT LINKING (BEFORE /:id)
 // =====================================================
-
 router.get(
     "/:id/parent",
     authMiddleware,
     getStudentParent
 );
-
-
-// =====================================================
-// LINK PARENT TO STUDENT
-// =====================================================
 
 router.patch(
     "/:id/parent",
@@ -114,32 +96,20 @@ router.patch(
     linkParentToStudent
 );
 
-
-// =====================================================
-// UNLINK PARENT FROM STUDENT
-// =====================================================
-
 router.delete(
     "/:id/parent",
     authMiddleware,
     unlinkParentFromStudent
 );
 
-
 // =====================================================
-// APPROVE STUDENT
+// STUDENT LIFECYCLE MANAGEMENT
 // =====================================================
-
 router.patch(
     "/:id/approve",
     authMiddleware,
     approveStudent
 );
-
-
-// =====================================================
-// UPDATE STUDENT
-// =====================================================
 
 router.put(
     "/:id",
@@ -147,21 +117,11 @@ router.put(
     updateStudent
 );
 
-
-// =====================================================
-// SUSPEND STUDENT
-// =====================================================
-
 router.patch(
     "/:id/suspend",
     authMiddleware,
     suspendStudent
 );
-
-
-// =====================================================
-// REINSTATE STUDENT
-// =====================================================
 
 router.patch(
     "/:id/reinstate",
@@ -169,21 +129,11 @@ router.patch(
     reinstateStudent
 );
 
-
-// =====================================================
-// GRADUATE STUDENT
-// =====================================================
-
 router.patch(
     "/:id/graduate",
     authMiddleware,
     graduateStudent
 );
-
-
-// =====================================================
-// ARCHIVE STUDENT
-// =====================================================
 
 router.patch(
     "/:id/archive",
@@ -191,28 +141,19 @@ router.patch(
     archiveStudent
 );
 
-
-// =====================================================
-// DELETE STUDENT
-// =====================================================
-
 router.delete(
     "/:id",
     authMiddleware,
     deleteStudent
 );
 
-
 // =====================================================
-// GET ONE STUDENT
-// IMPORTANT: KEEP THIS LAST
+// GET SINGLE STUDENT (MUST REMAIN AT THE BOTTOM)
 // =====================================================
-
 router.get(
     "/:id",
     authMiddleware,
     getStudent
 );
-
 
 module.exports = router;
