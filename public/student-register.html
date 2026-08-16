@@ -55,12 +55,12 @@
         <div class="form-grid">
             <div class="form-group">
                 <label>First Name <span class="required">*</span></label>
-                <input type="text" id="first_name" required placeholder="e.g. John">
+                <input type="text" id="first_name" required placeholder="e.g. khalid">
             </div>
 
             <div class="form-group">
                 <label>Last Name <span class="required">*</span></label>
-                <input type="text" id="last_name" required placeholder="e.g. Doe">
+                <input type="text" id="last_name" required placeholder="e.g. Abdulazeez">
             </div>
 
             <div class="form-group full-width">
@@ -88,6 +88,13 @@
                 <input type="password" id="password" minlength="6" required placeholder="At least 6 characters">
             </div>
         </div>
+
+          <div class="form-group full-width">
+                <label>Confirm Password <span class="required">*</span></label>
+                <input type="password" id="confirm_password" minlength="6" required placeholder="At least 6 characters">
+            </div>
+        </div>
+
 
         <button type="submit" id="submitBtn">Register as Student</button>
     </form>
@@ -119,7 +126,8 @@
             phone: document.getElementById("phone").value,
             school_code: document.getElementById("school_code").value.trim().toUpperCase(),
             current_class: document.getElementById("current_class").value,
-            password: document.getElementById("password").value
+            password: document.getElementById("password").value,
+            confirm_password: document.getElementById("confirm_password").value
         };
 
         submitBtn.disabled = true;
