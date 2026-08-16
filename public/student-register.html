@@ -250,6 +250,9 @@
     const alertBox = document.getElementById("alertBox");
     const submitBtn = document.getElementById("submitBtn");
 
+    // Replace this with your actual live backend URL on Render
+    const BASE_URL = "https://edutrust-15ii.onrender.com";
+
     function showAlert(msg, isError = true) {
         alertBox.textContent = msg;
         alertBox.className = `alert ${isError ? 'alert-error' : 'alert-success'}`;
@@ -274,11 +277,18 @@
         submitBtn.textContent = "Creating Account...";
 
         try {
-            const res = await fetch("/api/students", {
+            // Absolute URL points to Express backend instead of the frontend static server
+            const res = await fetch(`${BASE_URL}/api/students`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
+
+            // Handle non-JSON responses (like 404/405/500 HTML pages) gracefully
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error(`Server returned ${res.status} (${res.statusText}). Check your endpoint URL.`);
+            }
 
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || "Registration failed.");
