@@ -8,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="/logo-icon.png">
+    <link rel="icon" type="image/png" href="/logo-icon.png">
     <title>EduTrust | School Management Platform</title>
 
     <style>
@@ -207,7 +207,7 @@
     </div>
 
     <a href="/login.html" class="header-btn">
-        Login
+        School Login
     </a>
 </header>
 
@@ -235,85 +235,114 @@
              PARENT
         ====================================================== -->
 
-     <div class="portal-card parent">
+        <div class="portal-card parent">
 
-    <div class="portal-icon">
-        👨‍👩‍👧
-    </div>
+            <div class="portal-icon">
+                👨‍👩‍👧
+            </div>
 
-    <h2>Parent Portal</h2>
+            <h2>Parent Portal</h2>
 
-    <p>
-        Register your child, view your children's
-        information, monitor school fees and receive
-        school updates.
-    </p>
+            <p>
+                Register your child, view your children's
+                information, monitor school fees and receive
+                school updates.
+            </p>
 
-    <a
-        href="parent-register.html"
-        class="portal-btn"
-    >
-        Register as Parent
-    </a>
+            <a
+                href="parent-register.html"
+                class="portal-btn"
+            >
+                Register as Parent
+            </a>
 
-    <a
-        href="parent-login.html"
-        class="portal-btn"
-        style="
-            margin-top:10px;
-            background:#047857;
-        "
-    >
-        Parent Login
-    </a>
+            <a
+                href="parent-login.html"
+                class="portal-btn"
+                style="
+                    margin-top:10px;
+                    background:#047857;
+                "
+            >
+                Parent Login
+            </a>
 
-</div>
+        </div>
 
+        <!-- =====================================================
+             STUDENT
+        ====================================================== -->
 
-<div class="portal-card student">
+        <div class="portal-card student">
 
-    <div class="portal-icon">
-        🎓
-    </div>
+            <div class="portal-icon">
+                🎓
+            </div>
 
-    <h2>Student Portal</h2>
+            <h2>Student Portal</h2>
 
-    <p>
-        Access your student dashboard, academic
-        records, results, attendance and timetable.
-    </p>
+            <p>
+                Access your student dashboard, academic
+                records, results, attendance and timetable.
+            </p>
 
-    <a
-        href="/student/login"
-        class="portal-btn"
-    >
-        Student Portal
-    </a>
+            <a
+                href="student-register.html"
+                class="portal-btn"
+            >
+                Register as Student
+            </a>
 
-</div>
+            <a
+                href="student-login.html"
+                class="portal-btn"
+                style="
+                    margin-top:10px;
+                    background:#b45309;
+                "
+            >
+                Student Login
+            </a>
 
+        </div>
 
-<div class="portal-card staff">
+        <!-- =====================================================
+             STAFF
+        ====================================================== -->
 
-    <div class="portal-icon">
-        👨‍🏫
-    </div>
+        <div class="portal-card staff">
 
-    <h2>Staff Portal</h2>
+            <div class="portal-icon">
+                👨‍🏫
+            </div>
 
-    <p>
-        Teachers and school staff can manage
-        students, attendance, classes and records.
-    </p>
+            <h2>Staff Portal</h2>
 
-    <a
-        href="/staff/login"
-        class="portal-btn"
-    >
-        Staff Portal
-    </a>
+            <p>
+                Teachers and school staff can manage
+                students, attendance, classes and records.
+            </p>
 
-</div>
+            <a
+                href="staff-register.html"
+                class="portal-btn"
+            >
+                Register as Staff
+            </a>
+
+            <a
+                href="staff-login.html"
+                class="portal-btn"
+                style="
+                    margin-top:10px;
+                    background:#6d28d9;
+                "
+            >
+                Staff Login
+            </a>
+
+        </div>
+
     </div>
 
 </section>
@@ -330,27 +359,38 @@
 
     /*
      * ============================================================
-     * PORTAL ACCESS CHECK
+     * AUTOMATIC REDIRECT CHECK
      * ============================================================
      *
-     * These routes are intentionally separated:
-     *
-     * Parent  -> /parent/login
-     * Student -> /student/login
-     * Staff   -> /staff/login
-     *
-     * After successful login, each portal should redirect the user
-     * to the correct dashboard.
-     *
-     * Parent:
-     * /parent/dashboard
-     *
-     * Student:
-     * /student/dashboard
-     *
-     * Staff:
-     * /staff/dashboard
+     * Checks if a user is already logged in (token stored in localStorage)
+     * and redirects them to their respective portal dashboard based on role.
      */
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const token = localStorage.getItem("token");
+        const userRole = localStorage.getItem("userRole");
+
+        if (token && userRole) {
+            switch (userRole.toLowerCase()) {
+                case "parent":
+                    window.location.href = "parent-dashboard.html";
+                    break;
+                case "student":
+                    window.location.href = "student-dashboard.html";
+                    break;
+                case "staff":
+                case "teacher":
+                    window.location.href = "staff-dashboard.html";
+                    break;
+                case "principal":
+                case "admin":
+                    window.location.href = "dashboard.html";
+                    break;
+                default:
+                    break;
+            }
+        }
+    });
 
 </script>
 
