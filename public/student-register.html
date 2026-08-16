@@ -3,50 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduTrust - Student Registration</title>
+    <title>Student Registration | EduTrust Portal</title>
     <style>
         :root {
-            --primary: #1e3a8a;
+            --primary: #2563eb;
             --primary-hover: #1d4ed8;
-            --bg: #f8fafc;
+            --accent: #dbeafe;
+            --bg-gradient: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
             --card-bg: #ffffff;
-            --text: #0f172a;
-            --muted: #64748b;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
             --border: #cbd5e1;
-            --error: #dc2626;
-            --success: #16a34a;
+            --error: #ef4444;
+            --success: #10b981;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem 1rem; }
-        .container { background: var(--card-bg); width: 100%; max-width: 550px; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid var(--border); }
-        .header { text-align: center; margin-bottom: 2rem; }
-        .header h1 { color: var(--primary); font-size: 1.8rem; margin-bottom: 0.5rem; }
-        .header p { color: var(--muted); font-size: 0.95rem; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-        .form-group.full-width { grid-column: span 2; }
-        label { font-size: 0.875rem; font-weight: 600; }
-        label .required { color: var(--error); }
-        input { padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
-        input:focus { border-color: var(--primary); }
-        .alert { padding: 0.85rem; border-radius: 6px; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
-        .alert-error { background-color: #fef2f2; color: var(--error); border: 1px solid #fecaca; }
-        .alert-success { background-color: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
-        button { width: 100%; margin-top: 1.5rem; padding: 0.85rem; background-color: var(--primary); color: #ffffff; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
-        button:hover { background-color: var(--primary-hover); }
-        button:disabled { opacity: 0.65; cursor: not-allowed; }
-        .footer-link { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--muted); }
-        .footer-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .form-group.full-width { grid-column: span 1; } }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 580px;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            margin-bottom: 0.75rem;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        label span.req {
+            color: var(--error);
+        }
+
+        input, select {
+            padding: 0.8rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+        }
+
+        input:focus, select:focus {
+            background-color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        .alert {
+            padding: 0.9rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            margin-bottom: 1.25rem;
+            display: none;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background-color: #fef2f2;
+            color: var(--error);
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background-color: #ecfdf5;
+            color: var(--success);
+            border: 1px solid #a7f3d0;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 0.9rem;
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 1.75rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .card { padding: 1.75rem 1.25rem; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="card">
     <div class="header">
-        <h1>EduTrust</h1>
-        <p>Student Registration</p>
+        <span class="badge">Student Portal</span>
+        <h1>Create Account</h1>
+        <p>Register as a student to access your academic dashboard</p>
     </div>
 
     <div id="alertBox" class="alert"></div>
@@ -54,53 +202,46 @@
     <form id="studentRegisterForm">
         <div class="form-grid">
             <div class="form-group">
-                <label>First Name <span class="required">*</span></label>
-                <input type="text" id="first_name" required placeholder="e.g. khalid">
+                <label>First Name <span class="req">*</span></label>
+                <input type="text" id="first_name" required placeholder="John">
             </div>
 
             <div class="form-group">
-                <label>Last Name <span class="required">*</span></label>
-                <input type="text" id="last_name" required placeholder="e.g. Abdulazeez">
+                <label>Last Name <span class="req">*</span></label>
+                <input type="text" id="last_name" required placeholder="Doe">
             </div>
 
             <div class="form-group full-width">
-                <label>Email Address <span class="required">*</span></label>
+                <label>Email Address <span class="req">*</span></label>
                 <input type="email" id="email" required placeholder="student@school.com">
             </div>
 
             <div class="form-group">
-                <label>Phone Number</label>
-                <input type="tel" id="phone" placeholder="+234...">
+                <label>School Code <span class="req">*</span></label>
+                <input type="text" id="school_code" required placeholder="e.g. SCH1024">
             </div>
 
             <div class="form-group">
-                <label>School Code <span class="required">*</span></label>
-                <input type="text" id="school_code" required placeholder="e.g. SCH12345">
+                <label>Class / Grade <span class="req">*</span></label>
+                <input type="text" id="current_class" required placeholder="e.g. SSS 2, JSS 1">
             </div>
 
             <div class="form-group full-width">
-                <label>Class / Grade <span class="required">*</span></label>
-                <input type="text" id="current_class" required placeholder="e.g. JSS 1, SSS 2">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" placeholder="+234 800 000 0000">
             </div>
 
             <div class="form-group full-width">
-                <label>Password <span class="required">*</span></label>
-                <input type="password" id="password" minlength="6" required placeholder="At least 6 characters">
+                <label>Password <span class="req">*</span></label>
+                <input type="password" id="password" minlength="6" required placeholder="Minimum 6 characters">
             </div>
         </div>
-
-          <div class="form-group full-width">
-                <label>Confirm Password <span class="required">*</span></label>
-                <input type="password" id="confirm_password" minlength="6" required placeholder="At least 6 characters">
-            </div>
-        </div>
-
 
         <button type="submit" id="submitBtn">Register as Student</button>
     </form>
 
-    <div class="footer-link">
-        Already registered? <a href="student-login.html">Log in here</a>
+    <div class="footer">
+        Already registered? <a href="student-login.html">Sign in here</a>
     </div>
 </div>
 
@@ -109,8 +250,8 @@
     const alertBox = document.getElementById("alertBox");
     const submitBtn = document.getElementById("submitBtn");
 
-    function showAlert(message, isError = true) {
-        alertBox.textContent = message;
+    function showAlert(msg, isError = true) {
+        alertBox.textContent = msg;
         alertBox.className = `alert ${isError ? 'alert-error' : 'alert-success'}`;
         alertBox.style.display = 'block';
     }
@@ -123,35 +264,27 @@
             first_name: document.getElementById("first_name").value,
             last_name: document.getElementById("last_name").value,
             email: document.getElementById("email").value,
-            phone: document.getElementById("phone").value,
             school_code: document.getElementById("school_code").value.trim().toUpperCase(),
             current_class: document.getElementById("current_class").value,
-            password: document.getElementById("password").value,
-            confirm_password: document.getElementById("confirm_password").value
+            phone: document.getElementById("phone").value,
+            password: document.getElementById("password").value
         };
 
         submitBtn.disabled = true;
-        submitBtn.textContent = "Registering...";
+        submitBtn.textContent = "Creating Account...";
 
         try {
-            const response = await fetch("/api/students", {
+            const res = await fetch("/api/students", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
-            const data = await response.json();
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || "Registration failed.");
 
-            if (!response.ok) {
-                throw new Error(data.message || "Student registration failed.");
-            }
-
-            showAlert("Registration successful! Redirecting to student login...", false);
-            form.reset();
-
-            setTimeout(() => {
-                window.location.href = "student-login.html";
-            }, 2000);
+            showAlert("Registration successful! Redirecting to login...", false);
+            setTimeout(() => { window.location.href = "student-login.html"; }, 2000);
 
         } catch (err) {
             showAlert(err.message, true);
