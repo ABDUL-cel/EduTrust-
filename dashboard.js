@@ -1,837 +1,2572 @@
-"use strict";
+/* =============================================================
+   EDUTRUST PRINCIPAL DASHBOARD
+   COMPLETE FRONTEND CONTROLLER
+   -------------------------------------------------------------
+   IMPORTANT:
+   - This file DOES NOT rebuild or replace dashboard HTML.
+   - It keeps your existing sidebar, cards, grids and page sections.
+   - It only switches existing .page-content sections and hydrates
+     them with real backend data.
+   ============================================================= */
 
-// ============================================================
-// CONFIGURATION
-// ============================================================
+(() => {
+    "use strict";
 
-const API_BASE_URL = "https://edutrust-15ii.onrender.com/api";
+    const API_BASE_URL =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000/api"
+            : "https://edutrust-15ii.onrender.com/api";
 
-// ============================================================
-// DOM ELEMENTS
-// ============================================================
+    const TOKEN_KEYS = ["edutrust_token", "token"];
 
-const sidebar = document.getElementById("sidebar");
-const menuToggle = document.getElementById("menu-toggle");
-const logoutButton = document.getElementById("logoutButton");
-const themeToggle = document.getElementById("theme-toggle");
-const notificationButton = document.getElementById("notification-button");
-const notificationDropdown = document.getElementById("notification-dropdown");
-const toast = document.getElementById("toast");
+    const navItems = document.querySelectorAll(
+        ".nav-item[data-page], .submenu-item[data-page]"
+    );
 
-// ============================================================
-// AUTHENTICATION
-// ============================================================
+    const pageTitle =
+        document.getElementById("pageTitle");
 
-const token =
-    localStorage.getItem("token") ||
-    sessionStorage.getItem("token");
+    const contentArea =
+        document.getElementById("contentArea");
 
-if (!token) {
-    window.location.href = "login.html";
-}
+    const sidebar =
+        document.querySelector(".sidebar");
 
-// ============================================================
-// API HELPER
-// ============================================================
+    const menuToggle =
+        document.getElementById("menu-toggle");
 
-async function apiRequest(endpoint, options = {}) {
-    try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            ...options,
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-                ...(options.headers || {})
+    const logoutButton =
+        document.getElementById("logoutButton");
+
+    const notificationButton =
+        document.getElementById("notification-button");
+
+    const notificationDropdown =
+        document.getElementById("notification-dropdown");
+
+    const themeToggle =
+        document.getElementById("theme-toggle");
+
+    const globalSearch =
+        document.getElementById("global-search");
+
+    let dashboardData = null;
+
+
+    /* =============================================================
+       AUTH
+       ============================================================= */
+
+    function getToken() {
+
+        for (const key of TOKEN_KEYS) {
+
+            const token =
+                localStorage.getItem(key);
+
+            if (token) {
+                return token;
             }
+        }
+
+        return "";
+    }
+
+
+    function clearAuth() {
+
+        [
+            "edutrust_token",
+            "token",
+            "school_id",
+            "school",
+            "user",
+            "principal",
+            "dashboard"
+        ].forEach(key => {
+
+            localStorage.removeItem(key);
+
         });
+    }
+
+
+    function authHeaders(json = false) {
+
+        const token =
+            getToken();
+
+        const headers = {};
+
+        if (json) {
+
+            headers["Content-Type"] =
+                "application/json";
+        }
+
+        if (token) {
+
+            headers.Authorization =
+                `Bearer ${token}`;
+        }
+
+        return headers;
+    }
+
+
+    async function apiRequest(
+        path,
+        options = {}
+    ) {
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}${path}`,
+                {
+                    ...options,
+
+                    headers: {
+                        ...authHeaders(
+                            Boolean(options.body)
+                        ),
+
+                        ...(options.headers || {})
+                    }
+                }
+            );
+
 
         let data = {};
+
+
         try {
-            data = await response.json();
-        } catch {
+
+            data =
+                await response.json();
+
+        } catch (_) {
+
             data = {};
         }
 
+
         if (response.status === 401) {
-            localStorage.removeItem("token");
-            sessionStorage.removeItem("token");
-            window.location.href = "login.html";
-            throw new Error("Authentication expired.");
+
+            clearAuth();
+
+            window.location.href =
+                "index.html";
+
+            throw new Error(
+                "Your session has expired. Please login again."
+            );
         }
 
-        if (!response.ok) {
-            throw new Error(data.message || "Request failed.");
+
+        if (
+            !response.ok ||
+            data.success === false
+        ) {
+
+            throw new Error(
+                data.message ||
+                `Request failed with status ${response.status}.`
+            );
         }
+
 
         return data;
-    } catch (error) {
-        console.error(`API Request Error [${endpoint}]:`, error);
-        throw error;
-    }
-}
-
-// ============================================================
-// SCHOOL & USER STATE
-// ============================================================
-
-let currentSchool = null;
-let currentUser = null;
-
-// ============================================================
-// LOAD & RENDER PROFILE
-// ============================================================
-
-async function loadProfile() {
-    try {
-        const data = await apiRequest("/auth/profile");
-
-        if (data.success || data.user) {
-            currentUser = data.user || null;
-            currentSchool = data.school || null;
-            renderProfile();
-            populateSchoolForm();
-        }
-    } catch (error) {
-        showToast(error.message || "Unable to load profile details.", "error");
-    }
-}
-
-function renderProfile() {
-    if (!currentSchool && !currentUser) return;
-
-    const schoolName = currentSchool?.name || "School Overview";
-    const userRole = currentUser?.role || "Administrator";
-
-    updateElementText("sidebarSchoolName", schoolName);
-    updateElementText("sidebarUserRole", userRole);
-
-    const schoolAvatar = document.getElementById("schoolAvatar");
-    if (schoolAvatar) {
-        schoolAvatar.textContent = getInitials(schoolName);
-    }
-}
-
-function getInitials(name) {
-    return String(name || "School")
-        .trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map(word => word.charAt(0).toUpperCase())
-        .join("");
-}
-
-function populateSchoolForm() {
-    if (!currentSchool) return;
-
-    setValue("schoolName", currentSchool.name);
-    setValue("schoolCode", currentSchool.school_code);
-    setValue("schoolPhone", currentSchool.phone);
-    setValue("schoolEmail", currentSchool.email);
-    setValue("schoolType", currentSchool.school_type);
-    setValue("schoolAddress", currentSchool.address);
-    setValue("academicSession", currentSchool.academic_session);
-    setValue("currentTerm", currentSchool.current_term);
-    setValue("schoolMotto", currentSchool.motto);
-    setValue("schoolWebsite", currentSchool.website);
-
-    const principalInput = document.getElementById("schoolPrincipal");
-    if (principalInput) {
-        principalInput.value = currentUser?.full_name || currentUser?.name || "Principal";
-    }
-}
-
-function setValue(id, value) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.value = value || "";
-    }
-}
-
-function updateElementText(id, value) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.textContent = value;
-    }
-}
-
-// ============================================================
-// NAVIGATION SYSTEM
-// ============================================================
-
-function showPage(page) {
-    document.querySelectorAll(".page-content").forEach(element => {
-        element.classList.add("hidden");
-    });
-
-    const pageElement = document.getElementById(`${page}Page`);
-    if (pageElement) {
-        pageElement.classList.remove("hidden");
     }
 
-    document.querySelectorAll(".nav-item[data-page], .submenu-item[data-page]").forEach(button => {
-        button.classList.remove("active");
-        if (button.dataset.page === page) {
-            button.classList.add("active");
-        }
-    });
 
-    if (window.innerWidth <= 768 && sidebar) {
-        sidebar.classList.remove("open");
-    }
+    async function apiGet(path) {
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
-    // Execute section specific loading handlers
-    switch (page) {
-        case "overview":
-            loadOverviewData();
-            break;
-        case "students":
-            loadStudents();
-            break;
-        case "parents":
-            loadParents();
-            break;
-        case "staff":
-            loadStaff();
-            break;
-        case "fees":
-            loadFees();
-            break;
-        case "fee-structures":
-            loadFeeStructures();
-            break;
-        case "payments":
-            loadPayments();
-            break;
-        case "outstanding":
-            loadOutstandingFees();
-            break;
-        case "announcements":
-            loadAnnouncements();
-            break;
-        case "messages":
-            loadMessages();
-            break;
-        case "notifications":
-            loadNotifications();
-            break;
-    }
-}
-
-// Global Nav Handler Click Registration
-document.addEventListener("click", function(e) {
-    const btn = e.target.closest("[data-page]");
-    if (btn) {
-        const page = btn.dataset.page;
-        if (page) {
-            showPage(page);
-        }
-    }
-});
-
-// ============================================================
-// OVERVIEW METRICS & LIVE DATA
-// ============================================================
-
-async function loadOverviewData() {
-    try {
-        const data = await apiRequest("/dashboard/overview-stats");
-        
-        if (data) {
-            updateElementText("totalStudents", data.totalStudents || "0");
-            updateElementText("feesCollected", data.feesCollected || "₦0");
-            updateElementText("outstandingFees", data.outstandingFees || "₦0");
-            updateElementText("totalParents", data.totalParents || "0");
-
-            if (data.outstandingStudentsCount !== undefined) {
-                updateElementText("outstandingStudents", `${data.outstandingStudentsCount} students with balances`);
+        return apiRequest(
+            path,
+            {
+                method: "GET"
             }
-
-            if (data.collectionPercentage) {
-                updateElementText("collectionPercentage", `${data.collectionPercentage}%`);
-            }
-            if (data.feesCollected) {
-                updateElementText("collectionCollected", data.feesCollected);
-            }
-            if (data.outstandingFees) {
-                updateElementText("collectionOutstanding", data.outstandingFees);
-            }
-        }
-    } catch (e) {
-        console.warn("Using active data states for overview metrics.");
+        );
     }
 
-    loadRecentPayments();
-}
 
-async function loadRecentPayments() {
-    const table = document.getElementById("recentPaymentsTable");
-    if (!table) return;
+    async function apiPut(
+        path,
+        body
+    ) {
 
-    try {
-        const data = await apiRequest("/payments/recent");
-        const payments = data.payments || [];
-
-        if (!payments.length) {
-            table.innerHTML = `<tr><td colspan="4">No payment records available.</td></tr>`;
-            return;
-        }
-
-        table.innerHTML = payments.map(p => `
-            <tr>
-                <td>${escapeHtml(p.parentName || p.parent || "N/A")}</td>
-                <td>${escapeHtml(p.studentName || p.student || "N/A")}</td>
-                <td>${escapeHtml(p.amount || "₦0")}</td>
-                <td><span class="status ${getStatusClass(p.status)}">${escapeHtml(p.status || "Paid")}</span></td>
-            </tr>
-        `).join("");
-    } catch (e) {
-        table.innerHTML = `<tr><td colspan="4">No recent payment records found.</td></tr>`;
-    }
-}
-
-// ============================================================
-// STUDENTS DATA
-// ============================================================
-
-async function loadStudents() {
-    const table = document.getElementById("studentsTable");
-    if (!table) return;
-
-    try {
-        const data = await apiRequest("/students");
-        const students = data.students || [];
-
-        if (!students.length) {
-            table.innerHTML = `<tr><td colspan="5">No students found.</td></tr>`;
-            updateElementText("totalStudents", "0");
-            return;
-        }
-
-        updateElementText("totalStudents", students.length.toLocaleString());
-
-        table.innerHTML = students.map(student => {
-            const fullName = [student.first_name || student.firstName, student.other_name, student.last_name || student.lastName]
-                .filter(Boolean)
-                .join(" ");
-
-            return `
-                <tr>
-                    <td>${escapeHtml(student.admission_number || student.admissionNo || "N/A")}</td>
-                    <td>${escapeHtml(fullName || "Unnamed Student")}</td>
-                    <td>${escapeHtml(student.gender || "N/A")}</td>
-                    <td>${escapeHtml(student.class_name || student.class || "N/A")}</td>
-                    <td>
-                        <span class="status ${getStatusClass(student.status)}">
-                            ${escapeHtml(student.status || "Active")}
-                        </span>
-                    </td>
-                </tr>
-            `;
-        }).join("");
-    } catch (error) {
-        table.innerHTML = `<tr><td colspan="5">Unable to load students from server.</td></tr>`;
-    }
-}
-
-// ============================================================
-// PARENTS DATA
-// ============================================================
-
-async function loadParents() {
-    const table = document.getElementById("parentsTable");
-    if (!table) return;
-
-    try {
-        const data = await apiRequest("/parents");
-        const parents = data.parents || [];
-
-        updateElementText("totalParents", parents.length.toLocaleString());
-
-        if (!parents.length) {
-            table.innerHTML = `<tr><td colspan="5">No parents found.</td></tr>`;
-            return;
-        }
-
-        table.innerHTML = parents.map(parent => {
-            const fullName = [parent.first_name || parent.firstName, parent.other_name, parent.last_name || parent.lastName]
-                .filter(Boolean)
-                .join(" ");
-
-            return `
-                <tr>
-                    <td>${escapeHtml(fullName || parent.name || "N/A")}</td>
-                    <td>${escapeHtml(parent.relationship || "Parent")}</td>
-                    <td>${escapeHtml(parent.phone || "N/A")}</td>
-                    <td>${escapeHtml(parent.email || "N/A")}</td>
-                    <td>
-                        <span class="status ${getStatusClass(parent.status)}">
-                            ${escapeHtml(parent.status || "Active")}
-                        </span>
-                    </td>
-                </tr>
-            `;
-        }).join("");
-    } catch (error) {
-        table.innerHTML = `<tr><td colspan="5">Unable to load parents.</td></tr>`;
-    }
-}
-
-// ============================================================
-// STAFF DATA
-// ============================================================
-
-async function loadStaff() {
-    const table = document.getElementById("staffTable");
-    if (!table) return;
-
-    try {
-        const data = await apiRequest("/staff");
-        const staffList = data.staff || [];
-
-        if (!staffList.length) {
-            table.innerHTML = `<tr><td colspan="5">No staff records found.</td></tr>`;
-            return;
-        }
-
-        table.innerHTML = staffList.map(member => `
-            <tr>
-                <td>${escapeHtml(member.name || member.full_name || "N/A")}</td>
-                <td>${escapeHtml(member.role || "Teacher")}</td>
-                <td>${escapeHtml(member.email || "N/A")}</td>
-                <td>${escapeHtml(member.phone || "N/A")}</td>
-                <td><span class="status ${getStatusClass(member.status)}">${escapeHtml(member.status || "Active")}</span></td>
-            </tr>
-        `).join("");
-    } catch (e) {
-        table.innerHTML = `<tr><td colspan="5">Unable to load staff directory.</td></tr>`;
-    }
-}
-
-// ============================================================
-// SCHOOL FEES & FEE STRUCTURES
-// ============================================================
-
-async function loadFees() {
-    const table = document.getElementById("feesTable");
-    if (!table) return;
-
-    try {
-        const data = await apiRequest("/fees");
-        const fees = data.fees || [];
-
-        if (!fees.length) {
-            table.innerHTML = `<tr><td colspan="5">No fee records recorded.</td></tr>`;
-            return;
-        }
-
-        table.innerHTML = fees.map(f => `
-            <tr>
-                <td>${escapeHtml(f.studentName || "N/A")}</td>
-                <td>${escapeHtml(f.class || "N/A")}</td>
-                <td>${escapeHtml(f.expectedAmount || "₦0")}</td>
-                <td>${escapeHtml(f.paidAmount || "₦0")}</td>
-                <td><span class="status ${getStatusClass(f.status)}">${escapeHtml(f.status || "Pending")}</span></td>
-            </tr>
-        `).join("");
-    } catch (e) {
-        table.innerHTML = `<tr><td colspan="5">Unable to load fee collections.</td></tr>`;
-    }
-}
-
-async function loadFeeStructures() {
-    const table = document.getElementById("feeStructuresTable");
-    if (!table) return;
-
-    try {
-        const data = await apiRequest("/fees/structures");
-        const structures = data.structures || [];
-
-        if (!structures.length) {
-            table.innerHTML = `<tr><td colspan="5">No fee structures defined yet.</td></tr>`;
-            return;
-        }
-
-        table.innerHTML = structures.map(s => `
-            <tr>
-                <td>${escapeHtml(s.name || "Standard Fee")}</td>
-                <td>${escapeHtml(s.classes || s.class || "All Classes")}</td>
-                <td>${escapeHtml(s.term || "Current Term")}</td>
-                <td>${escapeHtml(s.amount || "₦0")}</td>
-                <td><span class="status ${getStatusClass(s.status)}">${escapeHtml(s.status || "Active")}</span></td>
-            </tr>
-        `).join("");
-    } catch (e) {
-        table.innerHTML = `<tr><td colspan="5">Unable to fetch fee structures.</td></tr>`;
-    }
-}
-
-// ============================================================
-// PAYMENTS & OUTSTANDING
-// ============================================================
-
-async function loadPayments() {
-    const table = document.getElementById("paymentsTable");
-    if (!table) return;
-
-    try {
-        const data = await apiRequest("/payments/parent-payments");
-        const payments = data.payments || [];
-
-        if (!payments.length) {
-            table.innerHTML = `<tr><td colspan="5">No parent payment records available.</td></tr>`;
-            return;
-        }
-
-        table.innerHTML = payments.map(p => `
-            <tr>
-                <td>${escapeHtml(p.parentName || "N/A")}</td>
-                <td>${escapeHtml(p.studentName || "N/A")}</td>
-                <td>${escapeHtml(p.amount || "₦0")}</td>
-                <td>${escapeHtml(p.date || "N/A")}</td>
-                <td><span class="status ${getStatusClass(p.status)}">${escapeHtml(p.status || "Paid")}</span></td>
-            </tr>
-        `).join("");
-    } catch (e) {
-        table.innerHTML = `<tr><td colspan="5">Unable to load payment history.</td></tr>`;
-    }
-}
-
-async function loadOutstandingFees() {
-    const table = document.getElementById("outstandingTable");
-    if (!table) return;
-
-    try {
-        const data = await apiRequest("/fees/outstanding");
-        const list = data.outstanding || [];
-
-        if (!list.length) {
-            table.innerHTML = `<tr><td colspan="6">No outstanding balance records found.</td></tr>`;
-            return;
-        }
-
-        table.innerHTML = list.map(item => `
-            <tr>
-                <td>${escapeHtml(item.studentName || "N/A")}</td>
-                <td>${escapeHtml(item.parentName || "N/A")}</td>
-                <td>${escapeHtml(item.class || "N/A")}</td>
-                <td>${escapeHtml(item.totalFee || "₦0")}</td>
-                <td>${escapeHtml(item.balance || "₦0")}</td>
-                <td><span class="status warning">${escapeHtml(item.status || "Unpaid")}</span></td>
-            </tr>
-        `).join("");
-    } catch (e) {
-        table.innerHTML = `<tr><td colspan="6">Unable to load outstanding records.</td></tr>`;
-    }
-}
-
-// ============================================================
-// ANNOUNCEMENTS, MESSAGES & NOTIFICATIONS
-// ============================================================
-
-async function loadAnnouncements() {
-    const container = document.getElementById("announcementsListContainer");
-    if (!container) return;
-
-    try {
-        const data = await apiRequest("/announcements");
-        const list = data.announcements || [];
-
-        if (!list.length) {
-            container.innerHTML = `<p>No announcements available at this time.</p>`;
-            return;
-        }
-
-        container.innerHTML = list.map(a => `
-            <div class="announcement-item" style="padding: 12px 0; border-bottom: 1px solid #eee;">
-                <h4>${escapeHtml(a.title)}</h4>
-                <p>${escapeHtml(a.content)}</p>
-                <small>${escapeHtml(a.meta || a.date || "")}</small>
-            </div>
-        `).join("");
-    } catch (e) {
-        container.innerHTML = `<p>No active announcements.</p>`;
-    }
-}
-
-async function loadMessages() {
-    const container = document.getElementById("messagesListContainer");
-    if (!container) return;
-
-    try {
-        const data = await apiRequest("/messages");
-        const messages = data.messages || [];
-
-        if (!messages.length) {
-            container.innerHTML = `<p>No message history found.</p>`;
-            return;
-        }
-
-        container.innerHTML = messages.map(m => `
-            <div class="message-item" style="padding: 12px 0; border-bottom: 1px solid #eee;">
-                <strong>${escapeHtml(m.senderName || m.sender)}</strong>
-                <p>${escapeHtml(m.text || m.content)}</p>
-                <small>${escapeHtml(m.time || "")}</small>
-            </div>
-        `).join("");
-    } catch (e) {
-        container.innerHTML = `<p>No messages found.</p>`;
-    }
-}
-
-async function loadNotifications() {
-    const container = document.getElementById("notificationsPageList");
-    if (!container) return;
-
-    try {
-        const data = await apiRequest("/notifications");
-        const list = data.notifications || [];
-
-        if (!list.length) {
-            container.innerHTML = `<p>You have no notifications.</p>`;
-            return;
-        }
-
-        container.innerHTML = list.map(n => `
-            <div class="notification-item" style="padding: 12px 0; border-bottom: 1px solid #eee;">
-                <h4>${escapeHtml(n.title)}</h4>
-                <p>${escapeHtml(n.message)}</p>
-                <small>${escapeHtml(n.timeAgo || n.date || "")}</small>
-            </div>
-        `).join("");
-    } catch (e) {
-        container.innerHTML = `<p>No notifications available.</p>`;
-    }
-}
-
-// ============================================================
-// SCHOOL PROFILE FORM SUBMISSION
-// ============================================================
-
-const schoolForm = document.getElementById("schoolForm");
-
-if (schoolForm) {
-    schoolForm.addEventListener("submit", async event => {
-        event.preventDefault();
-
-        if (!currentSchool?._id) {
-            showToast("School ID is missing. Please reload page.", "error");
-            return;
-        }
-
-        const saveButton = document.getElementById("saveSchoolButton");
-
-        const payload = {
-            name: document.getElementById("schoolName")?.value.trim(),
-            phone: document.getElementById("schoolPhone")?.value.trim(),
-            email: document.getElementById("schoolEmail")?.value.trim().toLowerCase(),
-            address: document.getElementById("schoolAddress")?.value.trim(),
-            school_type: document.getElementById("schoolType")?.value.trim(),
-            academic_session: document.getElementById("academicSession")?.value.trim(),
-            current_term: document.getElementById("currentTerm")?.value,
-            motto: document.getElementById("schoolMotto")?.value.trim(),
-            website: document.getElementById("schoolWebsite")?.value.trim()
-        };
-
-        try {
-            if (saveButton) {
-                saveButton.disabled = true;
-                saveButton.textContent = "Saving...";
-            }
-
-            const data = await apiRequest(`/schools/${currentSchool._id}`, {
+        return apiRequest(
+            path,
+            {
                 method: "PUT",
-                body: JSON.stringify(payload)
-            });
-
-            if (!data.success && !data.school) {
-                throw new Error(data.message || "Failed to update school profile.");
+                body: JSON.stringify(body)
             }
+        );
+    }
 
-            currentSchool = data.school || { ...currentSchool, ...payload };
-            renderProfile();
-            populateSchoolForm();
-            showToast("School profile updated successfully!");
-        } catch (error) {
-            showToast(error.message || "Failed to update school.", "error");
-        } finally {
-            if (saveButton) {
-                saveButton.disabled = false;
-                saveButton.textContent = "Save School Profile";
+
+    /* =============================================================
+       HELPERS
+       ============================================================= */
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    function fullName(person) {
+
+        const name = [
+            person?.first_name,
+            person?.other_name,
+            person?.last_name
+        ]
+            .filter(Boolean)
+            .join(" ")
+            .trim();
+
+
+        return (
+            name ||
+            person?.full_name ||
+            "Unknown"
+        );
+    }
+
+
+    function initials(name) {
+
+        return String(
+            name || "U"
+        )
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(
+                part =>
+                    part.charAt(0).toUpperCase()
+            )
+            .join("");
+    }
+
+
+    function formatDate(value) {
+
+        if (!value) {
+            return "—";
+        }
+
+
+        const date =
+            new Date(value);
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return "—";
+        }
+
+
+        return date.toLocaleDateString(
+            "en-NG",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+    }
+
+
+    function formatNumber(value) {
+
+        return Number(
+            value || 0
+        ).toLocaleString(
+            "en-NG"
+        );
+    }
+
+
+    function statusClass(status) {
+
+        const value =
+            String(
+                status || ""
+            ).toLowerCase();
+
+
+        if (
+            value === "active" ||
+            value === "paid" ||
+            value === "completed"
+        ) {
+
+            return "paid";
+        }
+
+
+        return "pending";
+    }
+
+
+    function getPageElement(page) {
+
+        return document.getElementById(
+            `${page}Page`
+        );
+    }
+
+
+    function getCurrentPage() {
+
+        const visible =
+            document.querySelector(
+                ".page-content:not(.hidden)"
+            );
+
+
+        return (
+            visible?.id?.replace(
+                /Page$/,
+                ""
+            ) ||
+            "overview"
+        );
+    }
+
+
+    function toast(
+        message,
+        type = "success"
+    ) {
+
+        const toastElement =
+            document.getElementById(
+                "toast"
+            );
+
+
+        if (!toastElement) {
+
+            console.log(message);
+
+            return;
+        }
+
+
+        toastElement.textContent =
+            message;
+
+
+        toastElement.className =
+            `toast show ${type}`;
+
+
+        window.clearTimeout(
+            toast._timer
+        );
+
+
+        toast._timer =
+            window.setTimeout(
+                () => {
+
+                    toastElement.classList.remove(
+                        "show"
+                    );
+
+                },
+                3500
+            );
+    }
+
+
+    /* =============================================================
+       PAGE NAVIGATION
+       ============================================================= */
+
+    function showPage(
+        page,
+        clickedItem = null
+    ) {
+
+        if (!contentArea) {
+            return;
+        }
+
+
+        const target =
+            getPageElement(page);
+
+
+        if (!target) {
+
+            console.warn(
+                `Dashboard page '${page}' was not found in dashboard.html.`
+            );
+
+            return;
+        }
+
+
+        document
+            .querySelectorAll(
+                ".page-content"
+            )
+            .forEach(
+                section => {
+
+                    section.classList.add(
+                        "hidden"
+                    );
+
+                }
+            );
+
+
+        target.classList.remove(
+            "hidden"
+        );
+
+
+        navItems.forEach(
+            item =>
+                item.classList.remove(
+                    "active"
+                )
+        );
+
+
+        if (clickedItem) {
+
+            clickedItem.classList.add(
+                "active"
+            );
+
+        } else {
+
+            document
+                .querySelectorAll(
+                    `[data-page="${CSS.escape(page)}"]`
+                )
+                .forEach(
+                    item =>
+                        item.classList.add(
+                            "active"
+                        )
+                );
+        }
+
+
+        if (pageTitle) {
+
+            const label =
+                clickedItem
+                    ? clickedItem.textContent.trim()
+                    : document
+                        .querySelector(
+                            `[data-page="${CSS.escape(page)}"]`
+                        )
+                        ?.textContent
+                        ?.trim();
+
+
+            if (label) {
+
+                pageTitle.textContent =
+                    label;
             }
         }
-    });
-}
 
-// ============================================================
-// ADD STUDENT MODAL & FORM
-// ============================================================
 
-const addStudentButton = document.getElementById("add-student-button");
-const studentModal = document.getElementById("student-modal");
-const closeStudentModal = document.getElementById("close-student-modal");
-const cancelStudentModal = document.getElementById("cancel-student-modal");
-const studentForm = document.getElementById("student-form");
+        if (
+            window.innerWidth <= 768 &&
+            sidebar
+        ) {
 
-if (addStudentButton && studentModal) {
-    addStudentButton.addEventListener("click", () => {
-        studentModal.style.display = "flex";
-    });
-}
+            sidebar.classList.remove(
+                "show"
+            );
+        }
 
-if (closeStudentModal && studentModal) {
-    closeStudentModal.addEventListener("click", () => {
-        studentModal.style.display = "none";
-    });
-}
 
-if (cancelStudentModal && studentModal) {
-    cancelStudentModal.addEventListener("click", () => {
-        studentModal.style.display = "none";
-    });
-}
+        if (page === "overview") {
 
-if (studentForm) {
-    studentForm.addEventListener("submit", async function(event) {
-        event.preventDefault();
+            hydrateOverview();
+        }
 
-        const payload = {
-            first_name: document.getElementById("student-first-name").value.trim(),
-            last_name: document.getElementById("student-last-name").value.trim(),
-            gender: document.getElementById("student-gender").value,
-            class_name: document.getElementById("student-class").value,
-            email: document.getElementById("student-email").value.trim(),
-            phone: document.getElementById("student-phone").value.trim()
-        };
+
+        if (
+            page === "school" ||
+            page === "school-profile"
+        ) {
+
+            hydrateSchoolPages();
+        }
+
+
+        if (page === "students") {
+
+            hydrateStudentsPage();
+        }
+
+
+        if (page === "parents") {
+
+            hydrateParentsPage();
+        }
+
+
+        if (page === "staff") {
+
+            hydrateStaffPage();
+        }
+    }
+
+
+    function setupNavigation() {
+
+        navItems.forEach(
+            item => {
+
+                item.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+
+                        const page =
+                            item.getAttribute(
+                                "data-page"
+                            );
+
+
+                        if (!page) {
+                            return;
+                        }
+
+
+                        showPage(
+                            page,
+                            item
+                        );
+                    }
+                );
+            }
+        );
+
+
+        document
+            .querySelectorAll(
+                ".text-button[data-page]"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        event => {
+
+                            event.preventDefault();
+
+                            const page =
+                                button.getAttribute(
+                                    "data-page"
+                                );
+
+                            if (page) {
+
+                                showPage(
+                                    page
+                                );
+                            }
+                        }
+                    );
+                }
+            );
+    }
+
+
+    /* =============================================================
+       SIDEBAR
+       ============================================================= */
+
+    function setupSidebar() {
+
+        if (
+            menuToggle &&
+            sidebar
+        ) {
+
+            menuToggle.addEventListener(
+                "click",
+                () => {
+
+                    if (
+                        window.innerWidth <= 768
+                    ) {
+
+                        sidebar.classList.toggle(
+                            "show"
+                        );
+
+                    } else {
+
+                        sidebar.classList.toggle(
+                            "collapsed"
+                        );
+                    }
+                }
+            );
+        }
+
+
+        const settingsToggle =
+            document.querySelector(
+                ".settings-toggle"
+            );
+
+
+        const reportsToggle =
+            document.querySelector(
+                ".reports-toggle"
+            );
+
+
+        if (settingsToggle) {
+
+            const group =
+                settingsToggle.closest(
+                    ".nav-group"
+                );
+
+
+            settingsToggle.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    group?.classList.toggle(
+                        "open"
+                    );
+                }
+            );
+        }
+
+
+        if (reportsToggle) {
+
+            const group =
+                reportsToggle.closest(
+                    ".nav-group"
+                );
+
+
+            reportsToggle.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    group?.classList.toggle(
+                        "open"
+                    );
+                }
+            );
+        }
+    }
+
+
+    /* =============================================================
+       NOTIFICATIONS
+       ============================================================= */
+
+    function setupNotifications() {
+
+        if (
+            !notificationButton ||
+            !notificationDropdown
+        ) {
+
+            return;
+        }
+
+
+        notificationButton.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                notificationDropdown.classList.toggle(
+                    "show"
+                );
+            }
+        );
+
+
+        notificationDropdown.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+            }
+        );
+
+
+        document.addEventListener(
+            "click",
+            () => {
+
+                notificationDropdown.classList.remove(
+                    "show"
+                );
+            }
+        );
+    }
+
+
+    /* =============================================================
+       THEME
+       ============================================================= */
+
+    function setupTheme() {
+
+        const savedTheme =
+            localStorage.getItem(
+                "edutrust_theme"
+            );
+
+
+        if (
+            savedTheme === "dark"
+        ) {
+
+            document.body.classList.add(
+                "dark-mode"
+            );
+
+
+            if (themeToggle) {
+
+                themeToggle.textContent =
+                    "☀️";
+            }
+        }
+
+
+        if (!themeToggle) {
+            return;
+        }
+
+
+        themeToggle.addEventListener(
+            "click",
+            () => {
+
+                const dark =
+                    document.body.classList.toggle(
+                        "dark-mode"
+                    );
+
+
+                localStorage.setItem(
+                    "edutrust_theme",
+                    dark
+                        ? "dark"
+                        : "light"
+                );
+
+
+                themeToggle.textContent =
+                    dark
+                        ? "☀️"
+                        : "🌙";
+            }
+        );
+    }
+
+
+    /* =============================================================
+       LOGOUT
+       ============================================================= */
+
+    function setupLogout() {
+
+        if (!logoutButton) {
+            return;
+        }
+
+
+        logoutButton.addEventListener(
+            "click",
+            () => {
+
+                clearAuth();
+
+                window.location.href =
+                    "index.html";
+            }
+        );
+    }
+
+
+    /* =============================================================
+       GLOBAL SEARCH
+       ============================================================= */
+
+    function setupSearch() {
+
+        if (!globalSearch) {
+            return;
+        }
+
+
+        globalSearch.addEventListener(
+            "input",
+            () => {
+
+                const query =
+                    globalSearch.value
+                        .trim()
+                        .toLowerCase();
+
+
+                if (!query) {
+
+                    document
+                        .querySelectorAll(
+                            ".page-content:not(.hidden) tbody tr"
+                        )
+                        .forEach(
+                            row => {
+
+                                row.style.display =
+                                    "";
+                            }
+                        );
+
+                    return;
+                }
+
+
+                document
+                    .querySelectorAll(
+                        ".page-content:not(.hidden) tbody tr"
+                    )
+                    .forEach(
+                        row => {
+
+                            row.style.display =
+                                row.textContent
+                                    .toLowerCase()
+                                    .includes(query)
+                                    ? ""
+                                    : "none";
+                        }
+                    );
+            }
+        );
+    }
+
+
+    /* =============================================================
+       SCHOOL HEADER
+       ============================================================= */
+
+    function hydrateSchoolHeader(
+        school,
+        user
+    ) {
+
+        if (!school) {
+            return;
+        }
+
+
+        document
+            .querySelectorAll(
+                ".school-profile h3"
+            )
+            .forEach(
+                element => {
+
+                    element.textContent =
+                        school.name ||
+                        "School";
+                }
+            );
+
+
+        document
+            .querySelectorAll(
+                ".school-profile p"
+            )
+            .forEach(
+                element => {
+
+                    element.textContent =
+                        user?.role ||
+                        "Administrator";
+                }
+            );
+
+
+        const avatar =
+            document.querySelector(
+                ".school-avatar"
+            );
+
+
+        if (avatar) {
+
+            avatar.textContent =
+                initials(
+                    school.name
+                );
+        }
+
+
+        const profileButton =
+            document.getElementById(
+                "profile-button"
+            );
+
+
+        if (profileButton) {
+
+            const strong =
+                profileButton.querySelector(
+                    "strong"
+                );
+
+
+            const small =
+                profileButton.querySelector(
+                    "small"
+                );
+
+
+            const avatarElement =
+                profileButton.querySelector(
+                    ".profile-avatar"
+                );
+
+
+            if (strong) {
+
+                strong.textContent =
+                    user?.full_name ||
+                    fullName(user) ||
+                    "Principal";
+            }
+
+
+            if (small) {
+
+                small.textContent =
+                    user?.role ||
+                    "Principal";
+            }
+
+
+            if (avatarElement) {
+
+                avatarElement.textContent =
+                    initials(
+                        user?.full_name ||
+                        fullName(user)
+                    );
+            }
+        }
+    }
+
+
+    /* =============================================================
+       STAT CARDS
+       ============================================================= */
+
+    function findStatCard(
+        label,
+        root = document
+    ) {
+
+        const cards =
+            root.querySelectorAll(
+                ".stat-card"
+            );
+
+
+        const wanted =
+            String(
+                label
+            ).toLowerCase();
+
+
+        for (const card of cards) {
+
+            const text =
+                card.textContent
+                    .replace(
+                        /\s+/g,
+                        " "
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+            if (
+                text.includes(
+                    wanted
+                )
+            ) {
+
+                return card;
+            }
+        }
+
+
+        return null;
+    }
+
+
+    function setStat(
+        label,
+        value,
+        root = document
+    ) {
+
+        const card =
+            findStatCard(
+                label,
+                root
+            );
+
+
+        if (!card) {
+            return;
+        }
+
+
+        const heading =
+            card.querySelector(
+                "h2, h3"
+            );
+
+
+        if (heading) {
+
+            heading.textContent =
+                value;
+        }
+    }
+
+
+    /* =============================================================
+       DASHBOARD OVERVIEW
+       ============================================================= */
+
+    async function loadDashboardOverview() {
+
+        const data =
+            await apiGet(
+                "/dashboard/overview"
+            );
+
+
+        dashboardData =
+            data;
+
+
+        if (data.school) {
+
+            localStorage.setItem(
+                "school",
+                JSON.stringify(
+                    data.school
+                )
+            );
+
+
+            localStorage.setItem(
+                "school_id",
+                String(
+                    data.school.id ||
+                    ""
+                )
+            );
+        }
+
+
+        if (data.user) {
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(
+                    data.user
+                )
+            );
+        }
+
+
+        return data;
+    }
+
+
+    function hydrateOverviewFromData(
+        data
+    ) {
+
+        if (!data) {
+            return;
+        }
+
+
+        const stats =
+            data.statistics ||
+            {};
+
+
+        const finance =
+            data.finance ||
+            {};
+
+
+        const overview =
+            getPageElement(
+                "overview"
+            );
+
+
+        if (!overview) {
+            return;
+        }
+
+
+        setStat(
+            "Total Students",
+            formatNumber(
+                stats.totalStudents
+            ),
+            overview
+        );
+
+
+        setStat(
+            "Active Parents",
+            formatNumber(
+                stats.activeParents
+            ),
+            overview
+        );
+
+
+        if (
+            finance.feesCollected !==
+                null &&
+            finance.feesCollected !==
+                undefined
+        ) {
+
+            setStat(
+                "Fees Collected",
+                finance.feesCollected,
+                overview
+            );
+        }
+
+
+        if (
+            finance.outstandingFees !==
+                null &&
+            finance.outstandingFees !==
+                undefined
+        ) {
+
+            setStat(
+                "Outstanding Fees",
+                finance.outstandingFees,
+                overview
+            );
+        }
+
+
+        renderRecentPayments(
+            data.recent?.payments ||
+            [],
+            overview
+        );
+
+
+        updateCollectionProgress(
+            finance,
+            overview
+        );
+
+
+        renderRecentActivity(
+            data.recent?.activity ||
+            [],
+            overview
+        );
+    }
+
+
+    function renderRecentPayments(
+        payments,
+        root = document
+    ) {
+
+        const table =
+            root.querySelector(
+                "#recentPaymentsTable"
+            );
+
+
+        if (!table) {
+            return;
+        }
+
+
+        if (!payments.length) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="4">
+                        No payment records available.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        table.innerHTML =
+            payments
+                .slice(0, 10)
+                .map(
+                    payment => `
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(
+                                    payment.parent_name ||
+                                    payment.parent ||
+                                    "—"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    payment.student_name ||
+                                    payment.student ||
+                                    "—"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    payment.amount_display ||
+                                    payment.amount ||
+                                    "₦0"
+                                )}
+                            </td>
+
+                            <td>
+
+                                <span class="status ${statusClass(
+                                    payment.status
+                                )}">
+                                    ${escapeHtml(
+                                        payment.status ||
+                                        "Pending"
+                                    )}
+                                </span>
+
+                            </td>
+
+                        </tr>
+                    `
+                )
+                .join("");
+    }
+
+
+    function updateCollectionProgress(
+        finance,
+        root = document
+    ) {
+
+        const collected =
+            Number(
+                finance.feesCollectedRaw ??
+                finance.feesCollected ??
+                0
+            );
+
+
+        const outstanding =
+            Number(
+                finance.outstandingFeesRaw ??
+                finance.outstandingFees ??
+                0
+            );
+
+
+        const total =
+            collected +
+            outstanding;
+
+
+        const percentage =
+            total > 0
+                ? Math.round(
+                    (collected / total) *
+                    100
+                )
+                : 0;
+
+
+        const percentageElement =
+            root.querySelector(
+                "#collectionPercentage"
+            );
+
+
+        const collectedElement =
+            root.querySelector(
+                "#collectionCollected"
+            );
+
+
+        const outstandingElement =
+            root.querySelector(
+                "#collectionOutstanding"
+            );
+
+
+        if (percentageElement) {
+
+            percentageElement.textContent =
+                `${percentage}%`;
+        }
+
+
+        if (collectedElement) {
+
+            collectedElement.textContent =
+                finance.feesCollected ||
+                `₦${formatNumber(collected)}`;
+        }
+
+
+        if (outstandingElement) {
+
+            outstandingElement.textContent =
+                finance.outstandingFees ||
+                `₦${formatNumber(outstanding)}`;
+        }
+    }
+
+
+    function renderRecentActivity(
+        activity,
+        root = document
+    ) {
+
+        const candidates =
+            root.querySelectorAll(
+                ".activity-list, .recent-activity, .dashboard-activity"
+            );
+
+
+        if (!candidates.length) {
+            return;
+        }
+
+
+        const container =
+            candidates[0];
+
+
+        container.innerHTML =
+            activity
+                .slice(0, 10)
+                .map(
+                    item => `
+
+                        <div class="activity-item">
+
+                            <div class="activity-icon">
+                                ${escapeHtml(
+                                    item.icon ||
+                                    "📌"
+                                )}
+                            </div>
+
+                            <div class="activity-content">
+
+                                <strong>
+                                    ${escapeHtml(
+                                        item.title ||
+                                        "Activity"
+                                    )}
+                                </strong>
+
+                                <p>
+                                    ${escapeHtml(
+                                        item.name ||
+                                        "Unknown"
+                                    )}
+                                </p>
+
+                                <small>
+                                    ${escapeHtml(
+                                        item.description ||
+                                        ""
+                                    )}
+                                </small>
+
+                            </div>
+
+                            <span class="status ${statusClass(
+                                item.status
+                            )}">
+                                ${escapeHtml(
+                                    item.status ||
+                                    "Active"
+                                )}
+                            </span>
+
+                        </div>
+
+                    `
+                )
+                .join("");
+    }
+
+
+    async function hydrateOverview() {
 
         try {
-            const response = await apiRequest('/students', {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
 
-            showToast("Student added successfully!");
-            studentForm.reset();
-            if (studentModal) studentModal.style.display = "none";
-            loadStudents();
+            const data =
+                await loadDashboardOverview();
+
+
+            hydrateSchoolHeader(
+                data.school,
+                data.user
+            );
+
+
+            hydrateOverviewFromData(
+                data
+            );
+
         } catch (error) {
-            showToast(error.message || "Failed to add student.", "error");
+
+            console.error(
+                "Dashboard overview error:",
+                error
+            );
+
+
+            toast(
+                error.message,
+                "error"
+            );
         }
-    });
-}
-
-// ============================================================
-// UTILITIES & HELPERS
-// ============================================================
-
-function getStatusClass(status) {
-    switch (String(status || "").toLowerCase()) {
-        case "active":
-        case "paid":
-        case "published":
-            return "paid";
-        case "pending":
-        case "partial":
-        case "draft":
-            return "pending";
-        case "suspended":
-        case "inactive":
-        case "unpaid":
-        case "warning":
-            return "warning";
-        default:
-            return "paid";
     }
-}
 
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
 
-function showToast(message, type = "success") {
-    if (!toast) {
-        alert(message);
-        return;
-    }
-    toast.textContent = message;
-    toast.className = `toast ${type}`;
-    toast.classList.add("show");
+    /* =============================================================
+       STUDENTS
+       ============================================================= */
 
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3500);
-}
+    function renderStudents(
+        students,
+        root = document
+    ) {
 
-// UI Toggles & Dropdowns
-const reportsToggle = document.querySelector(".reports-toggle");
-if (reportsToggle) {
-    reportsToggle.addEventListener("click", () => {
-        reportsToggle.closest(".nav-group")?.classList.toggle("open");
-    });
-}
+        const table =
+            root.querySelector(
+                "#studentsTable"
+            );
 
-const settingsToggle = document.querySelector(".settings-toggle");
-if (settingsToggle) {
-    settingsToggle.addEventListener("click", () => {
-        settingsToggle.closest(".nav-group")?.classList.toggle("open");
-    });
-}
 
-if (menuToggle && sidebar) {
-    menuToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("open");
-    });
-}
-
-if (notificationButton && notificationDropdown) {
-    notificationButton.addEventListener("click", (e) => {
-        e.stopPropagation();
-        notificationDropdown.classList.toggle("show");
-    });
-
-    document.addEventListener("click", (e) => {
-        if (!notificationDropdown.contains(e.target) && !notificationButton.contains(e.target)) {
-            notificationDropdown.classList.remove("show");
+        if (!table) {
+            return;
         }
-    });
-}
 
-if (themeToggle) {
-    const savedTheme = localStorage.getItem("edutrust_theme");
-    if (savedTheme === "dark") {
-        document.body.classList.add("dark-mode");
-        themeToggle.textContent = "☀️";
+
+        table.innerHTML =
+            students.length
+
+                ? students
+                    .map(
+                        student => `
+
+                            <tr>
+
+                                <td>
+                                    ${escapeHtml(
+                                        student.admission_number ||
+                                        "—"
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        fullName(
+                                            student
+                                        )
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        student.gender ||
+                                        "—"
+                                    )}
+                                </td>
+
+                                <td>
+
+                                    ${escapeHtml(
+                                        student.class_name ||
+                                        "—"
+                                    )}
+
+                                    ${
+                                        student.arm
+                                            ? ` ${escapeHtml(
+                                                student.arm
+                                            )}`
+                                            : ""
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    <span class="status ${statusClass(
+                                        student.status
+                                    )}">
+                                        ${escapeHtml(
+                                            student.status ||
+                                            "Unknown"
+                                        )}
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        `
+                    )
+                    .join("")
+
+                : `
+
+                    <tr>
+
+                        <td colspan="5">
+                            No students found.
+                        </td>
+
+                    </tr>
+
+                `;
     }
 
-    themeToggle.addEventListener("click", () => {
-        document.body.classList.toggle("dark-mode");
-        const dark = document.body.classList.contains("dark-mode");
-        localStorage.setItem("edutrust_theme", dark ? "dark" : "light");
-        themeToggle.textContent = dark ? "☀️" : "🌙";
-    });
-}
 
-if (logoutButton) {
-    logoutButton.addEventListener("click", () => {
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token");
-        window.location.href = "login.html";
-    });
-}
+    function hydrateStudentsFromOverview(
+        data
+    ) {
 
-// ============================================================
-// INITIALIZATION
-// ============================================================
+        const page =
+            getPageElement(
+                "students"
+            );
 
-async function initializeDashboard() {
-    await loadProfile();
-    await loadOverviewData();
-}
 
-initializeDashboard();
+        if (!page) {
+            return;
+        }
+
+
+        const stats =
+            data.statistics ||
+            {};
+
+
+        const students =
+            data.recent?.students ||
+            [];
+
+
+        setStat(
+            "Total Students",
+            formatNumber(
+                stats.totalStudents
+            ),
+            page
+        );
+
+
+        setStat(
+            "Active Students",
+            formatNumber(
+                stats.activeStudents
+            ),
+            page
+        );
+
+
+        setStat(
+            "New Students",
+            formatNumber(
+                stats.newStudentsLast30Days
+            ),
+            page
+        );
+
+
+        renderStudents(
+            students,
+            page
+        );
+    }
+
+
+    async function hydrateStudentsPage() {
+
+        try {
+
+            const data =
+                dashboardData ||
+                await loadDashboardOverview();
+
+
+            hydrateStudentsFromOverview(
+                data
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Students page error:",
+                error
+            );
+
+
+            toast(
+                error.message,
+                "error"
+            );
+        }
+    }
+
+
+    /* =============================================================
+       PARENTS
+       ============================================================= */
+
+    function renderParents(
+        parents,
+        root = document
+    ) {
+
+        const table =
+            root.querySelector(
+                "#parentsTable"
+            );
+
+
+        if (!table) {
+            return;
+        }
+
+
+        table.innerHTML =
+            parents.length
+
+                ? parents
+                    .map(
+                        parent => `
+
+                            <tr>
+
+                                <td>
+                                    ${escapeHtml(
+                                        fullName(
+                                            parent
+                                        )
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        parent.relationship ||
+                                        "Parent/Guardian"
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        parent.phone ||
+                                        "—"
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        parent.email ||
+                                        "—"
+                                    )}
+                                </td>
+
+                                <td>
+
+                                    <span class="status ${statusClass(
+                                        parent.status
+                                    )}">
+                                        ${escapeHtml(
+                                            parent.status ||
+                                            "Unknown"
+                                        )}
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        `
+                    )
+                    .join("")
+
+                : `
+
+                    <tr>
+
+                        <td colspan="5">
+                            No parents found.
+                        </td>
+
+                    </tr>
+
+                `;
+    }
+
+
+    async function hydrateParentsPage() {
+
+        try {
+
+            const data =
+                dashboardData ||
+                await loadDashboardOverview();
+
+
+            const page =
+                getPageElement(
+                    "parents"
+                );
+
+
+            if (!page) {
+                return;
+            }
+
+
+            const stats =
+                data.statistics ||
+                {};
+
+
+            const parents =
+                data.recent?.parents ||
+                [];
+
+
+            setStat(
+                "Total Parents",
+                formatNumber(
+                    stats.totalParents
+                ),
+                page
+            );
+
+
+            setStat(
+                "Active Parents",
+                formatNumber(
+                    stats.activeParents
+                ),
+                page
+            );
+
+
+            renderParents(
+                parents,
+                page
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Parents page error:",
+                error
+            );
+
+
+            toast(
+                error.message,
+                "error"
+            );
+        }
+    }
+
+
+    /* =============================================================
+       STAFF & TEACHERS
+       ============================================================= */
+
+    function renderStaff(
+        staff,
+        root = document
+    ) {
+
+        const table =
+            Array.from(
+                root.querySelectorAll(
+                    ".table-container table"
+                )
+            )
+                .find(
+                    candidate => {
+
+                        const headers =
+                            Array.from(
+                                candidate.querySelectorAll(
+                                    "thead th"
+                                )
+                            )
+                                .map(
+                                    th =>
+                                        th.textContent
+                                            .trim()
+                                            .toLowerCase()
+                                );
+
+
+                        return (
+                            headers.includes(
+                                "name"
+                            ) &&
+                            headers.includes(
+                                "role"
+                            ) &&
+                            headers.includes(
+                                "email"
+                            ) &&
+                            headers.includes(
+                                "phone"
+                            ) &&
+                            headers.includes(
+                                "status"
+                            )
+                        );
+                    }
+                );
+
+
+        if (!table) {
+            return;
+        }
+
+
+        table.innerHTML =
+            staff.length
+
+                ? staff
+                    .map(
+                        user => `
+
+                            <tr>
+
+                                <td>
+                                    ${escapeHtml(
+                                        fullName(
+                                            user
+                                        )
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        user.role ||
+                                        "Staff"
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        user.email ||
+                                        "—"
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        user.phone ||
+                                        "—"
+                                    )}
+                                </td>
+
+                                <td>
+
+                                    <span class="status ${statusClass(
+                                        user.status
+                                    )}">
+                                        ${escapeHtml(
+                                            user.status ||
+                                            "Unknown"
+                                        )}
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        `
+                    )
+                    .join("")
+
+                : `
+
+                    <tr>
+
+                        <td colspan="5">
+                            No staff records found.
+                        </td>
+
+                    </tr>
+
+                `;
+    }
+
+
+    async function hydrateStaffPage() {
+
+        try {
+
+            const data =
+                dashboardData ||
+                await loadDashboardOverview();
+
+
+            const page =
+                getPageElement(
+                    "staff"
+                );
+
+
+            if (!page) {
+                return;
+            }
+
+
+            const stats =
+                data.statistics ||
+                {};
+
+
+            const staff =
+                data.recent?.staff ||
+                [];
+
+
+            setStat(
+                "Total Staff",
+                formatNumber(
+                    stats.totalStaff
+                ),
+                page
+            );
+
+
+            setStat(
+                "Teachers",
+                formatNumber(
+                    stats.teachers
+                ),
+                page
+            );
+
+
+            setStat(
+                "Administrative Staff",
+                formatNumber(
+                    stats.administrativeStaff
+                ),
+                page
+            );
+
+
+            setStat(
+                "Support Staff",
+                formatNumber(
+                    stats.supportStaff
+                ),
+                page
+            );
+
+
+            renderStaff(
+                staff,
+                page
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Staff page error:",
+                error
+            );
+
+
+            toast(
+                error.message,
+                "error"
+            );
+        }
+    }
+
+
+    /* =============================================================
+       SCHOOL MANAGEMENT
+       ============================================================= */
+
+    function hydrateSchoolDetails(
+        school,
+        root = document
+    ) {
+
+        if (!school) {
+            return;
+        }
+
+
+        const mappings = {
+
+            "School Name":
+                school.name,
+
+            "School Email":
+                school.email,
+
+            "Phone Number":
+                school.phone,
+
+            "School Address":
+                school.address,
+
+            "School Type":
+                school.school_type,
+
+            "Current Session":
+                school.academic_session,
+
+            "Current Term":
+                school.current_term,
+
+            "School Code":
+                school.school_code,
+
+            "Website":
+                school.website,
+
+            "Account Status":
+                school.status,
+
+            "School Status":
+                school.status
+        };
+
+
+        root
+            .querySelectorAll(
+                ".detail-item"
+            )
+            .forEach(
+                item => {
+
+                    const label =
+                        item
+                            .querySelector(
+                                "span"
+                            )
+                            ?.textContent
+                            ?.trim();
+
+
+                    const value =
+                        mappings[label];
+
+
+                    if (
+                        value ===
+                        undefined
+                    ) {
+                        return;
+                    }
+
+
+                    const strong =
+                        item.querySelector(
+                            "strong"
+                        );
+
+
+                    if (strong) {
+
+                        strong.textContent =
+                            value ||
+                            "—";
+                    }
+                }
+            );
+
+
+        root
+            .querySelectorAll(
+                ".status-overview h3"
+            )
+            .forEach(
+                element => {
+
+                    element.textContent =
+                        school.status ||
+                        "Unknown";
+                }
+            );
+
+
+        const sessionElements =
+            root.querySelectorAll(
+                ".status-information strong"
+            );
+
+
+        sessionElements.forEach(
+            element => {
+
+                if (
+                    element.parentElement
+                        ?.textContent
+                        ?.toLowerCase()
+                        .includes(
+                            "session"
+                        )
+                ) {
+
+                    element.textContent =
+                        school.academic_session ||
+                        "—";
+                }
+            }
+        );
+    }
+
+
+    function fillSchoolForm(
+        school,
+        user
+    ) {
+
+        const form =
+            document.querySelector(
+                ".school-form"
+            );
+
+
+        if (
+            !form ||
+            !school
+        ) {
+            return;
+        }
+
+
+        const inputs =
+            form.querySelectorAll(
+                "input, textarea, select"
+            );
+
+
+        inputs.forEach(
+            input => {
+
+                const label =
+                    input
+                        .parentElement
+                        ?.querySelector(
+                            "label"
+                        )
+                        ?.textContent
+                        ?.trim()
+                        .toLowerCase();
+
+
+                if (!label) {
+                    return;
+                }
+
+
+                if (
+                    label.includes(
+                        "school name"
+                    )
+                ) {
+
+                    input.value =
+                        school.name ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "school code"
+                    )
+                ) {
+
+                    input.value =
+                        school.school_code ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "principal"
+                    )
+                ) {
+
+                    input.value =
+                        user?.full_name ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "phone"
+                    )
+                ) {
+
+                    input.value =
+                        school.phone ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "email"
+                    )
+                ) {
+
+                    input.value =
+                        school.email ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "address"
+                    )
+                ) {
+
+                    input.value =
+                        school.address ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "school type"
+                    )
+                ) {
+
+                    input.value =
+                        school.school_type ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "session"
+                    )
+                ) {
+
+                    input.value =
+                        school.academic_session ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "term"
+                    )
+                ) {
+
+                    input.value =
+                        school.current_term ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "motto"
+                    )
+                ) {
+
+                    input.value =
+                        school.motto ||
+                        "";
+                }
+
+
+                if (
+                    label.includes(
+                        "website"
+                    )
+                ) {
+
+                    input.value =
+                        school.website ||
+                        "";
+                }
+            }
+        );
+    }
+
+
+    async function hydrateSchoolPages() {
+
+        try {
+
+            const data =
+                dashboardData ||
+                await loadDashboardOverview();
+
+
+            hydrateSchoolHeader(
+                data.school,
+                data.user
+            );
+
+
+            const schoolPage =
+                getPageElement(
+                    "school"
+                );
+
+
+            const profilePage =
+                getPageElement(
+                    "school-profile"
+                );
+
+
+            if (schoolPage) {
+
+                hydrateSchoolDetails(
+                    data.school,
+                    schoolPage
+                );
+            }
+
+
+            if (profilePage) {
+
+                hydrateSchoolDetails(
+                    data.school,
+                    profilePage
+                );
+            }
+
+
+            fillSchoolForm(
+                data.school,
+                data.user
+            );
+
+        } catch (error) {
+
+            console.error(
+                "School page error:",
+                error
+            );
+
+
+            toast(
+                error.message,
+                "error"
+            );
+        }
+    }
+
+
+    /* =============================================================
+       SCHOOL FORM
+       -------------------------------------------------------------
+       The current backend exposes dashboard overview.
+       Until a confirmed PUT school endpoint is available,
+       the dashboard does not pretend that a school update
+       succeeded.
+       ============================================================= */
+
+    function setupSchoolForm() {
+
+        const form =
+            document.querySelector(
+                ".school-form"
+            );
+
+
+        if (!form) {
+            return;
+        }
+
+
+        form.addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+
+                toast(
+                    "School editing UI is ready. Add the authenticated school PUT endpoint before saving changes.",
+                    "error"
+                );
+            }
+        );
+    }
+
+
+    /* =============================================================
+       ADD STUDENT BUTTONS
+       ============================================================= */
+
+    function setupAddStudentButtons() {
+
+        document.addEventListener(
+            "click",
+            event => {
+
+                const button =
+                    event.target.closest(
+                        ".primary-button"
+                    );
+
+
+                if (!button) {
+                    return;
+                }
+
+
+                const text =
+                    button.textContent
+                        .trim()
+                        .toLowerCase();
+
+
+                if (
+                    text.includes(
+                        "add student"
+                    )
+                ) {
+
+                    showPage(
+                        "students"
+                    );
+
+
+                    toast(
+                        "Students section opened."
+                    );
+                }
+            }
+        );
+    }
+
+
+    /* =============================================================
+       INITIAL LOAD
+       ============================================================= */
+
+    async function initDashboard() {
+
+        if (!getToken()) {
+
+            window.location.href =
+                "index.html";
+
+            return;
+        }
+
+
+        setupNavigation();
+
+        setupSidebar();
+
+        setupNotifications();
+
+        setupTheme();
+
+        setupLogout();
+
+        setupSearch();
+
+        setupSchoolForm();
+
+        setupAddStudentButtons();
+
+
+        showPage(
+            "overview"
+        );
+    }
+
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initDashboard
+    );
+
+})();
