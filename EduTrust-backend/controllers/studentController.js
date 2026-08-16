@@ -12,18 +12,14 @@ const getSchoolId = (req) => {
 // =====================================================
 // REGISTER STUDENT
 // =====================================================
+const School = require("../models/School"); // Ensure School model is imported
+
 exports.registerStudent = async (req, res) => {
     try {
-        const school_id = getSchoolId(req);
-
-        if (!school_id) {
-            return res.status(400).json({
-                success: false,
-                message: "School account could not be identified."
-            });
-        }
+        let school_id = getSchoolId(req); // Try getting from auth middleware (if logged in)
 
         const {
+            school_code, // <-- Read school_code from public form payload
             parent_id,
             admission_number,
             first_name,
@@ -38,6 +34,31 @@ exports.registerStudent = async (req, res) => {
             passport
         } = req.body;
 
+        // IF public registration (no auth token), look up school by school_code
+        if (!school_id) {
+            if (!school_code || !school_code.trim()) {
+                return res.status(400).json({
+                    success: false,
+                    message: "School code is required."
+                });
+            }
+
+            // Find school by code (case-insensitive)
+            const school = await School.findOne({
+                school_code: { $regex: new RegExp(`^${school_code.trim()}$`, "i") }
+            });
+
+            if (!school) {
+                return res.status(404).json({
+                    success: false,
+                    message: "School account could not be identified with the provided code."
+                });
+            }
+
+            school_id = school._id;
+        }
+
+        // Validate required fields
         if (
             !admission_number?.trim() ||
             !first_name?.trim() ||
@@ -53,6 +74,7 @@ exports.registerStudent = async (req, res) => {
             });
         }
 
+        // Validate parent if provided
         if (parent_id) {
             const parent = await Parent.findOne({
                 _id: parent_id,
@@ -67,8 +89,7 @@ exports.registerStudent = async (req, res) => {
             }
         }
 
-        const normalizedAdmissionNumber =
-            admission_number.trim();
+        const normalizedAdmissionNumber = admission_number.trim();
 
         const existingStudent = await Student.findOne({
             school_id,
@@ -78,11 +99,11 @@ exports.registerStudent = async (req, res) => {
         if (existingStudent) {
             return res.status(409).json({
                 success: false,
-                message:
-                    "A student with this admission number already exists."
+                message: "A student with this admission number already exists."
             });
         }
 
+        // Create student with status: "Pending"
         const student = await Student.create({
             school_id,
             parent_id: parent_id || null,
