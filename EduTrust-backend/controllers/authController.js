@@ -388,6 +388,17 @@ exports.login = async (req, res) => {
         }
 
         // ==================================================
+        // ROLE VALIDATION (PREVENT PARENT LOGIN HERE)
+        // ==================================================
+
+        if (user.role !== "principal" && user.role !== "admin") {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied. Please use the Parent Portal to log in."
+            });
+        }
+
+        // ==================================================
         // ACCOUNT STATUS
         // ==================================================
 
