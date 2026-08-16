@@ -104,8 +104,6 @@
                 SYSTEM
             </p>
 
-            <!-- REPORTS -->
-
             <div class="nav-group">
 
                 <button class="nav-item reports-toggle" type="button">
@@ -141,8 +139,6 @@
                 </div>
 
             </div>
-
-            <!-- SETTINGS -->
 
             <div class="nav-group">
 
@@ -212,13 +208,7 @@
     </aside>
 
 
-    <!-- =========================================================
-         MAIN AREA
-    ========================================================== -->
-
     <main class="main-area">
-
-        <!-- TOPBAR -->
 
         <header class="topbar">
 
@@ -315,7 +305,6 @@
                         <button
                             class="view-all-notifications"
                             type="button"
-                            data-page="notifications"
                         >
                             View All Notifications →
                         </button>
@@ -329,18 +318,10 @@
         </header>
 
 
-        <!-- =====================================================
-             CONTENT AREA
-        ====================================================== -->
-
         <section
             class="content-area"
             id="contentArea"
         >
-
-            <!-- =================================================
-                 OVERVIEW
-            ================================================== -->
 
             <div
                 class="page-content"
@@ -365,15 +346,12 @@
                         class="primary-button"
                         id="addStudentButton"
                         type="button"
-                        data-page="students"
                     >
                         + Add Student
                     </button>
 
                 </div>
 
-
-                <!-- STATISTICS -->
 
                 <div class="stats-grid">
 
@@ -469,7 +447,7 @@
                         <div class="stat-card-top">
 
                             <span class="stat-icon purple">
-                                👨‍bash
+                                👨‍👩‍👧
                             </span>
 
                             <span class="stat-change positive">
@@ -495,11 +473,7 @@
                 </div>
 
 
-                <!-- DASHBOARD GRID -->
-
                 <div class="dashboard-grid">
-
-                    <!-- RECENT PAYMENTS -->
 
                     <div class="dashboard-card">
 
@@ -526,6 +500,7 @@
                             </button>
 
                         </div>
+
 
                         <div class="table-container">
 
@@ -560,7 +535,7 @@
                                     <tr>
 
                                         <td colspan="4">
-                                            Loading payment records...
+                                            No payment records available.
                                         </td>
 
                                     </tr>
@@ -573,8 +548,6 @@
 
                     </div>
 
-
-                    <!-- FEE COLLECTION -->
 
                     <div class="dashboard-card">
 
@@ -594,6 +567,7 @@
 
                         </div>
 
+
                         <div class="collection-progress">
 
                             <div class="progress-circle">
@@ -607,6 +581,7 @@
                                 </span>
 
                             </div>
+
 
                             <div class="progress-details">
 
@@ -623,6 +598,7 @@
                                     </strong>
 
                                 </div>
+
 
                                 <div>
 
@@ -649,10 +625,6 @@
             </div>
 
 
-            <!-- =================================================
-                 SCHOOL MANAGEMENT
-            ================================================== -->
-
             <div
                 class="page-content hidden"
                 id="schoolPage"
@@ -673,6 +645,7 @@
                     </div>
 
                 </div>
+
 
                 <div class="dashboard-card">
 
@@ -907,10 +880,6 @@
             </div>
 
 
-            <!-- =================================================
-                 STUDENTS
-            ================================================== -->
-
             <div
                 class="page-content hidden"
                 id="studentsPage"
@@ -932,12 +901,14 @@
 
                     <button
                         class="primary-button"
-                        id="add-student-button"
+                        id="studentsAddButton"
+                        type="button"
                     >
                         + Add Student
                     </button>
 
                 </div>
+
 
                 <div class="dashboard-card">
 
@@ -956,6 +927,7 @@
                         </div>
 
                     </div>
+
 
                     <div class="table-container">
 
@@ -1010,10 +982,6 @@
             </div>
 
 
-            <!-- =================================================
-                 PARENTS
-            ================================================== -->
-
             <div
                 class="page-content hidden"
                 id="parentsPage"
@@ -1042,6 +1010,7 @@
 
                 </div>
 
+
                 <div class="dashboard-card">
 
                     <div class="card-header">
@@ -1059,6 +1028,7 @@
                         </div>
 
                     </div>
+
 
                     <div class="table-container">
 
@@ -1113,10 +1083,6 @@
             </div>
 
 
-            <!-- =================================================
-                 STAFF
-            ================================================== -->
-
             <div
                 class="page-content hidden"
                 id="staffPage"
@@ -1136,11 +1102,12 @@
 
                     </div>
 
-                    <button class="primary-button" id="addStaffButton">
+                    <button class="primary-button">
                         + Add Staff
                     </button>
 
                 </div>
+
 
                 <div class="dashboard-card">
 
@@ -1155,6 +1122,7 @@
                         </div>
 
                     </div>
+
 
                     <div class="table-container">
 
@@ -1188,12 +1156,12 @@
 
                             </thead>
 
-                            <tbody id="staffTable">
+                            <tbody>
 
                                 <tr>
 
                                     <td colspan="5">
-                                        Loading staff members...
+                                        Staff management will appear here.
                                     </td>
 
                                 </tr>
@@ -1208,10 +1176,6 @@
 
             </div>
 
-
-            <!-- =================================================
-                 FEES
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1241,52 +1205,14 @@
                         <div>
 
                             <h3>
-                                Fee Management Overview
+                                Fee Management
                             </h3>
 
                             <p>
-                                Real-time fee collection status.
+                                Fee management data will be connected to the backend.
                             </p>
 
                         </div>
-
-                    </div>
-
-                    <div class="table-container">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Student</th>
-
-                                    <th>Class</th>
-
-                                    <th>Expected Amount</th>
-
-                                    <th>Amount Paid</th>
-
-                                    <th>Status</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="feesTable">
-
-                                <tr>
-
-                                    <td colspan="5">
-                                        Loading school fee data...
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
 
                     </div>
 
@@ -1294,10 +1220,6 @@
 
             </div>
 
-
-            <!-- =================================================
-                 FEE STRUCTURES
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1321,65 +1243,11 @@
                 </div>
 
                 <div class="dashboard-card">
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <h3>
-                                Active Fee Structures
-                            </h3>
-
-                        </div>
-
-                    </div>
-
-                    <div class="table-container">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Structure Name</th>
-
-                                    <th>Class</th>
-
-                                    <th>Term</th>
-
-                                    <th>Total Amount</th>
-
-                                    <th>Status</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="feeStructuresTable">
-
-                                <tr>
-
-                                    <td colspan="5">
-                                        Loading fee structures...
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
+                    Fee structures will appear here.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 PAYMENTS
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1403,53 +1271,11 @@
                 </div>
 
                 <div class="dashboard-card">
-
-                    <div class="table-container">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Parent</th>
-
-                                    <th>Student</th>
-
-                                    <th>Amount</th>
-
-                                    <th>Date</th>
-
-                                    <th>Status</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="paymentsTable">
-
-                                <tr>
-
-                                    <td colspan="5">
-                                        Loading payment history...
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
+                    Payment records will appear here.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 OUTSTANDING
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1473,55 +1299,11 @@
                 </div>
 
                 <div class="dashboard-card">
-
-                    <div class="table-container">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Student</th>
-
-                                    <th>Parent / Guardian</th>
-
-                                    <th>Class</th>
-
-                                    <th>Total Fee</th>
-
-                                    <th>Balance</th>
-
-                                    <th>Status</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="outstandingTable">
-
-                                <tr>
-
-                                    <td colspan="6">
-                                        Loading outstanding records...
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
+                    Outstanding fee records will appear here.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 ANNOUNCEMENTS
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1544,16 +1326,12 @@
 
                 </div>
 
-                <div class="dashboard-card" id="announcementsListContainer">
-                    Loading announcements...
+                <div class="dashboard-card">
+                    No announcements yet.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 MESSAGES
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1576,16 +1354,12 @@
 
                 </div>
 
-                <div class="dashboard-card" id="messagesListContainer">
-                    Loading messages...
+                <div class="dashboard-card">
+                    No messages yet.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 NOTIFICATIONS
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1608,16 +1382,12 @@
 
                 </div>
 
-                <div class="dashboard-card" id="notificationsPageList">
-                    Loading notifications...
+                <div class="dashboard-card">
+                    No notifications yet.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 SCHOOL PROFILE
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1643,17 +1413,13 @@
                 <div class="dashboard-card">
 
                     <p>
-                        Use <button class="text-button" data-page="school">School Management</button> to edit your school details.
+                        Use School Management to edit your school.
                     </p>
 
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 USER ROLES
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1677,15 +1443,11 @@
                 </div>
 
                 <div class="dashboard-card">
-                    User roles management system active.
+                    User roles management will appear here.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 PAYMENT SETTINGS
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1709,15 +1471,11 @@
                 </div>
 
                 <div class="dashboard-card">
-                    Payment gateway integrated.
+                    Payment settings will appear here.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 SECURITY
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1741,15 +1499,11 @@
                 </div>
 
                 <div class="dashboard-card">
-                    Security settings configured.
+                    Security settings will appear here.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 EMAIL SETTINGS
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1773,15 +1527,11 @@
                 </div>
 
                 <div class="dashboard-card">
-                    Email and SMS communication tools ready.
+                    Email and SMS settings will appear here.
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 BACKUP
-            ================================================== -->
 
             <div
                 class="page-content hidden"
@@ -1805,7 +1555,7 @@
                 </div>
 
                 <div class="dashboard-card">
-                    Database automated backups enabled.
+                    Backup management will appear here.
                 </div>
 
             </div>
@@ -1817,167 +1567,11 @@
 </div>
 
 
-<!-- ADD STUDENT MODAL -->
+<div
+    id="toast"
+    class="toast"
+></div>
 
-<div class="student-modal" id="student-modal" style="display: none;">
-
-    <div class="student-modal-content">
-
-        <div class="modal-header">
-
-            <div>
-
-                <h2>Add New Student</h2>
-
-                <p>Register a new student in your school.</p>
-
-            </div>
-
-            <button type="button" class="close-modal" id="close-student-modal">×</button>
-
-        </div>
-
-        <form id="student-form">
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="student-first-name">First Name</label>
-
-                    <input type="text" id="student-first-name" placeholder="Enter first name" required>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="student-last-name">Last Name</label>
-
-                    <input type="text" id="student-last-name" placeholder="Enter last name" required>
-
-                </div>
-
-            </div>
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="student-gender">Gender</label>
-
-                    <select id="student-gender" required>
-
-                        <option value="">Select gender</option>
-
-                        <option value="Male">Male</option>
-
-                        <option value="Female">Female</option>
-
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="student-class">Class</label>
-
-                    <select id="student-class" required>
-
-                        <option value="">Select class</option>
-
-                        <optgroup label="Nursery">
-
-                            <option>Nursery 1</option>
-
-                            <option>Nursery 2</option>
-
-                            <option>Nursery 3</option>
-
-                        </optgroup>
-
-                        <optgroup label="Primary">
-
-                            <option>Primary 1</option>
-
-                            <option>Primary 2</option>
-
-                            <option>Primary 3</option>
-
-                            <option>Primary 4</option>
-
-                            <option>Primary 5</option>
-
-                            <option>Primary 6</option>
-
-                        </optgroup>
-
-                        <optgroup label="Junior Secondary School">
-
-                            <option>JSS 1</option>
-
-                            <option>JSS 2</option>
-
-                            <option>JSS 3</option>
-
-                        </optgroup>
-
-                        <optgroup label="Senior Secondary School">
-
-                            <option>SS 1</option>
-
-                            <option>SS 2</option>
-
-                            <option>SS 3</option>
-
-                        </optgroup>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="student-email">Email Address</label>
-
-                <input type="email" id="student-email" placeholder="student@example.com" required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="student-phone">Phone Number</label>
-
-                <input type="tel" id="student-phone" placeholder="Enter phone number" required>
-
-            </div>
-
-            <div class="modal-actions">
-
-                <button type="button" class="cancel-button" id="cancel-student-modal">Cancel</button>
-
-                <button type="submit" class="primary-button">Add Student</button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-
-<!-- =============================================================
-     TOAST
-============================================================= -->
-
-<div id="toast" class="toast"></div>
-
-
-<!-- =============================================================
-     DASHBOARD JAVASCRIPT
-============================================================= -->
 
 <script src="dashboard.js"></script>
 
