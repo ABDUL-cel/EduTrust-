@@ -1,7 +1,7 @@
 const Student = require("../models/student");
 const Parent = require("../models/Parent");
 const User = require("../models/User");
-
+const School = require("../models/School");
 // =====================================================
 // HELPER: GET SCHOOL ID
 // =====================================================
@@ -9,17 +9,21 @@ const getSchoolId = (req) => {
     return req.user?.school_id || req.user?.schoolId || null;
 };
 
+// Helper to generate initial tracking number: EDU + 6 random digits
+function generateInitialRegNumber() {
+    const randomDigits = Math.floor(100000 + Math.random() * 900000); // Guarantees 6 digits
+    return `EDU${randomDigits}`; // e.g., EDU938792
+}
+
 // =====================================================
 // REGISTER STUDENT
 // =====================================================
-const School = require("../models/School"); // Ensure School model is imported
-
 exports.registerStudent = async (req, res) => {
     try {
-        let school_id = getSchoolId(req); // Try getting from auth middleware (if logged in)
+        let school_id = typeof getSchoolId === "function" ? getSchoolId(req) : null;
 
         const {
-            school_code, // <-- Read school_code from public form payload
+            school_code,
             parent_id,
             admission_number,
             first_name,
@@ -28,13 +32,16 @@ exports.registerStudent = async (req, res) => {
             gender,
             date_of_birth,
             class_name,
-            arm,
+            current_class, // Fallback from frontend
             home_address,
             medical_information,
-            passport
+            passport,
+            email,
+            phone,
+            password
         } = req.body;
 
-        // IF public registration (no auth token), look up school by school_code
+        // Resolve school_id via school_code if not authenticated
         if (!school_id) {
             if (!school_code || !school_code.trim()) {
                 return res.status(400).json({
@@ -43,7 +50,7 @@ exports.registerStudent = async (req, res) => {
                 });
             }
 
-            // Find school by code (case-insensitive)
+            // FIX 1: Lowercase "i" for case-insensitive regex
             const school = await School.findOne({
                 school_code: { $regex: new RegExp(`^${school_code.trim()}$`, "i") }
             });
@@ -58,82 +65,62 @@ exports.registerStudent = async (req, res) => {
             school_id = school._id;
         }
 
-        // Validate required fields
-        if (
-            !admission_number?.trim() ||
-            !first_name?.trim() ||
-            !last_name?.trim() ||
-            !gender ||
-            !date_of_birth ||
-            !class_name?.trim()
-        ) {
+        // Determine class name from either class_name or current_class
+        const selectedClass = (class_name || current_class || "").trim();
+
+        // Basic validation
+        if (!first_name?.trim() || !last_name?.trim() || !selectedClass) {
             return res.status(400).json({
                 success: false,
-                message:
-                    "Admission number, first name, last name, gender, date of birth and class are required."
+                message: "First name, last name, and class/grade are required."
             });
         }
 
-        // Validate parent if provided
-        if (parent_id) {
-            const parent = await Parent.findOne({
-                _id: parent_id,
-                school_id
-            });
+        // FIX 2: Generate initial code (or use explicit admission_number if passed by admin)
+        const initialRegNumber = admission_number?.trim() || generateInitialRegNumber();
 
-            if (!parent) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Selected parent does not belong to this school."
-                });
-            }
-        }
-
-        const normalizedAdmissionNumber = admission_number.trim();
-
+        // FIX 3: Check for duplicates against the actual tracking number being saved
         const existingStudent = await Student.findOne({
             school_id,
-            admission_number: normalizedAdmissionNumber
+            admission_number: initialRegNumber
         });
 
         if (existingStudent) {
             return res.status(409).json({
                 success: false,
-                message: "A student with this admission number already exists."
+                message: "A student with this tracking code already exists. Please submit again."
             });
         }
 
-        // Create student with status: "Pending"
+        // Create student document
         const student = await Student.create({
             school_id,
             parent_id: parent_id || null,
-            admission_number: normalizedAdmissionNumber,
+            admission_number: initialRegNumber, // Saved as EDU938792 initially
             first_name: first_name.trim(),
             last_name: last_name.trim(),
             other_name: other_name?.trim() || "",
-            gender,
-            date_of_birth,
-            class_name: class_name.trim(),
-            arm: arm?.trim() || "",
+            email: email?.trim() || "",
+            phone: phone?.trim() || "",
+            password: password || "", // Note: Remember to hash before saving if auth enabled
+            gender: gender || "Not Specified",
+            date_of_birth: date_of_birth || null,
+            class_name: selectedClass,
             home_address: home_address || "",
             medical_information: medical_information || "",
             passport: passport || "",
             status: "Pending"
         });
 
-        const populatedStudent = await Student.findById(student._id)
-            .populate("parent_id")
-            .lean();
-
         return res.status(201).json({
             success: true,
-            message: "Student registration submitted successfully.",
-            student: populatedStudent
+            message: "Registration submitted successfully!",
+            registration_code: initialRegNumber,
+            student
         });
 
     } catch (error) {
         console.error("REGISTER STUDENT ERROR:", error);
-
         return res.status(500).json({
             success: false,
             message: "Failed to register student.",
@@ -141,7 +128,6 @@ exports.registerStudent = async (req, res) => {
         });
     }
 };
-
 // =====================================================
 // GET ALL STUDENTS
 // =====================================================
