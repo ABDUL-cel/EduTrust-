@@ -452,6 +452,13 @@ exports.loginParent = async (
             });
         }
 
+        // Inside your Parent Login Controller
+if (user.role !== "parent") {
+    return res.status(403).json({
+        success: false,
+        message: "Access denied. School staff must log in via the main portal."
+    });
+}
         // ==================================================
         // STATUS
         // ==================================================
