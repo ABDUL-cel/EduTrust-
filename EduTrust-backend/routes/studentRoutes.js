@@ -9,6 +9,7 @@ const {
     getPendingStudents,
     getActiveStudents,
     approveStudent,
+    rejectStudent,
     updateStudent,
     suspendStudent,
     reinstateStudent,
@@ -109,6 +110,12 @@ router.patch(
     "/:id/approve",
     authMiddleware,
     approveStudent
+);
+
+router.patch(
+    "/:id/reject",
+    authMiddleware,
+    rejectStudent
 );
 
 router.put(
