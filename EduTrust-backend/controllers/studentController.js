@@ -948,7 +948,7 @@ exports.getStudentDashboardData = async (req, res) => {
             error: error.message
         });
     }
-};====================================================
+};
 // backend/controllers/studentController.js
 // IMPORTANT ADDITION:
 // LINK A STUDENT TO A PARENT
