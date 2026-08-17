@@ -41,7 +41,7 @@ const registrationLimiter = rateLimit({
 // REGISTER STUDENT (PUBLIC ACCESS + RATE LIMITED)
 // =====================================================
 router.post(
-    "/",
+    "/register", // <--- Change "/" to "/register"
     registrationLimiter,
     registerStudent
 );
