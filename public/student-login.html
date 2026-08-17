@@ -184,7 +184,7 @@
     </form>
 
     <div class="footer">
-        Don't have an account? <a href="student-register.html">Register here</a>
+        Don't have an account? <a href="register.html">Register here</a>
     </div>
 </div>
 
@@ -193,33 +193,45 @@
     const alertBox = document.getElementById("alertBox");
     const submitBtn = document.getElementById("submitBtn");
 
+    // Live Render Service Backend Base URL
+    const BASE_URL = "https://edutrust-15ii.onrender.com";
+
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         alertBox.style.display = 'none';
 
-        const email = document.getElementById("email").value;
+        const email = document.getElementById("email").value.trim().toLowerCase();
         const password = document.getElementById("password").value;
 
         submitBtn.disabled = true;
         submitBtn.textContent = "Authenticating...";
 
         try {
-            const res = await fetch("/api/students/login", {
+            const res = await fetch(`${BASE_URL}/api/students/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password })
             });
 
             const data = await res.json();
-            if (!res.ok) throw new Error(data.message || "Invalid credentials.");
+            
+            if (!res.ok) {
+                throw new Error(data.message || "Invalid credentials.");
+            }
 
+            // Save Token and User payload to local storage
             localStorage.setItem("edutrust_token", data.token);
-            localStorage.setItem("edutrust_user", JSON.stringify(data.user));
+            localStorage.setItem("edutrust_user", JSON.stringify(data.user || data.student));
 
-            window.location.href = "/student-dashboard.html";
+            // Redirect to dashboard
+            window.location.href = "student-dashboard.html";
 
         } catch (err) {
-            alertBox.textContent = err.message;
+            const errorMessage = err.name === "TypeError" 
+                ? "Network error: Unable to connect to server. Render service may be waking up." 
+                : err.message;
+
+            alertBox.textContent = errorMessage;
             alertBox.style.display = 'block';
         } finally {
             submitBtn.disabled = false;
