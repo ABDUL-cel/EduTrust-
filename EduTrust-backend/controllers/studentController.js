@@ -12,15 +12,20 @@ const getSchoolId = (req) => {
 
 // Helper to generate initial tracking number: EDU + 6 random digits
 function generateInitialRegNumber() {
-    const randomDigits = Math.floor(100000 + Math.random() * 900000); // Guarantees 6 digits
-    return `EDU${randomDigits}`; // e.g., EDU938792
+    const randomDigits = Math.floor(100000 + Math.random() * 900000);
+    return `EDU${randomDigits}`;
+}
+
+// Helper to safely escape special characters in regular expressions
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // =====================================================
 // HELPER: GENERATE SCHOOL-BRANDED ADMISSION NUMBER
 // =====================================================
 async function generateOfficialAdmissionNo(school, className, arm = "", department = "") {
-    // 1. Get 3-letter prefix from School Name (e.g., "Adewole" -> "ADE")
+    // 1. Get 3-letter prefix from School Name or Code
     let schoolPrefix = "SCH";
     
     if (school?.school_code && school.school_code.trim().length >= 3) {
@@ -67,7 +72,7 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
 
         categoryCode = armLetter ? `${level}/${armLetter}` : level;
     }
-    // --- PRIMARY / NURSERY / CRECHE (NO ARMS, LEVEL ONLY) ---
+    // --- PRIMARY / NURSERY / CRECHE ---
     else {
         const lowerLevelMatch = rawClass.match(/(PRM[1-6]|PRIMARY[1-6]|NUR[1-3]|NURSERY[1-3]|CRECHE)/);
         
@@ -83,8 +88,9 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
     // 3. Current Registration Year
     const year = new Date().getFullYear();
 
-    // 4. Check database for existing count under this exact prefix structure
-    const pattern = new RegExp(`^${schoolPrefix}/${categoryCode}/${year}/`);
+    // 4. Build pattern regex dynamically (escaped)
+    const basePrefix = `${schoolPrefix}/${categoryCode}/${year}/`;
+    const pattern = new RegExp(`^${escapeRegExp(basePrefix)}`);
 
     const count = await Student.countDocuments({
         school_id: school._id,
@@ -94,8 +100,7 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
     // 5. Build 4-digit sequence (0001, 0002...)
     const nextSeq = (count + 1).toString().padStart(4, "0");
 
-    // Output: ADE/PRM1/2026/0001 or ADE/JSS1/A/2026/0001 or ADE/SS1/ART/2026/0001
-    return `${schoolPrefix}/${categoryCode}/${year}/${nextSeq}`;
+    return `${basePrefix}${nextSeq}`;
 }
 
 // =====================================================
@@ -126,7 +131,6 @@ exports.registerStudent = async (req, res) => {
             password
         } = req.body;
 
-        // Resolve school_id via school_code if not authenticated
         if (!school_id) {
             if (!school_code || !school_code.trim()) {
                 return res.status(400).json({
@@ -136,7 +140,7 @@ exports.registerStudent = async (req, res) => {
             }
 
             const school = await School.findOne({
-                school_code: { $regex: new RegExp(`^${school_code.trim()}$`, "i") }
+                school_code: { $regex: new RegExp(`^${escapeRegExp(school_code.trim())}$`, "i") }
             });
 
             if (!school) {
@@ -175,7 +179,7 @@ exports.registerStudent = async (req, res) => {
         const student = await Student.create({
             school_id,
             parent_id: parent_id || null,
-            admission_number: initialRegNumber, // Temporary (e.g., EDU938792)
+            admission_number: initialRegNumber,
             first_name: first_name.trim(),
             last_name: last_name.trim(),
             other_name: other_name?.trim() || "",
@@ -239,7 +243,6 @@ exports.approveStudent = async (req, res) => {
 
         const school = await School.findById(school_id);
 
-        // Generate official dynamic admission number
         const officialAdmissionNumber = await generateOfficialAdmissionNo(
             school,
             studentToApprove.class_name,
@@ -713,6 +716,13 @@ exports.linkParentToStudent = async (req, res) => {
         const school_id = getSchoolId(req);
         const { parent_id } = req.body;
 
+        if (!school_id) {
+            return res.status(400).json({
+                success: false,
+                message: "Your account is not connected to a school."
+            });
+        }
+
         if (!parent_id) {
             return res.status(400).json({
                 success: false,
@@ -720,12 +730,16 @@ exports.linkParentToStudent = async (req, res) => {
             });
         }
 
-        const parent = await Parent.findOne({ _id: parent_id, school_id });
+        const parent = await Parent.findOne({
+            _id: parent_id,
+            school_id,
+            status: "Active"
+        });
 
         if (!parent) {
             return res.status(404).json({
                 success: false,
-                message: "Parent not found in this school."
+                message: "Parent not found in this school or account is inactive."
             });
         }
 
@@ -948,165 +962,4 @@ exports.getStudentDashboardData = async (req, res) => {
             error: error.message
         });
     }
-};
-// backend/controllers/studentController.js
-// IMPORTANT ADDITION:
-// LINK A STUDENT TO A PARENT
-// ============================================================
-// ============================================================
-// LINK STUDENT TO PARENT
-// Principal / authorized school staff
-// ============================================================
-
-exports.linkStudentParent = async (req, res) => {
-
-    try {
-
-        const schoolId =
-            req.user?.school_id;
-
-        const studentId =
-            req.params.id;
-
-        const {
-            parent_id
-        } = req.body;
-
-
-        if (!schoolId) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Your account is not connected to a school."
-
-            });
-
-        }
-
-
-        if (!parent_id) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Parent ID is required."
-
-            });
-
-        }
-
-
-        // ====================================================
-        // FIND PARENT IN SAME SCHOOL
-        // ====================================================
-
-        const parent =
-            await Parent.findOne({
-
-                _id:
-                    parent_id,
-
-                school_id:
-                    schoolId,
-
-                status: "Active"
-
-            });
-
-
-        if (!parent) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "Parent not found in this school."
-
-            });
-
-        }
-
-
-        // ====================================================
-        // FIND STUDENT IN SAME SCHOOL
-        // ====================================================
-
-        const student =
-            await Student.findOneAndUpdate(
-
-                {
-                    _id:
-                        studentId,
-
-                    school_id:
-                        schoolId
-
-                },
-
-                {
-                    parent_id:
-                        parent._id
-                },
-
-                {
-                    new: true,
-                    runValidators: true
-                }
-
-            );
-
-
-        if (!student) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "Student not found."
-
-            });
-
-        }
-
-
-        return res.status(200).json({
-
-            success: true,
-
-            message:
-                "Student successfully linked to parent.",
-
-            student
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "LINK STUDENT PARENT ERROR:",
-            error
-        );
-
-        return res.status(500).json({
-
-            success: false,
-
-            message:
-                "Failed to link student to parent.",
-
-            error:
-                error.message
-
-        });
-
-    }
-
 };
