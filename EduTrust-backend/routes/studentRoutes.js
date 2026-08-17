@@ -45,7 +45,12 @@ router.post(
     registrationLimiter,
     registerStudent
 );
-
+// Student Login (ADD THIS BLOCK)
+// =====================================================
+router.post(
+    "/login",
+    loginStudent
+);
 // =====================================================
 // LOGGED-IN STUDENT PROFILE & DASHBOARD
 // =====================================================
