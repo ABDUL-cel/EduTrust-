@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration | EduTrust Portal</title>
+    <title>Student Registration | EduTrust</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,13 +36,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 2rem 1rem;
+            padding: 2.5rem 1rem;
         }
 
         .card {
             background: var(--card-bg);
             width: 100%;
-            max-width: 580px;
+            max-width: 680px;
             padding: 2.5rem;
             border-radius: 16px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
@@ -79,6 +79,18 @@
             font-size: 0.95rem;
         }
 
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1.5rem 0 0.75rem 0;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid var(--accent);
+            grid-column: span 2;
+        }
+
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -111,7 +123,7 @@
             align-items: center;
         }
 
-        input {
+        input, select, textarea {
             width: 100%;
             padding: 0.8rem 1rem;
             border: 1.5px solid var(--border);
@@ -120,9 +132,15 @@
             outline: none;
             transition: all 0.2s ease;
             background-color: #f8fafc;
+            color: var(--text-main);
         }
 
-        input:focus {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus, select:focus, textarea:focus {
             background-color: #ffffff;
             border-color: var(--primary);
             box-shadow: 0 0 0 4px var(--focus-ring);
@@ -139,19 +157,10 @@
             font-weight: 600;
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
-            margin-top: 0;
-            box-shadow: none;
-            width: auto;
-        }
-
-        .toggle-password:hover {
-            color: var(--primary);
-            background-color: transparent;
-            transform: none;
         }
 
         .alert {
-            padding: 0.9rem;
+            padding: 1rem;
             border-radius: 8px;
             font-size: 0.875rem;
             margin-bottom: 1.25rem;
@@ -168,14 +177,31 @@
 
         .alert-success {
             background-color: #ecfdf5;
-            color: var(--success);
+            color: #065f46;
             border: 1px solid #a7f3d0;
+        }
+
+        .code-box {
+            background: #ffffff;
+            border: 2px dashed var(--primary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+
+        .code-box strong {
+            font-size: 1.4rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+            display: block;
+            margin-top: 0.25rem;
         }
 
         button[type="submit"] {
             width: 100%;
-            margin-top: 1.5rem;
-            padding: 0.9rem;
+            margin-top: 1.75rem;
+            padding: 0.95rem;
             background-color: var(--primary);
             color: #ffffff;
             border: none;
@@ -185,10 +211,6 @@
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
         }
 
         button[type="submit"]:hover {
@@ -221,7 +243,7 @@
 
         @media (max-width: 600px) {
             .form-grid { grid-template-columns: 1fr; }
-            .full-width { grid-column: span 1; }
+            .full-width, .section-title { grid-column: span 1; }
             .card { padding: 1.75rem 1.25rem; }
         }
     </style>
@@ -230,59 +252,133 @@
 
 <div class="card">
     <div class="header">
-        <span class="badge">Student Portal</span>
-        <h1>Create Account</h1>
-        <p>Register as a student to access your academic dashboard</p>
+        <span class="badge">EduTrust Admission</span>
+        <h1>Student Registration</h1>
+        <p>Complete the form below to submit your application for review</p>
     </div>
 
     <div id="alertBox" class="alert" role="alert" aria-live="polite"></div>
 
     <form id="studentRegisterForm" novalidate>
         <div class="form-grid">
+            <!-- School Info Section -->
+            <div class="section-title">1. Institution Code</div>
+            
+            <div class="form-group full-width">
+                <label for="school_code">School Code <span class="req">*</span></label>
+                <input type="text" id="school_code" required placeholder="Enter School Code (e.g. SCH1024)" style="text-transform: uppercase;">
+            </div>
+
+            <!-- Personal Information -->
+            <div class="section-title">2. Personal Details</div>
+
             <div class="form-group">
                 <label for="first_name">First Name <span class="req">*</span></label>
-                <input type="text" id="first_name" required placeholder="John" autocomplete="given-name">
+                <input type="text" id="first_name" required placeholder="John">
             </div>
 
             <div class="form-group">
                 <label for="last_name">Last Name <span class="req">*</span></label>
-                <input type="text" id="last_name" required placeholder="Doe" autocomplete="family-name">
+                <input type="text" id="last_name" required placeholder="Doe">
             </div>
 
             <div class="form-group full-width">
-                <label for="email">Email Address <span class="req">*</span></label>
-                <input type="email" id="email" required placeholder="student@school.com" autocomplete="email">
+                <label for="other_name">Middle / Other Name</label>
+                <input type="text" id="other_name" placeholder="Alexander (Optional)">
             </div>
 
             <div class="form-group">
-                <label for="school_code">School Code <span class="req">*</span></label>
-                <input type="text" id="school_code" required placeholder="e.g. SCH1024" style="text-transform: uppercase;">
+                <label for="gender">Gender <span class="req">*</span></label>
+                <select id="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label for="current_class">Class / Grade <span class="req">*</span></label>
-                <input type="text" id="current_class" required placeholder="e.g. SSS 2, JSS 1">
+                <label for="date_of_birth">Date of Birth</label>
+                <input type="date" id="date_of_birth">
+            </div>
+
+            <!-- Academic Information -->
+            <div class="section-title">3. Academic Placement</div>
+
+            <div class="form-group">
+                <label for="class_name">Class / Grade <span class="req">*</span></label>
+                <select id="class_name" required>
+                    <option value="">Select Class</option>
+                    <option value="PRM1">Nursery 1</option>
+                    <option value="PRM2">Nursery 2</option>
+                    <option value="PRM3">Nursery 3</option>
+                    <option value="PRM1">Primary 1</option>
+                    <option value="PRM2">Primary 2</option>
+                    <option value="PRM3">Primary 3</option>
+                    <option value="PRM4">Primary 4</option>
+                    <option value="PRM5">Primary 5</option>
+                    <option value="PRM6">Primary 6</option>
+                    <option value="JSS1">JSS 1</option>
+                    <option value="JSS2">JSS 2</option>
+                    <option value="JSS3">JSS 3</option>
+                    <option value="SS1">SS 1</option>
+                    <option value="SS2">SS 2</option>
+                    <option value="SS3">SS 3</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="arm">Stream / Arm</label>
+                <input type="text" id="arm" placeholder="e.g. A, B, Gold (Optional)">
             </div>
 
             <div class="form-group full-width">
+                <label for="department">Department (Senior Secondary Only)</label>
+                <select id="department">
+                    <option value="">Select Department (If SS Class)</option>
+                    <option value="SCI">Science</option>
+                    <option value="ART">Arts / Humanities</option>
+                    <option value="COM">Commercial / Business</option>
+                </select>
+            </div>
+
+            <!-- Contact & Security -->
+            <div class="section-title">4. Account & Contact Information</div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="student@example.com">
+            </div>
+
+            <div class="form-group">
                 <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" placeholder="+234 800 000 0000" autocomplete="tel">
+                <input type="tel" id="phone" placeholder="+234 800 000 0000">
             </div>
 
             <div class="form-group full-width">
-                <label for="password">Password <span class="req">*</span></label>
+                <label for="password">Portal Password</label>
                 <div class="input-wrapper">
-                    <input type="password" id="password" minlength="6" required placeholder="Minimum 6 characters">
+                    <input type="password" id="password" minlength="6" placeholder="Create portal login password (Optional)">
                     <button type="button" class="toggle-password" id="togglePassword">Show</button>
                 </div>
             </div>
+
+            <div class="form-group full-width">
+                <label for="home_address">Home Address</label>
+                <textarea id="home_address" placeholder="Enter residential address"></textarea>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="medical_information">Medical Notes / Allergies</label>
+                <textarea id="medical_information" placeholder="List medical conditions, dietary restrictions, or emergency notes (Optional)"></textarea>
+            </div>
         </div>
 
-        <button type="submit" id="submitBtn">Register as Student</button>
+        <button type="submit" id="submitBtn">Submit Student Application</button>
     </form>
 
     <div class="footer">
-        Already registered? <a href="student-login.html">Sign in here</a>
+        Already registered? <a href="student-login.html">Sign in to Student Portal</a>
     </div>
 </div>
 
@@ -292,18 +388,31 @@
     const submitBtn = document.getElementById("submitBtn");
     const passwordInput = document.getElementById("password");
     const togglePasswordBtn = document.getElementById("togglePassword");
+    const classNameSelect = document.getElementById("class_name");
+    const departmentSelect = document.getElementById("department");
 
     const BASE_URL = "https://edutrust-15ii.onrender.com";
 
-    // Password visibility toggle logic
+    // Toggle password visibility
     togglePasswordBtn.addEventListener("click", () => {
         const isPassword = passwordInput.getAttribute("type") === "password";
         passwordInput.setAttribute("type", isPassword ? "text" : "password");
         togglePasswordBtn.textContent = isPassword ? "Hide" : "Show";
     });
 
-    function showAlert(msg, isError = true) {
-        alertBox.textContent = msg;
+    // Disable department unless SS class is selected
+    classNameSelect.addEventListener("change", (e) => {
+        const val = e.target.value;
+        if (val.startsWith("SS")) {
+            departmentSelect.disabled = false;
+        } else {
+            departmentSelect.disabled = true;
+            departmentSelect.value = "";
+        }
+    });
+
+    function showAlert(htmlContent, isError = true) {
+        alertBox.innerHTML = htmlContent;
         alertBox.className = `alert ${isError ? 'alert-error' : 'alert-success'}`;
         alertBox.style.display = 'block';
     }
@@ -312,57 +421,75 @@
         e.preventDefault();
         alertBox.style.display = 'none';
 
-        // Extract values
+        // Collect form data according to controller parameters
         const payload = {
+            school_code: document.getElementById("school_code").value.trim().toUpperCase(),
             first_name: document.getElementById("first_name").value.trim(),
             last_name: document.getElementById("last_name").value.trim(),
+            other_name: document.getElementById("other_name").value.trim(),
+            gender: document.getElementById("gender").value,
+            date_of_birth: document.getElementById("date_of_birth").value || null,
+            class_name: document.getElementById("class_name").value,
+            current_class: document.getElementById("class_name").value,
+            arm: document.getElementById("arm").value.trim(),
+            department: document.getElementById("department").value,
             email: document.getElementById("email").value.trim().toLowerCase(),
-            school_code: document.getElementById("school_code").value.trim().toUpperCase(),
-            current_class: document.getElementById("current_class").value.trim(),
             phone: document.getElementById("phone").value.trim(),
-            password: document.getElementById("password").value
+            password: document.getElementById("password").value,
+            home_address: document.getElementById("home_address").value.trim(),
+            medical_information: document.getElementById("medical_information").value.trim()
         };
 
-        // Basic client-side checks
-        if (!payload.first_name || !payload.last_name || !payload.email || !payload.school_code || !payload.current_class || !payload.password) {
-            showAlert("Please fill in all required fields.", true);
+        // Client validation check
+        if (!payload.school_code) {
+            showAlert("School Code is required.", true);
             return;
         }
-
-        if (payload.password.length < 6) {
-            showAlert("Password must be at least 6 characters long.", true);
+        if (!payload.first_name || !payload.last_name || !payload.class_name) {
+            showAlert("First Name, Last Name, and Class Selection are required.", true);
+            return;
+        }
+        if (payload.password && payload.password.length < 6) {
+            showAlert("Password must be at least 6 characters.", true);
             return;
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = "Creating Account...";
+        submitBtn.textContent = "Submitting Application...";
 
         try {
-            const res = await fetch(`${BASE_URL}/api/students`, {
+            const res = await fetch(`${BASE_URL}/api/students/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                throw new Error(`Server returned ${res.status} (${res.statusText}). Check backend setup.`);
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || "Registration failed.");
             }
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || "Registration failed.");
-
-            showAlert("Registration successful! Redirecting to login...", false);
-            setTimeout(() => { window.location.href = "student-login.html"; }, 2000);
+            // Display success message and generated application tracking code
+            const successHtml = `
+                <div><strong>Application Submitted Successfully!</strong></div>
+                <div>Your registration status is currently <strong>Pending Approval</strong>.</div>
+                <div class="code-box">
+                    Save your Tracking Code:
+                    <strong>${data.registration_code || data.student?.admission_number}</strong>
+                </div>
+            `;
+            showAlert(successHtml, false);
+            form.reset();
 
         } catch (err) {
             const errorMessage = err.name === "TypeError" 
-                ? "Unable to connect to server. Please check your internet connection." 
+                ? "Network error: Unable to reach EduTrust server. Render service may be waking up." 
                 : err.message;
             showAlert(errorMessage, true);
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = "Register as Student";
+            submitBtn.textContent = "Submit Student Application";
         }
     });
 </script>
