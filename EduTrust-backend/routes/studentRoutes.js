@@ -4,6 +4,7 @@ const rateLimit = require("express-rate-limit");
 
 const {
     registerStudent,
+    loginStudent,
     getStudents,
     getStudent,
     getPendingStudents,
