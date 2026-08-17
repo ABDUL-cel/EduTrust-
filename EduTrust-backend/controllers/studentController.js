@@ -1,7 +1,7 @@
 const Student = require("../models/student");
 const Parent = require("../models/Parent");
 const User = require("../models/User");
-const School = require("../models/School");
+const School = require("../models/school");
 // =====================================================
 // HELPER: GET SCHOOL ID
 // =====================================================
@@ -271,7 +271,83 @@ exports.getActiveStudents = async (req, res) => {
         });
     }
 };
+// =====================================================
+// HELPER: GENERATE SCHOOL-BRANDED ADMISSION NUMBER
+// =====================================================
+async function generateOfficialAdmissionNo(school, className) {
+    // 1. Get 3-letter prefix from School Name (e.g., "Adewole" -> "ADE")
+    let schoolPrefix = "SCH";
+    
+    if (school?.school_code && school.school_code.trim().length >= 3) {
+        schoolPrefix = school.school_code.trim().slice(0, 3).toUpperCase();
+    } else if (school?.name) {
+        const cleanName = school.name.trim().replace(/[^a-zA-Z0-9]/g, "");
+        if (cleanName.length >= 3) {
+            schoolPrefix = cleanName.slice(0, 3).toUpperCase();
+        }
+    }
 
+    // 2. Parse Class Level, Streams, and Departments
+    const rawClass = (className || "").toUpperCase().trim();
+    let categoryCode = "GEN";
+
+    // --- SENIOR SECONDARY (SS / SENIOR) ---
+    if (rawClass.includes("SS") || rawClass.includes("SENIOR")) {
+        const ssLevelMatch = rawClass.match(/SS[1-3]/);
+        const ssLevel = ssLevelMatch ? ssLevelMatch[0] : "SS";
+
+        let dept = "";
+        if (rawClass.includes("ART") || rawClass.includes("ARTS") || rawClass.includes("HUMANITY")) {
+            dept = "ART";
+        } else if (rawClass.includes("SCI") || rawClass.includes("SCIENCE")) {
+            dept = "SCI";
+        } else if (rawClass.includes("COM") || rawClass.includes("COMMERCE") || rawClass.includes("BUSINESS")) {
+            dept = "COM";
+        }
+
+        categoryCode = dept ? `${ssLevel}/${dept}` : ssLevel;
+    } 
+    // --- JUNIOR SECONDARY (JSS) - INCLUDES ARM/STREAM ---
+    else if (rawClass.includes("JSS") || rawClass.includes("JUNIOR")) {
+        const jssMatch = rawClass.match(/JSS[1-3]/);
+        const level = jssMatch ? jssMatch[0] : "JSS";
+
+        // Extract arm letter (e.g., A, B, C)
+        const armMatch = rawClass.match(/\b([A-Z])\b/);
+        const arm = armMatch ? armMatch[1] : "";
+
+        categoryCode = arm ? `${level}/${arm}` : level;
+    }
+    // --- PRIMARY / NURSERY / CRECHE (NO ARMS, LEVEL ONLY) ---
+    else {
+        const lowerLevelMatch = rawClass.match(/(PRM[1-6]|PRIMARY[1-6]|NUR[1-3]|NURSERY[1-3]|CRECHE)/);
+        
+        if (lowerLevelMatch) {
+            categoryCode = lowerLevelMatch[0]
+                .replace("PRIMARY", "PRM")
+                .replace("NURSERY", "NUR");
+        } else {
+            categoryCode = "GEN";
+        }
+    }
+
+    // 3. Current Registration Year
+    const year = new Date().getFullYear(); // 2026
+
+    // 4. Check database for existing count under this exact prefix structure
+    const pattern = new RegExp(`^${schoolPrefix}/${categoryCode}/${year}/`);
+
+    const count = await Student.countDocuments({
+        school_id: school._id,
+        admission_number: { $regex: pattern }
+    });
+
+    // 5. Build 4-digit sequence (0001, 0002...)
+    const nextSeq = (count + 1).toString().padStart(4, "0");
+
+    // Output structure: ADE/PRM1/2026/0001 or ADE/JSS1/A/2026/0001 or ADE/SS1/ART/2026/0001
+    return `${schoolPrefix}/${categoryCode}/${year}/${nextSeq}`;
+}
 // =====================================================
 // APPROVE STUDENT
 // =====================================================
