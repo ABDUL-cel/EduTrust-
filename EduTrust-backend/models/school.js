@@ -66,7 +66,6 @@ const SchoolSchema = new mongoose.Schema(
             unique: true,
             uppercase: true,
             trim: true,
-            index: true
         },
 
         logo: {
