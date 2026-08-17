@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Registration | EduTrust Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #2563eb;
@@ -16,6 +19,7 @@
             --border: #cbd5e1;
             --error: #ef4444;
             --success: #10b981;
+            --focus-ring: rgba(37, 99, 235, 0.2);
         }
 
         * {
@@ -101,7 +105,14 @@
             color: var(--error);
         }
 
-        input, select {
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input {
+            width: 100%;
             padding: 0.8rem 1rem;
             border: 1.5px solid var(--border);
             border-radius: 8px;
@@ -111,10 +122,32 @@
             background-color: #f8fafc;
         }
 
-        input:focus, select:focus {
+        input:focus {
             background-color: #ffffff;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin-top: 0;
+            box-shadow: none;
+            width: auto;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+            background-color: transparent;
+            transform: none;
         }
 
         .alert {
@@ -124,6 +157,7 @@
             margin-bottom: 1.25rem;
             display: none;
             font-weight: 500;
+            line-height: 1.4;
         }
 
         .alert-error {
@@ -138,7 +172,7 @@
             border: 1px solid #a7f3d0;
         }
 
-        button {
+        button[type="submit"] {
             width: 100%;
             margin-top: 1.5rem;
             padding: 0.9rem;
@@ -151,14 +185,18 @@
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        button:hover {
+        button[type="submit"]:hover {
             background-color: var(--primary-hover);
             transform: translateY(-1px);
         }
 
-        button:disabled {
+        button[type="submit"]:disabled {
             opacity: 0.7;
             transform: none;
             cursor: not-allowed;
@@ -197,43 +235,46 @@
         <p>Register as a student to access your academic dashboard</p>
     </div>
 
-    <div id="alertBox" class="alert"></div>
+    <div id="alertBox" class="alert" role="alert" aria-live="polite"></div>
 
-    <form id="studentRegisterForm">
+    <form id="studentRegisterForm" novalidate>
         <div class="form-grid">
             <div class="form-group">
-                <label>First Name <span class="req">*</span></label>
-                <input type="text" id="first_name" required placeholder="John">
+                <label for="first_name">First Name <span class="req">*</span></label>
+                <input type="text" id="first_name" required placeholder="John" autocomplete="given-name">
             </div>
 
             <div class="form-group">
-                <label>Last Name <span class="req">*</span></label>
-                <input type="text" id="last_name" required placeholder="Doe">
+                <label for="last_name">Last Name <span class="req">*</span></label>
+                <input type="text" id="last_name" required placeholder="Doe" autocomplete="family-name">
             </div>
 
             <div class="form-group full-width">
-                <label>Email Address <span class="req">*</span></label>
-                <input type="email" id="email" required placeholder="student@school.com">
+                <label for="email">Email Address <span class="req">*</span></label>
+                <input type="email" id="email" required placeholder="student@school.com" autocomplete="email">
             </div>
 
             <div class="form-group">
-                <label>School Code <span class="req">*</span></label>
-                <input type="text" id="school_code" required placeholder="e.g. SCH1024">
+                <label for="school_code">School Code <span class="req">*</span></label>
+                <input type="text" id="school_code" required placeholder="e.g. SCH1024" style="text-transform: uppercase;">
             </div>
 
             <div class="form-group">
-                <label>Class / Grade <span class="req">*</span></label>
+                <label for="current_class">Class / Grade <span class="req">*</span></label>
                 <input type="text" id="current_class" required placeholder="e.g. SSS 2, JSS 1">
             </div>
 
             <div class="form-group full-width">
-                <label>Phone Number</label>
-                <input type="tel" id="phone" placeholder="+234 800 000 0000">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="+234 800 000 0000" autocomplete="tel">
             </div>
 
             <div class="form-group full-width">
-                <label>Password <span class="req">*</span></label>
-                <input type="password" id="password" minlength="6" required placeholder="Minimum 6 characters">
+                <label for="password">Password <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" minlength="6" required placeholder="Minimum 6 characters">
+                    <button type="button" class="toggle-password" id="togglePassword">Show</button>
+                </div>
             </div>
         </div>
 
@@ -249,9 +290,17 @@
     const form = document.getElementById("studentRegisterForm");
     const alertBox = document.getElementById("alertBox");
     const submitBtn = document.getElementById("submitBtn");
+    const passwordInput = document.getElementById("password");
+    const togglePasswordBtn = document.getElementById("togglePassword");
 
-    // Replace this with your actual live backend URL on Render
     const BASE_URL = "https://edutrust-15ii.onrender.com";
+
+    // Password visibility toggle logic
+    togglePasswordBtn.addEventListener("click", () => {
+        const isPassword = passwordInput.getAttribute("type") === "password";
+        passwordInput.setAttribute("type", isPassword ? "text" : "password");
+        togglePasswordBtn.textContent = isPassword ? "Hide" : "Show";
+    });
 
     function showAlert(msg, isError = true) {
         alertBox.textContent = msg;
@@ -263,31 +312,41 @@
         e.preventDefault();
         alertBox.style.display = 'none';
 
+        // Extract values
         const payload = {
-            first_name: document.getElementById("first_name").value,
-            last_name: document.getElementById("last_name").value,
-            email: document.getElementById("email").value,
+            first_name: document.getElementById("first_name").value.trim(),
+            last_name: document.getElementById("last_name").value.trim(),
+            email: document.getElementById("email").value.trim().toLowerCase(),
             school_code: document.getElementById("school_code").value.trim().toUpperCase(),
-            current_class: document.getElementById("current_class").value,
-            phone: document.getElementById("phone").value,
+            current_class: document.getElementById("current_class").value.trim(),
+            phone: document.getElementById("phone").value.trim(),
             password: document.getElementById("password").value
         };
+
+        // Basic client-side checks
+        if (!payload.first_name || !payload.last_name || !payload.email || !payload.school_code || !payload.current_class || !payload.password) {
+            showAlert("Please fill in all required fields.", true);
+            return;
+        }
+
+        if (payload.password.length < 6) {
+            showAlert("Password must be at least 6 characters long.", true);
+            return;
+        }
 
         submitBtn.disabled = true;
         submitBtn.textContent = "Creating Account...";
 
         try {
-            // Absolute URL points to Express backend instead of the frontend static server
             const res = await fetch(`${BASE_URL}/api/students`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
-            // Handle non-JSON responses (like 404/405/500 HTML pages) gracefully
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
-                throw new Error(`Server returned ${res.status} (${res.statusText}). Check your endpoint URL.`);
+                throw new Error(`Server returned ${res.status} (${res.statusText}). Check backend setup.`);
             }
 
             const data = await res.json();
@@ -297,7 +356,10 @@
             setTimeout(() => { window.location.href = "student-login.html"; }, 2000);
 
         } catch (err) {
-            showAlert(err.message, true);
+            const errorMessage = err.name === "TypeError" 
+                ? "Unable to connect to server. Please check your internet connection." 
+                : err.message;
+            showAlert(errorMessage, true);
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = "Register as Student";
