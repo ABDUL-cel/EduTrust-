@@ -28,7 +28,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 // Rate limiter: Max 5 registrations per hour per IP address
 const registrationLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: 5,
+    max: 100,
     message: {
         success: false,
         message: "Too many accounts created from this IP. Please try again after an hour."
