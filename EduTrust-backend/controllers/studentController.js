@@ -312,6 +312,98 @@ exports.rejectStudent = async (req, res) => {
 };
 
 // =====================================================
+// LOGIN STUDENT
+// =====================================================
+exports.loginStudent = async (req, res) => {
+    try {
+        const { admission_number, email, password } = req.body;
+
+        // 1. Validate Input
+        const identifier = (admission_number || email || "").trim();
+        if (!identifier || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide your Admission Number/Email and Password."
+            });
+        }
+
+        // 2. Find Student by Admission Number or Email
+        const query = {
+            $or: [
+                { admission_number: identifier },
+                { email: identifier.toLowerCase() }
+            ]
+        };
+
+        const student = await Student.findOne(query);
+
+        if (!student) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid login credentials."
+            });
+        }
+
+        // 3. Verify Password
+        if (!student.password) {
+            return res.status(400).json({
+                success: false,
+                message: "Password not set for this student account."
+            });
+        }
+
+        let isMatch = false;
+        if (student.password.startsWith("$2a$") || student.password.startsWith("$2b$")) {
+            isMatch = await bcrypt.compare(password, student.password);
+        } else {
+            isMatch = student.password === password; // Plaintext fallback if not yet hashed
+        }
+
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid login credentials."
+            });
+        }
+
+        // 4. Generate JWT Token
+        const token = jwt.sign(
+            {
+                id: student._id,
+                student_id: student._id,
+                school_id: student.school_id,
+                role: "student"
+            },
+            process.env.JWT_SECRET || "edutrust_secret_key",
+            { expiresIn: "1d" }
+        );
+
+        // 5. Send Success Response
+        return res.status(200).json({
+            success: true,
+            message: "Student logged in successfully!",
+            token,
+            student: {
+                id: student._id,
+                first_name: student.first_name,
+                last_name: student.last_name,
+                admission_number: student.admission_number,
+                class_name: student.class_name,
+                school_id: student.school_id,
+                role: "student"
+            }
+        });
+
+    } catch (error) {
+        console.error("LOGIN STUDENT ERROR:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to log in student.",
+            error: error.message
+        });
+    }
+};
+// =====================================================
 // GET ALL STUDENTS
 // =====================================================
 exports.getStudents = async (req, res) => {
