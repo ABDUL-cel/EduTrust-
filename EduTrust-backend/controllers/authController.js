@@ -387,16 +387,21 @@ exports.login = async (req, res) => {
             });
         }
 
-        // ==================================================
-        // ROLE VALIDATION (PREVENT PARENT LOGIN HERE)
-        // ==================================================
+   // ==================================================
+// ROLE VALIDATION
+// SCHOOL PORTAL LOGIN
+// ALLOWED: PRINCIPAL + SUPERADMIN
+// ==================================================
 
-        if (user.role !== "principal" && user.role !== "admin") {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied. Please use the Parent Portal to log in."
-            });
-        }
+if (
+    user.role !== "Principal" &&
+    user.role !== "SuperAdmin"
+) {
+    return res.status(403).json({
+        success: false,
+        message: "Only Principal accounts can use the School Portal login."
+    });
+}
 
         // ==================================================
         // ACCOUNT STATUS
