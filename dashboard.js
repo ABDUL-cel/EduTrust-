@@ -7,7 +7,7 @@
 // CONFIGURATION
 // ============================================================
 
-const API_BASE_URL = "https://your-backend-url.onrender.com/api";
+const API_BASE_URL = "https://edutrust-15ii.onrender.com/api";
 
 
 // ============================================================
