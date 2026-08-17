@@ -44,14 +44,15 @@ const StudentSchema = new mongoose.Schema(
             type: String,
             enum: [
                 "Male",
-                "Female"
+                "Female",
+                "Not Specified"
             ],
-            required: true
+            default: "Not Specified"
         },
 
         date_of_birth: {
             type: Date,
-            required: true
+            default: null
         },
 
         class_name: {
@@ -61,6 +62,12 @@ const StudentSchema = new mongoose.Schema(
         },
 
         arm: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        department: {
             type: String,
             default: "",
             trim: true
@@ -91,6 +98,7 @@ const StudentSchema = new mongoose.Schema(
             enum: [
                 "Pending",
                 "Active",
+                "Rejected",
                 "Suspended",
                 "Graduated",
                 "Archived"
@@ -146,9 +154,10 @@ const StudentSchema = new mongoose.Schema(
 );
 
 // ======================================================
-// UNIQUE ADMISSION NUMBER PER SCHOOL
+// INDEXES FOR QUERY OPTIMIZATION
 // ======================================================
 
+// Ensure admission numbers are unique per school
 StudentSchema.index(
     {
         school_id: 1,
@@ -159,10 +168,13 @@ StudentSchema.index(
     }
 );
 
-// ======================================================
-// PARENT LOOKUP
-// ======================================================
+// Fast lookups for filtering students by school & status
+StudentSchema.index({
+    school_id: 1,
+    status: 1
+});
 
+// Fast parent lookups
 StudentSchema.index({
     school_id: 1,
     parent_id: 1
