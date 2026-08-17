@@ -1,5 +1,4 @@
-
-// ========const Student = require("../models/student");
+const Student = require("../models/student");
 const Parent = require("../models/Parent");
 const User = require("../models/User");
 const School = require("../models/school");
