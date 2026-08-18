@@ -437,7 +437,146 @@ function showPage(
     });
 }
 
+// ======================================================
+// REAL STUDENTS DATA — PRINCIPAL DASHBOARD
+// ======================================================
 
+async function loadStudentsFromBackend() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        console.error("No authentication token found.");
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/students", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            console.error("Failed to load students:", data.message);
+            return;
+        }
+
+        console.log("Students loaded:", data.students);
+
+        renderStudentsPage(data.students);
+
+    } catch (error) {
+        console.error("LOAD STUDENTS ERROR:", error);
+    }
+}
+
+
+// ======================================================
+// RENDER STUDENTS INTO EXISTING STUDENTS PAGE
+// ======================================================
+
+function renderStudentsPage(students) {
+
+    const studentsPage =
+        document.getElementById("studentsPage");
+
+    if (!studentsPage) {
+        console.warn(
+            "studentsPage element was not found in dashboard.html"
+        );
+        return;
+    }
+
+    const tbody =
+        studentsPage.querySelector("tbody");
+
+    if (!tbody) {
+        console.warn(
+            "Students table tbody was not found."
+        );
+        return;
+    }
+
+    tbody.innerHTML = "";
+
+    if (!students.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="100%" style="text-align:center;">
+                    No students found.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    students.forEach(student => {
+
+        const fullName = [
+            student.first_name,
+            student.other_name,
+            student.last_name
+        ]
+            .filter(Boolean)
+            .join(" ");
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>
+                ${fullName || "N/A"}
+            </td>
+
+            <td>
+                ${student.admission_number || "N/A"}
+            </td>
+
+            <td>
+                ${student.class_name || "N/A"}
+            </td>
+
+            <td>
+                ${student.arm || "N/A"}
+            </td>
+
+            <td>
+                ${student.gender || "N/A"}
+            </td>
+
+            <td>
+                <span class="status ${String(student.status || "").toLowerCase()}">
+                    ${student.status || "N/A"}
+                </span>
+            </td>
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
+
+// ======================================================
+// WHEN STUDENTS SIDEBAR IS CLICKED
+// ======================================================
+
+document.querySelectorAll(
+    '[data-page="students"]'
+).forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        setTimeout(() => {
+            loadStudentsFromBackend();
+        }, 100);
+
+    });
+
+});
 // ============================================================
 // NAV BUTTONS
 // ============================================================
