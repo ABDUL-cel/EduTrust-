@@ -458,12 +458,13 @@
         submitBtn.textContent = "Submitting Application...";
 
         try {
-           // Inside register.html JS script
-const res = await fetch(`${BASE_URL}/api/students`, { // <--- Remove "/register"
+// Change this:
+const res = await fetch(`${BASE_URL}/api/students/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
 });
+
             const data = await res.json();
 
             if (!res.ok) {
