@@ -1,17 +1,15 @@
 "use strict";
 
+/* ============================================================
+   CONFIGURATION
+============================================================ */
 
-// ============================================================
-// CONFIGURATION
-// ============================================================
-
-const API_BASE_URL =
-    "https://edutrust-15ii.onrender.com/api";
+const API_BASE_URL = "https://edutrust-15ii.onrender.com/api";
 
 
-// ============================================================
-// AUTHENTICATION
-// ============================================================
+/* ============================================================
+   AUTHENTICATION
+============================================================ */
 
 const token =
     localStorage.getItem("token") ||
@@ -22,9 +20,9 @@ if (!token) {
 }
 
 
-// ============================================================
-// API HELPER
-// ============================================================
+/* ============================================================
+   API HELPER
+============================================================ */
 
 async function apiRequest(endpoint, options = {}) {
 
@@ -36,8 +34,7 @@ async function apiRequest(endpoint, options = {}) {
             headers: {
                 "Content-Type": "application/json",
 
-                "Authorization":
-                    `Bearer ${token}`,
+                "Authorization": `Bearer ${token}`,
 
                 ...(options.headers || {})
             }
@@ -59,9 +56,7 @@ async function apiRequest(endpoint, options = {}) {
 
         window.location.href = "login.html";
 
-        throw new Error(
-            "Authentication expired."
-        );
+        throw new Error("Authentication expired.");
     }
 
     if (!response.ok) {
@@ -76,9 +71,9 @@ async function apiRequest(endpoint, options = {}) {
 }
 
 
-// ============================================================
-// DOM
-// ============================================================
+/* ============================================================
+   DOM ELEMENTS
+============================================================ */
 
 const sidebar =
     document.getElementById("sidebar");
@@ -102,9 +97,9 @@ const toast =
     document.getElementById("toast");
 
 
-// ============================================================
-// TOAST
-// ============================================================
+/* ============================================================
+   TOAST
+============================================================ */
 
 function showToast(message, type = "success") {
 
@@ -126,91 +121,24 @@ function showToast(message, type = "success") {
 }
 
 
-// ============================================================
-// SCHOOL DATA
-// ============================================================
+/* ============================================================
+   SCHOOL / USER DATA
+============================================================ */
 
 let currentSchool = null;
 let currentUser = null;
 
 
-// ============================================================
-// INITIALS
-// ============================================================
-
-function getInitials(name) {
-
-    return String(name || "School")
-        .trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map(word =>
-            word.charAt(0).toUpperCase()
-        )
-        .join("");
-}
-
-
-// ============================================================
-// SET VALUE
-// ============================================================
-
-function setValue(id, value) {
-
-    const element =
-        document.getElementById(id);
-
-    if (!element) {
-        return;
-    }
-
-    element.value =
-        value || "";
-}
-
-
-// ============================================================
-// UPDATE ELEMENT
-// ============================================================
-
-function updateElement(id, value) {
-
-    const element =
-        document.getElementById(id);
-
-    if (element) {
-        element.textContent = value;
-    }
-}
-
-
-// ============================================================
-// ESCAPE HTML
-// ============================================================
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-
-// ============================================================
-// PROFILE
-// ============================================================
+/* ============================================================
+   PROFILE
+============================================================ */
 
 async function loadProfile() {
 
     try {
 
         const data =
-            await apiRequest(
-                "/auth/profile"
-            );
+            await apiRequest("/auth/profile");
 
         if (!data.success) {
 
@@ -242,18 +170,14 @@ async function loadProfile() {
 }
 
 
-// ============================================================
-// RENDER PROFILE
-// ============================================================
+/* ============================================================
+   RENDER PROFILE
+============================================================ */
 
 function renderProfile() {
 
-    if (!currentSchool) {
-        return;
-    }
-
     const schoolName =
-        currentSchool.name ||
+        currentSchool?.name ||
         "School";
 
     const userRole =
@@ -295,9 +219,26 @@ function renderProfile() {
 }
 
 
-// ============================================================
-// POPULATE SCHOOL FORM
-// ============================================================
+/* ============================================================
+   INITIALS
+============================================================ */
+
+function getInitials(name) {
+
+    return String(name || "School")
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(word =>
+            word.charAt(0).toUpperCase()
+        )
+        .join("");
+}
+
+
+/* ============================================================
+   SCHOOL FORM
+============================================================ */
 
 function populateSchoolForm() {
 
@@ -369,14 +310,66 @@ function populateSchoolForm() {
 }
 
 
-// ============================================================
-// PAGE NAVIGATION
-// ============================================================
+/* ============================================================
+   SET INPUT VALUE
+============================================================ */
+
+function setValue(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    element.value =
+        value ?? "";
+}
+
+
+/* ============================================================
+   ============================================================
+   MAIN PAGE NAVIGATION
+   ============================================================
+============================================================ */
+
+/*
+    IMPORTANT:
+
+    Every sidebar button has:
+
+        data-page="students"
+
+    or:
+
+        data-page="parents"
+
+    or:
+
+        data-page="school"
+
+    etc.
+
+    The matching main content page has:
+
+        id="studentsPage"
+
+        id="parentsPage"
+
+        id="schoolPage"
+
+    etc.
+
+    showPage() controls ALL of this.
+*/
+
 
 const navItems =
     document.querySelectorAll(
         ".nav-item[data-page], .submenu-item[data-page], .text-button[data-page]"
     );
+
 
 const pages =
     document.querySelectorAll(
@@ -386,30 +379,28 @@ const pages =
 
 function showPage(pageName) {
 
-    if (!pageName) {
-        return;
-    }
-
     console.log(
-        "Opening dashboard page:",
+        "OPENING PAGE:",
         pageName
     );
 
 
-    // --------------------------------------------------------
-    // Hide every page
-    // --------------------------------------------------------
+    /* --------------------------------------------------------
+       1. HIDE EVERY MAIN CONTENT PAGE
+    -------------------------------------------------------- */
 
     pages.forEach(page => {
 
         page.classList.add("hidden");
 
+        page.style.display = "none";
+
     });
 
 
-    // --------------------------------------------------------
-    // Find requested page
-    // --------------------------------------------------------
+    /* --------------------------------------------------------
+       2. FIND THE PAGE WE WANT
+    -------------------------------------------------------- */
 
     const targetPage =
         document.getElementById(
@@ -417,30 +408,37 @@ function showPage(pageName) {
         );
 
 
+    /* --------------------------------------------------------
+       3. OPEN THE PAGE
+    -------------------------------------------------------- */
+
     if (!targetPage) {
 
-        console.warn(
-            `Page "${pageName}Page" was not found.`
+        console.error(
+            `Main content page "${pageName}Page" was not found.`
+        );
+
+        showToast(
+            `Page "${pageName}" is not available.`,
+            "error"
         );
 
         return;
     }
 
 
-    // --------------------------------------------------------
-    // Show requested page
-    // --------------------------------------------------------
-
     targetPage.classList.remove("hidden");
 
+    targetPage.style.display = "block";
 
-    // --------------------------------------------------------
-    // Remove active state
-    // --------------------------------------------------------
+
+    /* --------------------------------------------------------
+       4. UPDATE ACTIVE SIDEBAR BUTTON
+    -------------------------------------------------------- */
 
     document
         .querySelectorAll(
-            ".nav-item[data-page], .submenu-item[data-page]"
+            ".nav-item[data-page], .submenu-item[data-page], .text-button[data-page]"
         )
         .forEach(item => {
 
@@ -449,52 +447,135 @@ function showPage(pageName) {
         });
 
 
-    // --------------------------------------------------------
-    // Activate clicked navigation item
-    // --------------------------------------------------------
-
-    document
-        .querySelectorAll(
+    const activeItems =
+        document.querySelectorAll(
             `[data-page="${pageName}"]`
-        )
-        .forEach(item => {
-
-            item.classList.add("active");
-
-        });
+        );
 
 
-    // --------------------------------------------------------
-    // Page-specific loading
-    // --------------------------------------------------------
+    activeItems.forEach(item => {
+
+        item.classList.add("active");
+
+    });
+
+
+    /* --------------------------------------------------------
+       5. LOAD DATA FOR THAT PAGE
+    -------------------------------------------------------- */
 
     switch (pageName) {
 
         case "overview":
-            loadDashboard();
+
+            loadDashboardOverview();
+
             break;
 
-        case "students":
-            loadStudents();
-            break;
-
-        case "parents":
-            loadParents();
-            break;
 
         case "school":
-        case "school-profile":
-            populateSchoolForm();
+
+            loadSchoolPage();
+
             break;
 
-        default:
+
+        case "students":
+
+            loadStudents();
+
             break;
+
+
+        case "parents":
+
+            loadParents();
+
+            break;
+
+
+        case "staff":
+
+            // Staff API can be connected later.
+            break;
+
+
+        case "fees":
+
+            // Fee API can be connected later.
+            break;
+
+
+        case "fee-structures":
+
+            // Fee structure API can be connected later.
+            break;
+
+
+        case "payments":
+
+            // Payment API can be connected later.
+            break;
+
+
+        case "outstanding":
+
+            // Outstanding API can be connected later.
+            break;
+
+
+        case "announcements":
+
+            break;
+
+
+        case "messages":
+
+            break;
+
+
+        case "notifications":
+
+            break;
+
+
+        case "school-profile":
+
+            loadSchoolPage();
+
+            break;
+
+
+        case "user-roles":
+
+            break;
+
+
+        case "payment-settings":
+
+            break;
+
+
+        case "security":
+
+            break;
+
+
+        case "email-settings":
+
+            break;
+
+
+        case "backup":
+
+            break;
+
     }
 
 
-    // --------------------------------------------------------
-    // Close mobile sidebar after navigation
-    // --------------------------------------------------------
+    /* --------------------------------------------------------
+       6. CLOSE MOBILE SIDEBAR
+    -------------------------------------------------------- */
 
     if (
         window.innerWidth <= 900 &&
@@ -507,9 +588,15 @@ function showPage(pageName) {
 }
 
 
-// ============================================================
-// NAVIGATION CLICK HANDLERS
-// ============================================================
+/* ============================================================
+   SIDEBAR CLICK EVENTS
+============================================================ */
+
+/*
+    THIS IS THE ONLY SIDEBAR NAVIGATION LISTENER.
+
+    Do NOT add another [data-page] listener elsewhere.
+*/
 
 navItems.forEach(item => {
 
@@ -519,8 +606,12 @@ navItems.forEach(item => {
 
             event.preventDefault();
 
+            event.stopPropagation();
+
             const pageName =
-                this.dataset.page;
+                this.getAttribute(
+                    "data-page"
+                );
 
             if (!pageName) {
                 return;
@@ -534,9 +625,9 @@ navItems.forEach(item => {
 });
 
 
-// ============================================================
-// REPORTS SUBMENU
-// ============================================================
+/* ============================================================
+   REPORTS SUBMENU
+============================================================ */
 
 const reportsToggle =
     document.querySelector(
@@ -551,23 +642,29 @@ if (reportsToggle) {
 
             event.preventDefault();
 
+            event.stopPropagation();
+
             const group =
-                this.closest(".nav-group");
+                this.closest(
+                    ".nav-group"
+                );
 
             if (!group) {
                 return;
             }
 
-            group.classList.toggle("open");
+            group.classList.toggle(
+                "open"
+            );
 
         }
     );
 }
 
 
-// ============================================================
-// SETTINGS SUBMENU
-// ============================================================
+/* ============================================================
+   SETTINGS SUBMENU
+============================================================ */
 
 const settingsToggle =
     document.querySelector(
@@ -582,31 +679,18 @@ if (settingsToggle) {
 
             event.preventDefault();
 
+            event.stopPropagation();
+
             const group =
-                this.closest(".nav-group");
+                this.closest(
+                    ".nav-group"
+                );
 
             if (!group) {
                 return;
             }
 
-            group.classList.toggle("open");
-
-        }
-    );
-}
-
-
-// ============================================================
-// MOBILE SIDEBAR
-// ============================================================
-
-if (menuToggle) {
-
-    menuToggle.addEventListener(
-        "click",
-        () => {
-
-            sidebar?.classList.toggle(
+            group.classList.toggle(
                 "open"
             );
 
@@ -615,14 +699,38 @@ if (menuToggle) {
 }
 
 
-// ============================================================
-// THEME
-// ============================================================
+/* ============================================================
+   MOBILE SIDEBAR
+============================================================ */
+
+if (menuToggle) {
+
+    menuToggle.addEventListener(
+        "click",
+        () => {
+
+            if (!sidebar) {
+                return;
+            }
+
+            sidebar.classList.toggle(
+                "open"
+            );
+
+        }
+    );
+}
+
+
+/* ============================================================
+   THEME
+============================================================ */
 
 const savedTheme =
     localStorage.getItem(
         "edutrust_theme"
     );
+
 
 if (savedTheme === "dark") {
 
@@ -631,7 +739,8 @@ if (savedTheme === "dark") {
     );
 
     if (themeToggle) {
-        themeToggle.textContent = "☀️";
+        themeToggle.textContent =
+            "☀️";
     }
 }
 
@@ -668,9 +777,9 @@ if (themeToggle) {
 }
 
 
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
+/* ============================================================
+   NOTIFICATIONS
+============================================================ */
 
 if (notificationButton) {
 
@@ -680,9 +789,13 @@ if (notificationButton) {
 
             event.stopPropagation();
 
-            notificationDropdown?.classList.toggle(
-                "show"
-            );
+            if (notificationDropdown) {
+
+                notificationDropdown.classList.toggle(
+                    "show"
+                );
+
+            }
 
         }
     );
@@ -713,14 +826,15 @@ document.addEventListener(
 );
 
 
-// ============================================================
-// SCHOOL UPDATE
-// ============================================================
+/* ============================================================
+   SCHOOL FORM UPDATE
+============================================================ */
 
 const schoolForm =
     document.getElementById(
         "schoolForm"
     );
+
 
 if (schoolForm) {
 
@@ -729,6 +843,7 @@ if (schoolForm) {
         async event => {
 
             event.preventDefault();
+
 
             if (!currentSchool?._id) {
 
@@ -740,58 +855,87 @@ if (schoolForm) {
                 return;
             }
 
+
             const saveButton =
                 document.getElementById(
                     "saveSchoolButton"
                 );
 
+
             const payload = {
 
                 name:
-                    document.getElementById(
-                        "schoolName"
-                    )?.value.trim(),
+                    document
+                        .getElementById(
+                            "schoolName"
+                        )
+                        ?.value
+                        .trim(),
 
                 phone:
-                    document.getElementById(
-                        "schoolPhone"
-                    )?.value.trim(),
+                    document
+                        .getElementById(
+                            "schoolPhone"
+                        )
+                        ?.value
+                        .trim(),
 
                 email:
-                    document.getElementById(
-                        "schoolEmail"
-                    )?.value.trim()
+                    document
+                        .getElementById(
+                            "schoolEmail"
+                        )
+                        ?.value
+                        .trim()
                         .toLowerCase(),
 
                 address:
-                    document.getElementById(
-                        "schoolAddress"
-                    )?.value.trim(),
+                    document
+                        .getElementById(
+                            "schoolAddress"
+                        )
+                        ?.value
+                        .trim(),
 
                 school_type:
-                    document.getElementById(
-                        "schoolType"
-                    )?.value.trim(),
+                    document
+                        .getElementById(
+                            "schoolType"
+                        )
+                        ?.value
+                        .trim(),
 
                 academic_session:
-                    document.getElementById(
-                        "academicSession"
-                    )?.value.trim(),
+                    document
+                        .getElementById(
+                            "academicSession"
+                        )
+                        ?.value
+                        .trim(),
 
                 current_term:
-                    document.getElementById(
-                        "currentTerm"
-                    )?.value,
+                    document
+                        .getElementById(
+                            "currentTerm"
+                        )
+                        ?.value,
 
                 motto:
-                    document.getElementById(
-                        "schoolMotto"
-                    )?.value.trim(),
+                    document
+                        .getElementById(
+                            "schoolMotto"
+                        )
+                        ?.value
+                        .trim(),
 
                 website:
-                    document.getElementById(
-                        "schoolWebsite"
-                    )?.value.trim()
+                    document
+                        .getElementById(
+                            "schoolWebsite"
+                        )
+                        ?.value
+                        .trim()
+
             };
 
 
@@ -804,6 +948,7 @@ if (schoolForm) {
 
                     saveButton.textContent =
                         "Saving...";
+
                 }
 
 
@@ -827,6 +972,7 @@ if (schoolForm) {
                         data.message ||
                         "Failed to update school."
                     );
+
                 }
 
 
@@ -834,6 +980,7 @@ if (schoolForm) {
                     data.school;
 
                 renderProfile();
+
                 populateSchoolForm();
 
                 showToast(
@@ -864,6 +1011,7 @@ if (schoolForm) {
 
                     saveButton.textContent =
                         "Save School Profile";
+
                 }
 
             }
@@ -873,124 +1021,24 @@ if (schoolForm) {
 }
 
 
-// ============================================================
-// LOAD DASHBOARD
-// ============================================================
+/* ============================================================
+   SCHOOL PAGE
+============================================================ */
 
-async function loadDashboard() {
+async function loadSchoolPage() {
 
-    try {
+    if (!currentSchool) {
 
-        const data =
-            await apiRequest(
-                "/dashboard"
-            );
-
-        if (!data) {
-            return;
-        }
-
-        updateElement(
-            "totalStudents",
-            Number(
-                data.totalStudents || 0
-            ).toLocaleString()
-        );
-
-        updateElement(
-            "totalParents",
-            Number(
-                data.totalParents || 0
-            ).toLocaleString()
-        );
-
-        updateElement(
-            "feesCollected",
-            formatCurrency(
-                data.feesCollected || 0
-            )
-        );
-
-        updateElement(
-            "outstandingFees",
-            formatCurrency(
-                data.outstandingFees || 0
-            )
-        );
-
-        updateElement(
-            "collectionCollected",
-            formatCurrency(
-                data.feesCollected || 0
-            )
-        );
-
-        updateElement(
-            "collectionOutstanding",
-            formatCurrency(
-                data.outstandingFees || 0
-            )
-        );
-
-        const collected =
-            Number(
-                data.feesCollected || 0
-            );
-
-        const outstanding =
-            Number(
-                data.outstandingFees || 0
-            );
-
-        const total =
-            collected + outstanding;
-
-        const percentage =
-            total > 0
-                ? Math.round(
-                    (collected / total) * 100
-                )
-                : 0;
-
-        updateElement(
-            "collectionPercentage",
-            `${percentage}%`
-        );
-
-    } catch (error) {
-
-        console.warn(
-            "Dashboard data unavailable:",
-            error.message
-        );
+        await loadProfile();
 
     }
+
 }
 
 
-// ============================================================
-// FORMAT CURRENCY
-// ============================================================
-
-function formatCurrency(value) {
-
-    const amount =
-        Number(value || 0);
-
-    return "₦" +
-        amount.toLocaleString(
-            "en-NG",
-            {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            }
-        );
-}
-
-
-// ============================================================
-// LOAD STUDENTS
-// ============================================================
+/* ============================================================
+   STUDENTS
+============================================================ */
 
 async function loadStudents() {
 
@@ -999,16 +1047,17 @@ async function loadStudents() {
             "studentsTable"
         );
 
+
     if (!table) {
         return;
     }
 
 
-    // Show loading state
+    /* Show loading state */
 
     table.innerHTML = `
         <tr>
-            <td colspan="5">
+            <td colspan="5" style="text-align:center;">
                 Loading students...
             </td>
         </tr>
@@ -1024,12 +1073,8 @@ async function loadStudents() {
 
 
         const students =
-            Array.isArray(data.students)
-                ? data.students
-                : [];
+            data.students || [];
 
-
-        // Update dashboard total
 
         updateElement(
             "totalStudents",
@@ -1037,13 +1082,11 @@ async function loadStudents() {
         );
 
 
-        // No students
-
         if (!students.length) {
 
             table.innerHTML = `
                 <tr>
-                    <td colspan="5">
+                    <td colspan="5" style="text-align:center;">
                         No students found.
                     </td>
                 </tr>
@@ -1052,8 +1095,6 @@ async function loadStudents() {
             return;
         }
 
-
-        // Render students
 
         table.innerHTML =
             students
@@ -1102,15 +1143,15 @@ async function loadStudents() {
 
                             <td>
 
-                                <span class="status ${getStatusClass(
-                                    student.status
-                                )}">
-
+                                <span
+                                    class="status ${getStatusClass(
+                                        student.status
+                                    )}"
+                                >
                                     ${escapeHtml(
                                         student.status ||
                                         "Active"
                                     )}
-
                                 </span>
 
                             </td>
@@ -1129,9 +1170,10 @@ async function loadStudents() {
             error
         );
 
+
         table.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="5" style="text-align:center;">
                     Unable to load students.
                 </td>
             </tr>
@@ -1141,9 +1183,9 @@ async function loadStudents() {
 }
 
 
-// ============================================================
-// LOAD PARENTS
-// ============================================================
+/* ============================================================
+   PARENTS
+============================================================ */
 
 async function loadParents() {
 
@@ -1152,6 +1194,7 @@ async function loadParents() {
             "parentsTable"
         );
 
+
     if (!table) {
         return;
     }
@@ -1159,7 +1202,7 @@ async function loadParents() {
 
     table.innerHTML = `
         <tr>
-            <td colspan="5">
+            <td colspan="5" style="text-align:center;">
                 Loading parents...
             </td>
         </tr>
@@ -1175,9 +1218,7 @@ async function loadParents() {
 
 
         const parents =
-            Array.isArray(data.parents)
-                ? data.parents
-                : [];
+            data.parents || [];
 
 
         updateElement(
@@ -1190,7 +1231,7 @@ async function loadParents() {
 
             table.innerHTML = `
                 <tr>
-                    <td colspan="5">
+                    <td colspan="5" style="text-align:center;">
                         No parents found.
                     </td>
                 </tr>
@@ -1247,15 +1288,15 @@ async function loadParents() {
 
                             <td>
 
-                                <span class="status ${getStatusClass(
-                                    parent.status
-                                )}">
-
+                                <span
+                                    class="status ${getStatusClass(
+                                        parent.status
+                                    )}"
+                                >
                                     ${escapeHtml(
                                         parent.status ||
                                         "Active"
                                     )}
-
                                 </span>
 
                             </td>
@@ -1274,9 +1315,10 @@ async function loadParents() {
             error
         );
 
+
         table.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="5" style="text-align:center;">
                     Unable to load parents.
                 </td>
             </tr>
@@ -1286,9 +1328,40 @@ async function loadParents() {
 }
 
 
-// ============================================================
-// STATUS CLASS
-// ============================================================
+/* ============================================================
+   DASHBOARD OVERVIEW
+============================================================ */
+
+async function loadDashboardOverview() {
+
+    /*
+        Students and parents are already loaded when needed.
+
+        This function exists so Overview is a proper page
+        just like Students, Parents, School, etc.
+    */
+
+    try {
+
+        await Promise.allSettled([
+            loadStudents(),
+            loadParents()
+        ]);
+
+    } catch (error) {
+
+        console.error(
+            "OVERVIEW ERROR:",
+            error
+        );
+
+    }
+}
+
+
+/* ============================================================
+   STATUS CLASS
+============================================================ */
 
 function getStatusClass(status) {
 
@@ -1299,24 +1372,65 @@ function getStatusClass(status) {
 
         case "active":
         case "paid":
+
             return "paid";
 
+
         case "pending":
+
             return "pending";
+
 
         case "suspended":
         case "inactive":
+
             return "warning";
 
+
         default:
+
             return "";
+
     }
 }
 
 
-// ============================================================
-// LOGOUT
-// ============================================================
+/* ============================================================
+   UPDATE ELEMENT
+============================================================ */
+
+function updateElement(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+    if (element) {
+
+        element.textContent =
+            value;
+
+    }
+}
+
+
+/* ============================================================
+   ESCAPE HTML
+============================================================ */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
 
 if (logoutButton) {
 
@@ -1340,20 +1454,98 @@ if (logoutButton) {
 }
 
 
-// ============================================================
-// INITIAL LOAD
-// ============================================================
+/* ============================================================
+   ADD STUDENT BUTTONS
+============================================================ */
+
+const addStudentButton =
+    document.getElementById(
+        "addStudentButton"
+    );
+
+
+const studentsAddButton =
+    document.getElementById(
+        "studentsAddButton"
+    );
+
+
+function openAddStudent() {
+
+    /*
+        For now this opens the Students page.
+
+        Later we can replace this with
+        your Add Student modal/form.
+    */
+
+    showPage("students");
+
+}
+
+
+if (addStudentButton) {
+
+    addStudentButton.addEventListener(
+        "click",
+        openAddStudent
+    );
+
+}
+
+
+if (studentsAddButton) {
+
+    studentsAddButton.addEventListener(
+        "click",
+        openAddStudent
+    );
+
+}
+
+
+/* ============================================================
+   ADD PARENT
+============================================================ */
+
+const addParentButton =
+    document.getElementById(
+        "addParentButton"
+    );
+
+
+if (addParentButton) {
+
+    addParentButton.addEventListener(
+        "click",
+        () => {
+
+            showPage("parents");
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   INITIALIZE DASHBOARD
+============================================================ */
 
 async function initializeDashboard() {
 
+    /*
+        First make Overview visible.
+    */
+
+    showPage("overview");
+
+
+    /*
+        Then load profile.
+    */
+
     await loadProfile();
-
-    // Load overview data initially.
-    await loadDashboard();
-
-    // Do not force Students page open.
-    // Students loads automatically when
-    // the Students sidebar button is clicked.
 
 }
 
