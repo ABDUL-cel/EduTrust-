@@ -1186,19 +1186,31 @@ async function loadStudents() {
 // =====================================================
 // LOAD STAFF & TEACHERS
 // =====================================================
+// =====================================================
+// LOAD STAFF & TEACHERS
+// =====================================================
 
 async function loadStaff() {
-    const table = document.querySelector("#staffPage tbody");
 
-    if (!table) return;
+    const table =
+        document.querySelector(
+            "#staffPage tbody"
+        );
 
+    if (!table) {
+        return;
+    }
+
+    // Show loading state
     table.innerHTML = `
         <tr>
-            <td colspan="5">Loading staff...</td>
+            <td colspan="5" style="text-align:center;">
+                Loading staff...
+            </td>
         </tr>
     `;
 
-    try {
+   try {
         const token = localStorage.getItem("token");
 
         if (!token) {
@@ -1215,81 +1227,136 @@ async function loadStaff() {
                 }
             }
         );
-if (!response.ok || !result.success) {
-    console.log("STAFF API STATUS:", response.status);
-    console.log("STAFF API RESPONSE:", result);
 
-    throw new Error(
-        result.message ||
-        "Failed to load staff."
-    );
-}
+        const data =
+            await apiRequest("/staff");
 
-        const staff = result.staff || [];
+
+        // =================================================
+        // CHECK RESPONSE
+        // =================================================
+
+        if (!data.success) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load staff."
+            );
+
+        }
+
+
+        // =================================================
+        // GET STAFF ARRAY
+        // =================================================
+
+        const staff =
+            data.staff || [];
+
+
+        console.log(
+            "STAFF LOADED:",
+            staff
+        );
+
+
+        // =================================================
+        // UPDATE STAFF TABLE
+        // =================================================
 
         if (!staff.length) {
+
             table.innerHTML = `
                 <tr>
-                    <td colspan="5">
+                    <td
+                        colspan="5"
+                        style="text-align:center;"
+                    >
                         No staff or teachers registered yet.
                     </td>
                 </tr>
             `;
+
             return;
         }
 
-        table.innerHTML = staff.map(member => {
 
-            const fullName =
-                member.full_name ||
-                [
-                    member.first_name,
-                    member.last_name
-                ]
-                    .filter(Boolean)
-                    .join(" ") ||
-                "Unnamed";
+        // =================================================
+        // RENDER STAFF
+        // =================================================
 
-            return `
-                <tr>
+        table.innerHTML =
+            staff
+                .map(member => {
 
-                    <td>
-                        ${escapeHtml(fullName)}
-                    </td>
+                    const fullName =
+                        member.full_name ||
+                        [
+                            member.first_name,
+                            member.last_name
+                        ]
+                            .filter(Boolean)
+                            .join(" ") ||
+                        "Unnamed";
 
-                    <td>
-                        ${escapeHtml(
-                            member.role || "Staff"
-                        )}
-                    </td>
 
-                    <td>
-                        ${escapeHtml(
-                            member.email || "—"
-                        )}
-                    </td>
+                    const role =
+                        member.role ||
+                        "Staff";
 
-                    <td>
-                        ${escapeHtml(
-                            member.phone || "—"
-                        )}
-                    </td>
 
-                    <td>
-                        <span class="status-badge ${
-                            String(member.status)
-                                .toLowerCase()
-                        }">
-                            ${escapeHtml(
-                                member.status || "Unknown"
-                            )}
-                        </span>
-                    </td>
+                    const email =
+                        member.email ||
+                        "—";
 
-                </tr>
-            `;
 
-        }).join("");
+                    const phone =
+                        member.phone ||
+                        "—";
+
+
+                    const status =
+                        member.status ||
+                        "Unknown";
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(fullName)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(role)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(email)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(phone)}
+                            </td>
+
+                            <td>
+
+                                <span
+                                    class="status-badge ${String(
+                                        status
+                                    ).toLowerCase()}"
+                                >
+                                    ${escapeHtml(status)}
+                                </span>
+
+                            </td>
+
+                        </tr>
+                    `;
+
+                })
+                .join("");
+
 
     } catch (error) {
 
@@ -1298,15 +1365,22 @@ if (!response.ok || !result.success) {
             error
         );
 
+
         table.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td
+                    colspan="5"
+                    style="text-align:center;"
+                >
                     Failed to load staff.
                 </td>
             </tr>
         `;
+
     }
+
 }
+
 /* ============================================================
    PARENTS
 ============================================================ */
