@@ -82,63 +82,53 @@
             <h3>Send Us a Direct Message</h3>
             <p>Fill out the form below and our support team will respond within 2–4 hours.</p>
         </div>
+<!-- Alert Box Banner for Success/Error Messages -->
+<div id="formAlert" class="form-alert" style="display: none;"></div>
 
-        <form id="contactForm" class="contact-form" action="#" method="POST">
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="fullName">Full Name <span class="required">*</span></label>
-                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
-                </div>
+<form id="contactForm" class="contact-form">
+    <div class="form-group">
+        <label for="fullName">Full Name *</label>
+        <input type="text" id="fullName" name="fullName" placeholder="e.g. Dr. Olatunji M." required>
+    </div>
 
-                <div class="form-group">
-                    <label for="email">Email Address <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" placeholder="e.g. admin@school.com" required>
-                </div>
-            </div>
+    <div class="form-group">
+        <label for="email">Email Address *</label>
+        <input type="email" id="email" name="email" placeholder="e.g. name@school.edu.ng" required>
+    </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" placeholder="e.g. 08086205382">
-                </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="phone">Phone Number (Optional)</label>
+            <input type="tel" id="phone" name="phone" placeholder="+234...">
+        </div>
 
-                <div class="form-group">
-                    <label for="userRole">I am a... <span class="required">*</span></label>
-                    <select id="userRole" name="userRole" required>
-                        <option value="" disabled selected>Select your role</option>
-                        <option value="School Owner / Admin">School Owner / Admin</option>
-                        <option value="Teacher">Teacher</option>
-                        <option value="Parent">Parent / Guardian</option>
-                        <option value="Student">Student</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-            </div>
+        <div class="form-group">
+            <label for="userRole">I am a *</label>
+            <select id="userRole" name="userRole" required>
+                <option value="" disabled selected>Select Role</option>
+                <option value="School Owner">School Owner / Proprietor</option>
+                <option value="Teacher">Teacher / Instructor</option>
+                <option value="Parent">Parent / Guardian</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    </div>
 
-            <div class="form-group">
-                <label for="subject">Inquiry Type <span class="required">*</span></label>
-                <select id="subject" name="subject" required>
-                    <option value="" disabled selected>Select category</option>
-                    <option value="Onboarding & Setup">Onboarding & School Setup</option>
-                    <option value="Result Processing">Result Processing & Gradebook Issue</option>
-                    <option value="Portal Access">Portal Access / Login Issue</option>
-                    <option value="Billing & Pricing">Billing & Pricing Inquiry</option>
-                    <option value="Demo Request">Request a Live Demonstration</option>
-                    <option value="General Inquiry">General Inquiry</option>
-                </select>
-            </div>
+    <div class="form-group">
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" name="subject" placeholder="e.g. School Onboarding Inquiry">
+    </div>
 
-            <div class="form-group">
-                <label for="message">Message Details <span class="required">*</span></label>
-                <textarea id="message" name="message" rows="5" placeholder="How can we assist you today?" required></textarea>
-            </div>
+    <div class="form-group">
+        <label for="message">Message *</label>
+        <textarea id="message" name="message" rows="5" placeholder="How can EduTrust help you?" required></textarea>
+    </div>
 
-            <button type="submit" class="submit-btn">
-                <span>Send Message</span>
-            </button>
+    <button type="submit" id="submitBtn" class="btn-primary">
+        Send Message
+    </button>
+</form>
 
-        </form>
     </div>
 
 </section>
@@ -161,6 +151,9 @@
         © 2026 EduTrust. All Rights Reserved.
     </p>
 </footer>
+
+    
+<!-- Link contact.js at the end of body -->
 <script src="contact.js"></script>
 </body>
 </html>
