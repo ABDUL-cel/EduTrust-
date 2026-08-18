@@ -10,6 +10,7 @@ const {
     createStaff,
     getStaff,
     getStaffMember,
+    updateStaff, // <--- Import here
     suspendStaff,
     activateStaff
 } = require("../controllers/staffController");
@@ -19,7 +20,12 @@ const {
 // Authentication
 // =======================================
 router.use(authMiddleware);
-
+// Principal only - Update staff
+router.put(
+    "/:id",
+    roleMiddleware("Principal"),
+    updateStaff
+);
 
 // =======================================
 // Staff Management
