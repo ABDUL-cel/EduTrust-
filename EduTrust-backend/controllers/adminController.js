@@ -1,8 +1,8 @@
 const ContactMessage = require('../models/ContactMessage');
 // Assuming you have School, User, and Result models in your project
-const School = require('../models/School');
+const School = require('../models/school');
 const User = require('../models/User');
-const Result = require('../models/Result');
+const Result = require('../models/result');
 
 // @desc    Get top-level dashboard metrics
 // @route   GET /api/admin/dashboard-stats
