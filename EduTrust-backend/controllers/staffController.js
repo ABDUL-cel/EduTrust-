@@ -9,13 +9,13 @@ const STAFF_ROLES = [
   "Accountant",
   "Secretary"
 ];
-
 // ======================================================
 // REGISTER STAFF (SELF-REGISTRATION VIA SCHOOL CODE)
 // ======================================================
 exports.registerStaff = async (req, res) => {
   try {
-    const { full_name, email, phone, password, school_code } = req.body;
+    // 1. Destructure 'role' from req.body alongside other fields
+    const { full_name, email, phone, password, school_code, role } = req.body;
 
     if (!full_name || !email || !password || !school_code) {
       return res.status(400).json({
@@ -34,7 +34,7 @@ exports.registerStaff = async (req, res) => {
     const normalizedEmail = String(email).trim().toLowerCase();
     const normalizedCode = String(school_code).trim().toUpperCase();
 
-    // 1. Check if user already exists
+    // 2. Check if user already exists
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(409).json({
@@ -43,7 +43,7 @@ exports.registerStaff = async (req, res) => {
       });
     }
 
-    // 2. Validate School Code
+    // 3. Validate School Code
     const school = await School.findOne({ school_code: normalizedCode });
     if (!school) {
       return res.status(404).json({
@@ -55,7 +55,7 @@ exports.registerStaff = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const nameParts = full_name.trim().split(" ");
 
-    // 3. Create Staff with 'Pending' status
+    // 4. Create Staff with valid 'role' and 'Pending' status
     await User.create({
       first_name: nameParts[0] || "",
       last_name: nameParts.slice(1).join(" ") || "",
@@ -63,8 +63,8 @@ exports.registerStaff = async (req, res) => {
       email: normalizedEmail,
       phone: phone || "",
       password: hashedPassword,
-      role: "PendingStaff",
-      status: "Pending",
+      role: role || "Teacher", // Set role to requested value (or default to "Teacher"/"Staff")
+      status: "Pending",       // 'status' handles account approval state!
       school_id: school._id
     });
 
@@ -81,6 +81,7 @@ exports.registerStaff = async (req, res) => {
     });
   }
 };
+
 
 // ======================================================
 // GET ALL PENDING STAFF FOR THE PRINCIPAL'S SCHOOL
