@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
-const School = require("../models/School");
+const School = require("../models/school");
 
 const STAFF_ROLES = [
   "Vice Principal",
