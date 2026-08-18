@@ -1,74 +1,45 @@
-
 const express = require("express");
-
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
 const {
-    createStaff,
-    getStaff,
-    getStaffMember,
-    updateStaff, // <--- Import here
-    suspendStaff,
-    activateStaff
+  registerStaff,
+  getPendingStaff,
+  approveStaff,
+  rejectStaff,
+  createStaff,
+  getStaff,
+  getStaffMember,
+  updateStaff,
+  suspendStaff,
+  activateStaff
 } = require("../controllers/staffController");
 
+// =======================================
+// PUBLIC ROUTE (Self-Registration)
+// =======================================
+router.post("/register", registerStaff);
 
 // =======================================
-// Authentication
+// PROTECTED ROUTES (Principal & Admin)
 // =======================================
 router.use(authMiddleware);
-// Principal only - Update staff
-router.put(
-    "/:id",
-    roleMiddleware("Principal"),
-    updateStaff
-);
 
-// =======================================
-// Staff Management
-// =======================================
+// Approval Workflow
+router.get("/pending", roleMiddleware("Principal"), getPendingStaff);
+router.patch("/approve/:staff_id", roleMiddleware("Principal"), approveStaff);
+router.delete("/reject/:staff_id", roleMiddleware("Principal"), rejectStaff);
 
-// Principal only
-router.post(
-    "/",
-    roleMiddleware("Principal"),
-    createStaff
-);
+// Staff Management (Collection Level)
+router.post("/", roleMiddleware("Principal"), createStaff);
+router.get("/", roleMiddleware("Principal"), getStaff);
 
-
-// Principal only
-router.get(
-    "/",
-    roleMiddleware("Principal"),
-    getStaff
-);
-
-
-// Principal only
-router.get(
-    "/:id",
-    roleMiddleware("Principal"),
-    getStaffMember
-);
-
-
-// Principal only
-router.patch(
-    "/:id/suspend",
-    roleMiddleware("Principal"),
-    suspendStaff
-);
-
-
-// Principal only
-router.patch(
-    "/:id/activate",
-    roleMiddleware("Principal"),
-    activateStaff
-);
-
+// Staff Management (Individual Member Level)
+router.get("/:id", roleMiddleware("Principal"), getStaffMember);
+router.put("/:id", roleMiddleware("Principal"), updateStaff);
+router.patch("/:id/suspend", roleMiddleware("Principal"), suspendStaff);
+router.patch("/:id/activate", roleMiddleware("Principal"), activateStaff);
 
 module.exports = router;
