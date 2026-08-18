@@ -1,5 +1,3 @@
-// dashboard.js
-
 "use strict";
 
 
@@ -7,7 +5,8 @@
 // CONFIGURATION
 // ============================================================
 
-const API_BASE_URL = "https://edutrust-15ii.onrender.com/api";
+const API_BASE_URL =
+    "https://edutrust-15ii.onrender.com/api";
 
 
 // ============================================================
@@ -18,7 +17,6 @@ const token =
     localStorage.getItem("token") ||
     sessionStorage.getItem("token");
 
-
 if (!token) {
     window.location.href = "login.html";
 }
@@ -28,10 +26,7 @@ if (!token) {
 // API HELPER
 // ============================================================
 
-async function apiRequest(
-    endpoint,
-    options = {}
-) {
+async function apiRequest(endpoint, options = {}) {
 
     const response = await fetch(
         `${API_BASE_URL}${endpoint}`,
@@ -57,9 +52,7 @@ async function apiRequest(
         data = {};
     }
 
-    if (
-        response.status === 401
-    ) {
+    if (response.status === 401) {
 
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");
@@ -113,10 +106,7 @@ const toast =
 // TOAST
 // ============================================================
 
-function showToast(
-    message,
-    type = "success"
-) {
+function showToast(message, type = "success") {
 
     if (!toast) {
         alert(message);
@@ -131,9 +121,7 @@ function showToast(
     toast.classList.add("show");
 
     setTimeout(() => {
-
         toast.classList.remove("show");
-
     }, 3500);
 }
 
@@ -147,7 +135,72 @@ let currentUser = null;
 
 
 // ============================================================
-// LOAD PROFILE
+// INITIALS
+// ============================================================
+
+function getInitials(name) {
+
+    return String(name || "School")
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(word =>
+            word.charAt(0).toUpperCase()
+        )
+        .join("");
+}
+
+
+// ============================================================
+// SET VALUE
+// ============================================================
+
+function setValue(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    element.value =
+        value || "";
+}
+
+
+// ============================================================
+// UPDATE ELEMENT
+// ============================================================
+
+function updateElement(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+
+// ============================================================
+// ESCAPE HTML
+// ============================================================
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+// ============================================================
+// PROFILE
 // ============================================================
 
 async function loadProfile() {
@@ -167,14 +220,10 @@ async function loadProfile() {
             );
         }
 
-        currentUser =
-            data.user;
-
-        currentSchool =
-            data.school;
+        currentUser = data.user;
+        currentSchool = data.school;
 
         renderProfile();
-
         populateSchoolForm();
 
     } catch (error) {
@@ -247,27 +296,6 @@ function renderProfile() {
 
 
 // ============================================================
-// INITIALS
-// ============================================================
-
-function getInitials(
-    name
-) {
-
-    return String(name || "School")
-        .trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map(
-            word =>
-                word.charAt(0)
-                    .toUpperCase()
-        )
-        .join("");
-}
-
-
-// ============================================================
 // POPULATE SCHOOL FORM
 // ============================================================
 
@@ -327,7 +355,6 @@ function populateSchoolForm() {
         currentSchool.website
     );
 
-
     const principalInput =
         document.getElementById(
             "schoolPrincipal"
@@ -343,114 +370,193 @@ function populateSchoolForm() {
 
 
 // ============================================================
-// SET VALUE
+// PAGE NAVIGATION
 // ============================================================
 
-function setValue(
-    id,
-    value
-) {
+const navItems =
+    document.querySelectorAll(
+        ".nav-item[data-page], .submenu-item[data-page], .text-button[data-page]"
+    );
 
-    const element =
-        document.getElementById(id);
+const pages =
+    document.querySelectorAll(
+        ".page-content"
+    );
 
-    if (!element) {
-        return;
-    }
-
-    element.value =
-        value || "";
-}
-
-
-// =====================================================
-// SIDEBAR PAGE NAVIGATION
-// =====================================================
-
-const navItems = document.querySelectorAll(
-    ".nav-item[data-page], .submenu-item[data-page]"
-);
-
-const pages = document.querySelectorAll(
-    ".page-content"
-);
 
 function showPage(pageName) {
 
-    pages.forEach((page) => {
+    if (!pageName) {
+        return;
+    }
+
+    console.log(
+        "Opening dashboard page:",
+        pageName
+    );
+
+
+    // --------------------------------------------------------
+    // Hide every page
+    // --------------------------------------------------------
+
+    pages.forEach(page => {
+
         page.classList.add("hidden");
+
     });
 
-    const targetPage = document.getElementById(
-        `${pageName}Page`
-    );
 
-    if (targetPage) {
-        targetPage.classList.remove("hidden");
+    // --------------------------------------------------------
+    // Find requested page
+    // --------------------------------------------------------
+
+    const targetPage =
+        document.getElementById(
+            `${pageName}Page`
+        );
+
+
+    if (!targetPage) {
+
+        console.warn(
+            `Page "${pageName}Page" was not found.`
+        );
+
+        return;
     }
 
-    navItems.forEach((item) => {
-        item.classList.remove("active");
-    });
 
-    const activeItem = document.querySelector(
-        `[data-page="${pageName}"]`
-    );
+    // --------------------------------------------------------
+    // Show requested page
+    // --------------------------------------------------------
 
-    if (activeItem) {
-        activeItem.classList.add("active");
+    targetPage.classList.remove("hidden");
+
+
+    // --------------------------------------------------------
+    // Remove active state
+    // --------------------------------------------------------
+
+    document
+        .querySelectorAll(
+            ".nav-item[data-page], .submenu-item[data-page]"
+        )
+        .forEach(item => {
+
+            item.classList.remove("active");
+
+        });
+
+
+    // --------------------------------------------------------
+    // Activate clicked navigation item
+    // --------------------------------------------------------
+
+    document
+        .querySelectorAll(
+            `[data-page="${pageName}"]`
+        )
+        .forEach(item => {
+
+            item.classList.add("active");
+
+        });
+
+
+    // --------------------------------------------------------
+    // Page-specific loading
+    // --------------------------------------------------------
+
+    switch (pageName) {
+
+        case "overview":
+            loadDashboard();
+            break;
+
+        case "students":
+            loadStudents();
+            break;
+
+        case "parents":
+            loadParents();
+            break;
+
+        case "school":
+        case "school-profile":
+            populateSchoolForm();
+            break;
+
+        default:
+            break;
     }
 
-    // Load page data when required
-    if (pageName === "students") {
-        loadStudents();
-    }
 
-    if (pageName === "parents") {
-        loadParents();
-    }
+    // --------------------------------------------------------
+    // Close mobile sidebar after navigation
+    // --------------------------------------------------------
 
-    if (pageName === "school" ||
-        pageName === "school-profile") {
-        loadSchool();
+    if (
+        window.innerWidth <= 900 &&
+        sidebar
+    ) {
+
+        sidebar.classList.remove("open");
+
     }
 }
 
 
-// Sidebar buttons
-navItems.forEach((item) => {
+// ============================================================
+// NAVIGATION CLICK HANDLERS
+// ============================================================
 
-    item.addEventListener("click", function () {
+navItems.forEach(item => {
 
-        const pageName =
-            this.dataset.page;
+    item.addEventListener(
+        "click",
+        function(event) {
 
-        if (!pageName) return;
+            event.preventDefault();
 
-        showPage(pageName);
+            const pageName =
+                this.dataset.page;
 
-    });
+            if (!pageName) {
+                return;
+            }
+
+            showPage(pageName);
+
+        }
+    );
 
 });
 
 
-// =====================================================
+// ============================================================
 // REPORTS SUBMENU
-// =====================================================
+// ============================================================
 
 const reportsToggle =
-    document.querySelector(".reports-toggle");
+    document.querySelector(
+        ".reports-toggle"
+    );
 
 if (reportsToggle) {
 
     reportsToggle.addEventListener(
         "click",
-        function () {
+        function(event) {
+
+            event.preventDefault();
 
             const group =
                 this.closest(".nav-group");
 
-            if (!group) return;
+            if (!group) {
+                return;
+            }
 
             group.classList.toggle("open");
 
@@ -459,202 +565,35 @@ if (reportsToggle) {
 }
 
 
-// =====================================================
+// ============================================================
 // SETTINGS SUBMENU
-// =====================================================
+// ============================================================
 
 const settingsToggle =
-    document.querySelector(".settings-toggle");
+    document.querySelector(
+        ".settings-toggle"
+    );
 
 if (settingsToggle) {
 
     settingsToggle.addEventListener(
         "click",
-        function () {
+        function(event) {
+
+            event.preventDefault();
 
             const group =
                 this.closest(".nav-group");
 
-            if (!group) return;
+            if (!group) {
+                return;
+            }
 
             group.classList.toggle("open");
 
         }
     );
 }
-
-
-// =====================================================
-// DEFAULT PAGE
-// =====================================================
-
-showPage("overview");
-
-// ======================================================
-// RENDER STUDENTS INTO EXISTING STUDENTS PAGE
-// ======================================================
-
-function renderStudentsPage(students) {
-
-    const studentsPage =
-        document.getElementById("studentsPage");
-
-    if (!studentsPage) {
-        console.warn(
-            "studentsPage element was not found in dashboard.html"
-        );
-        return;
-    }
-
-    const tbody =
-        studentsPage.querySelector("tbody");
-
-    if (!tbody) {
-        console.warn(
-            "Students table tbody was not found."
-        );
-        return;
-    }
-
-    tbody.innerHTML = "";
-
-    if (!students.length) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="100%" style="text-align:center;">
-                    No students found.
-                </td>
-            </tr>
-        `;
-
-        return;
-    }
-
-    students.forEach(student => {
-
-        const fullName = [
-            student.first_name,
-            student.other_name,
-            student.last_name
-        ]
-            .filter(Boolean)
-            .join(" ");
-
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>
-                ${fullName || "N/A"}
-            </td>
-
-            <td>
-                ${student.admission_number || "N/A"}
-            </td>
-
-            <td>
-                ${student.class_name || "N/A"}
-            </td>
-
-            <td>
-                ${student.arm || "N/A"}
-            </td>
-
-            <td>
-                ${student.gender || "N/A"}
-            </td>
-
-            <td>
-                <span class="status ${String(student.status || "").toLowerCase()}">
-                    ${student.status || "N/A"}
-                </span>
-            </td>
-        `;
-
-        tbody.appendChild(row);
-    });
-}
-
-
-// ======================================================
-// WHEN STUDENTS SIDEBAR IS CLICKED
-// ======================================================
-
-document.querySelectorAll(
-    '[data-page="students"]'
-).forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        setTimeout(() => {
-            loadStudentsFromBackend();
-        }, 100);
-
-    });
-
-});
-// ============================================================
-// NAV BUTTONS
-// ============================================================
-
-document
-    .querySelectorAll(
-        "[data-page]"
-    )
-    .forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const page =
-                        button.dataset.page;
-
-                    if (page) {
-
-                        showPage(page);
-                    }
-
-                }
-            );
-
-        }
-    );
-
-
-// ============================================================
-// REPORTS TOGGLE
-// ============================================================
-
-document
-    .querySelectorAll(
-        ".reports-toggle, .settings-toggle"
-    )
-    .forEach(
-        toggle => {
-
-            toggle.addEventListener(
-                "click",
-                () => {
-
-                    const group =
-                        toggle.closest(
-                            ".nav-group"
-                        );
-
-                    if (!group) {
-                        return;
-                    }
-
-                    group.classList.toggle(
-                        "open"
-                    );
-
-                }
-            );
-
-        }
-    );
 
 
 // ============================================================
@@ -723,6 +662,7 @@ if (themeToggle) {
                 dark
                     ? "☀️"
                     : "🌙";
+
         }
     );
 }
@@ -766,6 +706,7 @@ document.addEventListener(
             notificationDropdown.classList.remove(
                 "show"
             );
+
         }
 
     }
@@ -780,7 +721,6 @@ const schoolForm =
     document.getElementById(
         "schoolForm"
     );
-
 
 if (schoolForm) {
 
@@ -800,12 +740,10 @@ if (schoolForm) {
                 return;
             }
 
-
             const saveButton =
                 document.getElementById(
                     "saveSchoolButton"
                 );
-
 
             const payload = {
 
@@ -874,6 +812,7 @@ if (schoolForm) {
                         `/schools/${currentSchool._id}`,
                         {
                             method: "PUT",
+
                             body:
                                 JSON.stringify(
                                     payload
@@ -895,7 +834,6 @@ if (schoolForm) {
                     data.school;
 
                 renderProfile();
-
                 populateSchoolForm();
 
                 showToast(
@@ -936,6 +874,121 @@ if (schoolForm) {
 
 
 // ============================================================
+// LOAD DASHBOARD
+// ============================================================
+
+async function loadDashboard() {
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/dashboard"
+            );
+
+        if (!data) {
+            return;
+        }
+
+        updateElement(
+            "totalStudents",
+            Number(
+                data.totalStudents || 0
+            ).toLocaleString()
+        );
+
+        updateElement(
+            "totalParents",
+            Number(
+                data.totalParents || 0
+            ).toLocaleString()
+        );
+
+        updateElement(
+            "feesCollected",
+            formatCurrency(
+                data.feesCollected || 0
+            )
+        );
+
+        updateElement(
+            "outstandingFees",
+            formatCurrency(
+                data.outstandingFees || 0
+            )
+        );
+
+        updateElement(
+            "collectionCollected",
+            formatCurrency(
+                data.feesCollected || 0
+            )
+        );
+
+        updateElement(
+            "collectionOutstanding",
+            formatCurrency(
+                data.outstandingFees || 0
+            )
+        );
+
+        const collected =
+            Number(
+                data.feesCollected || 0
+            );
+
+        const outstanding =
+            Number(
+                data.outstandingFees || 0
+            );
+
+        const total =
+            collected + outstanding;
+
+        const percentage =
+            total > 0
+                ? Math.round(
+                    (collected / total) * 100
+                )
+                : 0;
+
+        updateElement(
+            "collectionPercentage",
+            `${percentage}%`
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Dashboard data unavailable:",
+            error.message
+        );
+
+    }
+}
+
+
+// ============================================================
+// FORMAT CURRENCY
+// ============================================================
+
+function formatCurrency(value) {
+
+    const amount =
+        Number(value || 0);
+
+    return "₦" +
+        amount.toLocaleString(
+            "en-NG",
+            {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }
+        );
+}
+
+
+// ============================================================
 // LOAD STUDENTS
 // ============================================================
 
@@ -951,6 +1004,17 @@ async function loadStudents() {
     }
 
 
+    // Show loading state
+
+    table.innerHTML = `
+        <tr>
+            <td colspan="5">
+                Loading students...
+            </td>
+        </tr>
+    `;
+
+
     try {
 
         const data =
@@ -960,8 +1024,20 @@ async function loadStudents() {
 
 
         const students =
-            data.students || [];
+            Array.isArray(data.students)
+                ? data.students
+                : [];
 
+
+        // Update dashboard total
+
+        updateElement(
+            "totalStudents",
+            students.length.toLocaleString()
+        );
+
+
+        // No students
 
         if (!students.length) {
 
@@ -973,82 +1049,76 @@ async function loadStudents() {
                 </tr>
             `;
 
-            updateElement(
-                "totalStudents",
-                "0"
-            );
-
             return;
         }
 
 
-        updateElement(
-            "totalStudents",
-            students.length.toLocaleString()
-        );
-
+        // Render students
 
         table.innerHTML =
             students
-                .map(
-                    student => {
+                .map(student => {
 
-                        const fullName =
-                            [
-                                student.first_name,
-                                student.other_name,
-                                student.last_name
-                            ]
-                                .filter(Boolean)
-                                .join(" ");
+                    const fullName =
+                        [
+                            student.first_name,
+                            student.other_name,
+                            student.last_name
+                        ]
+                            .filter(Boolean)
+                            .join(" ");
 
 
-                        return `
-                            <tr>
+                    return `
+                        <tr>
 
-                                <td>
+                            <td>
+                                ${escapeHtml(
+                                    student.admission_number ||
+                                    ""
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    fullName ||
+                                    "N/A"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    student.gender ||
+                                    "N/A"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    student.class_name ||
+                                    "N/A"
+                                )}
+                            </td>
+
+                            <td>
+
+                                <span class="status ${getStatusClass(
+                                    student.status
+                                )}">
+
                                     ${escapeHtml(
-                                        student.admission_number ||
-                                        ""
+                                        student.status ||
+                                        "Active"
                                     )}
-                                </td>
 
-                                <td>
-                                    ${escapeHtml(
-                                        fullName
-                                    )}
-                                </td>
+                                </span>
 
-                                <td>
-                                    ${escapeHtml(
-                                        student.gender ||
-                                        ""
-                                    )}
-                                </td>
+                            </td>
 
-                                <td>
-                                    ${escapeHtml(
-                                        student.class_name ||
-                                        ""
-                                    )}
-                                </td>
+                        </tr>
+                    `;
 
-                                <td>
-                                    <span class="status ${getStatusClass(
-                                        student.status
-                                    )}">
-                                        ${escapeHtml(
-                                            student.status ||
-                                            ""
-                                        )}
-                                    </span>
-                                </td>
-
-                            </tr>
-                        `;
-
-                    }
-                )
+                })
                 .join("");
 
 
@@ -1066,6 +1136,7 @@ async function loadStudents() {
                 </td>
             </tr>
         `;
+
     }
 }
 
@@ -1086,6 +1157,15 @@ async function loadParents() {
     }
 
 
+    table.innerHTML = `
+        <tr>
+            <td colspan="5">
+                Loading parents...
+            </td>
+        </tr>
+    `;
+
+
     try {
 
         const data =
@@ -1095,7 +1175,9 @@ async function loadParents() {
 
 
         const parents =
-            data.parents || [];
+            Array.isArray(data.parents)
+                ? data.parents
+                : [];
 
 
         updateElement(
@@ -1120,65 +1202,68 @@ async function loadParents() {
 
         table.innerHTML =
             parents
-                .map(
-                    parent => {
+                .map(parent => {
 
-                        const fullName =
-                            [
-                                parent.first_name,
-                                parent.other_name,
-                                parent.last_name
-                            ]
-                                .filter(Boolean)
-                                .join(" ");
+                    const fullName =
+                        [
+                            parent.first_name,
+                            parent.other_name,
+                            parent.last_name
+                        ]
+                            .filter(Boolean)
+                            .join(" ");
 
 
-                        return `
-                            <tr>
+                    return `
+                        <tr>
 
-                                <td>
+                            <td>
+                                ${escapeHtml(
+                                    fullName ||
+                                    "N/A"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    parent.relationship ||
+                                    "N/A"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    parent.phone ||
+                                    "N/A"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    parent.email ||
+                                    "N/A"
+                                )}
+                            </td>
+
+                            <td>
+
+                                <span class="status ${getStatusClass(
+                                    parent.status
+                                )}">
+
                                     ${escapeHtml(
-                                        fullName
+                                        parent.status ||
+                                        "Active"
                                     )}
-                                </td>
 
-                                <td>
-                                    ${escapeHtml(
-                                        parent.relationship ||
-                                        ""
-                                    )}
-                                </td>
+                                </span>
 
-                                <td>
-                                    ${escapeHtml(
-                                        parent.phone ||
-                                        ""
-                                    )}
-                                </td>
+                            </td>
 
-                                <td>
-                                    ${escapeHtml(
-                                        parent.email ||
-                                        ""
-                                    )}
-                                </td>
+                        </tr>
+                    `;
 
-                                <td>
-                                    <span class="status ${getStatusClass(
-                                        parent.status
-                                    )}">
-                                        ${escapeHtml(
-                                            parent.status ||
-                                            ""
-                                        )}
-                                    </span>
-                                </td>
-
-                            </tr>
-                        `;
-
-                    }
-                )
+                })
                 .join("");
 
 
@@ -1196,6 +1281,7 @@ async function loadParents() {
                 </td>
             </tr>
         `;
+
     }
 }
 
@@ -1204,9 +1290,7 @@ async function loadParents() {
 // STATUS CLASS
 // ============================================================
 
-function getStatusClass(
-    status
-) {
+function getStatusClass(status) {
 
     switch (
         String(status || "")
@@ -1227,58 +1311,6 @@ function getStatusClass(
         default:
             return "";
     }
-}
-
-
-// ============================================================
-// UPDATE ELEMENT
-// ============================================================
-
-function updateElement(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(id);
-
-    if (element) {
-
-        element.textContent =
-            value;
-    }
-}
-
-
-// ============================================================
-// ESCAPE HTML
-// ============================================================
-
-function escapeHtml(
-    value
-) {
-
-    return String(value ?? "")
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
 }
 
 
@@ -1316,10 +1348,12 @@ async function initializeDashboard() {
 
     await loadProfile();
 
-    await Promise.allSettled([
-        loadStudents(),
-        loadParents()
-    ]);
+    // Load overview data initially.
+    await loadDashboard();
+
+    // Do not force Students page open.
+    // Students loads automatically when
+    // the Students sidebar button is clicked.
 
 }
 
