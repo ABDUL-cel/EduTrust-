@@ -187,8 +187,10 @@
         Need a staff account? <a href="staff-register.html">Register here</a>
     </div>
 </div>
-
 <script>
+    // Set backend API URL (Render live endpoint)
+    const API_BASE_URL = "https://edutrust-15ii.onrender.com/api";
+
     const form = document.getElementById("staffLoginForm");
     const alertBox = document.getElementById("alertBox");
     const submitBtn = document.getElementById("submitBtn");
@@ -197,14 +199,15 @@
         e.preventDefault();
         alertBox.style.display = 'none';
 
-        const email = document.getElementById("email").value;
+        const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
 
         submitBtn.disabled = true;
         submitBtn.textContent = "Authenticating...";
 
         try {
-            const res = await fetch("/api/staff/login", {
+            // FIXED: Point to auth login route
+            const res = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password })
@@ -213,10 +216,17 @@
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || "Invalid credentials.");
 
+            // Store session details
             localStorage.setItem("edutrust_token", data.token);
             localStorage.setItem("edutrust_user", JSON.stringify(data.user));
 
-            window.location.href = "/staff-dashboard.html";
+            // Redirect based on user role returned by authController
+            const role = data.user.role;
+            if (role === "Principal" || role === "SuperAdmin") {
+                window.location.href = "principal-dashboard.html";
+            } else {
+                window.location.href = "staff-dashboard.html";
+            }
 
         } catch (err) {
             alertBox.textContent = err.message;
@@ -227,5 +237,6 @@
         }
     });
 </script>
+
 </body>
 </html>
