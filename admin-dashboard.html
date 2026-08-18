@@ -9,41 +9,52 @@
 </head>
 <body class="admin-body">
 
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
+    <!-- Mobile Backdrop Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar Navigation (Light Blue Theme) -->
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="index.html" class="logo">
                 <img src="logo-icon.png" alt="EduTrust Logo" class="logo-icon">
                 <span>Edu<span>Trust</span></span>
             </a>
-            <span class="admin-badge">SUPER ADMIN</span>
+            <div class="header-badge-row">
+                <span class="admin-badge">SUPER ADMIN</span>
+                <button class="mobile-close-btn" onclick="toggleSidebar()">✕</button>
+            </div>
         </div>
 
         <nav class="sidebar-menu">
             <a href="#" class="menu-item active">
-                <span class="icon">📊</span> Overview
+                <span class="icon">📊</span>
+                <span class="label">Overview</span>
             </a>
             <a href="#" class="menu-item">
-                <span class="icon">🏫</span> Schools Management
+                <span class="icon">🏫</span>
+                <span class="label">Schools Management</span>
             </a>
             <a href="#" class="menu-item">
-                <span class="icon">📩</span> Support Inquiries
+                <span class="icon">📩</span>
+                <span class="label">Support Inquiries</span>
                 <span class="menu-count">3</span>
             </a>
             <a href="#" class="menu-item">
-                <span class="icon">📜</span> System Logs
+                <span class="icon">📜</span>
+                <span class="label">System Logs</span>
             </a>
             <a href="#" class="menu-item">
-                <span class="icon">⚙️</span> Settings
+                <span class="icon">⚙️</span>
+                <span class="label">Settings</span>
             </a>
         </nav>
 
         <div class="sidebar-footer">
             <div class="admin-profile">
-                <div class="avatar">A</div>
+                <div class="avatar">AK</div>
                 <div class="profile-info">
                     <p class="admin-name">Abdulazeez K.</p>
-                    <p class="admin-role">Platform Admin</p>
+                    <p class="admin-role">Founder / Admin</p>
                 </div>
             </div>
             <a href="index.html" class="logout-btn" title="Logout">🚪</a>
@@ -53,16 +64,22 @@
     <!-- Main Content Area -->
     <main class="main-content">
 
-        <!-- Top Header Bar -->
+        <!-- Top Header Bar with Mobile Menu Button -->
         <header class="topbar">
-            <div class="page-title">
-                <h1>Overview & Dashboard</h1>
-                <p>Monitor platform performance, onboarded schools, and incoming support requests.</p>
+            <div class="topbar-left">
+                <button class="mobile-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Menu">
+                    ☰
+                </button>
+                <div class="page-title">
+                    <h1>Overview & Dashboard</h1>
+                    <p>Platform monitoring and inquiry inbox</p>
+                </div>
             </div>
+            
             <div class="topbar-actions">
                 <div class="system-status">
                     <span class="status-indicator"></span>
-                    <span>Backend Server Live</span>
+                    <span class="status-text">Backend Live</span>
                 </div>
             </div>
         </header>
@@ -71,7 +88,7 @@
         <section class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-header">
-                    <span class="metric-title">Total Onboarded Schools</span>
+                    <span class="metric-title">Onboarded Schools</span>
                     <span class="metric-icon">🏫</span>
                 </div>
                 <div class="metric-value">12</div>
@@ -80,11 +97,11 @@
 
             <div class="metric-card">
                 <div class="metric-header">
-                    <span class="metric-title">Active Platform Users</span>
+                    <span class="metric-title">Active Users</span>
                     <span class="metric-icon">👥</span>
                 </div>
                 <div class="metric-value">2,450</div>
-                <div class="metric-subtext">Admins, Teachers, Parents & Students</div>
+                <div class="metric-subtext">Admins, Teachers, Parents</div>
             </div>
 
             <div class="metric-card">
@@ -98,7 +115,7 @@
 
             <div class="metric-card">
                 <div class="metric-header">
-                    <span class="metric-title">Open Support Inquiries</span>
+                    <span class="metric-title">Open Inquiries</span>
                     <span class="metric-icon">💬</span>
                 </div>
                 <div class="metric-value">3</div>
@@ -106,15 +123,15 @@
             </div>
         </section>
 
-        <!-- Dashboard Two-Column Layout -->
+        <!-- Two-Column Layout -->
         <div class="dashboard-columns">
 
-            <!-- Recent Inquiries Table -->
+            <!-- Recent Inquiries Section -->
             <section class="panel main-panel">
                 <div class="panel-header">
                     <div>
-                        <h2>Recent Contact & Support Inquiries</h2>
-                        <p>Messages received from contact.html form</p>
+                        <h2>Contact & Support Messages</h2>
+                        <p>Messages from contact.html</p>
                     </div>
                     <a href="#" class="view-all-link">View All</a>
                 </div>
@@ -126,7 +143,6 @@
                                 <th>Sender</th>
                                 <th>Role</th>
                                 <th>Category</th>
-                                <th>Date</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -135,33 +151,30 @@
                             <tr>
                                 <td>
                                     <strong>Dr. Olatunji M.</strong><br>
-                                    <small>olatunji@greenoak.edu.ng</small>
+                                    <small class="text-muted">olatunji@greenoak.edu.ng</small>
                                 </td>
                                 <td>School Owner</td>
-                                <td>Onboarding & Setup</td>
-                                <td>Today, 09:15 AM</td>
+                                <td>Onboarding</td>
                                 <td><span class="status-pill pending">New</span></td>
                                 <td><button class="action-btn">View</button></td>
                             </tr>
                             <tr>
                                 <td>
                                     <strong>Amina Lawal</strong><br>
-                                    <small>a.lawal@gmail.com</small>
+                                    <small class="text-muted">a.lawal@gmail.com</small>
                                 </td>
                                 <td>Parent</td>
                                 <td>Portal Access</td>
-                                <td>Yesterday</td>
                                 <td><span class="status-pill active">In Progress</span></td>
                                 <td><button class="action-btn">View</button></td>
                             </tr>
                             <tr>
                                 <td>
                                     <strong>David Bello</strong><br>
-                                    <small>david@victorycollege.com</small>
+                                    <small class="text-muted">david@victorycollege.com</small>
                                 </td>
                                 <td>Teacher</td>
-                                <td>Result Processing</td>
-                                <td>16 Aug 2026</td>
+                                <td>Results</td>
                                 <td><span class="status-pill resolved">Resolved</span></td>
                                 <td><button class="action-btn">View</button></td>
                             </tr>
@@ -170,7 +183,7 @@
                 </div>
             </section>
 
-            <!-- System Activity Feed -->
+            <!-- Live Activity Feed -->
             <section class="panel side-panel">
                 <div class="panel-header">
                     <h2>Live Activity Feed</h2>
@@ -179,22 +192,22 @@
                     <li class="feed-item">
                         <span class="feed-icon green">✓</span>
                         <div class="feed-details">
-                            <p><strong>Victory College</strong> published 140 student report cards.</p>
-                            <small>25 mins ago</small>
+                            <p><strong>Victory College</strong> published report cards.</p>
+                            <small class="text-muted">25 mins ago</small>
                         </div>
                     </li>
                     <li class="feed-item">
                         <span class="feed-icon blue">+</span>
                         <div class="feed-details">
-                            <p>New school registration requested by <strong>Green Oak Prep</strong>.</p>
-                            <small>2 hours ago</small>
+                            <p>Onboarding request from <strong>Green Oak Prep</strong>.</p>
+                            <small class="text-muted">2 hours ago</small>
                         </div>
                     </li>
                     <li class="feed-item">
                         <span class="feed-icon orange">⚙️</span>
                         <div class="feed-details">
-                            <p>Express backend deployed successfully on Render.</p>
-                            <small>5 hours ago</small>
+                            <p>Express backend active on Render.</p>
+                            <small class="text-muted">5 hours ago</small>
                         </div>
                     </li>
                 </ul>
@@ -203,6 +216,16 @@
         </div>
 
     </main>
+
+    <!-- JS for Mobile Sidebar Toggle -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+    </script>
 
 </body>
 </html>
