@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact EduTrust</title>
     <link rel="stylesheet" href="home.css">
-      <link rel="icon" type="image/png" href="logo-icon.png">
+    <link rel="icon" type="image/png" href="logo-icon.png">
 </head>
 
 <body>
 
 <header class="navbar">
-
     <a href="index.html" class="logo">
         Edu<span>Trust</span>
     </a>
@@ -22,98 +21,145 @@
         <a href="login.html">Login</a>
         <a href="register.html" class="nav-button">Get Started</a>
     </nav>
-
 </header>
 
 <section class="hero-section">
-
     <div class="hero-content">
-
-        <p class="section-label">
-            CONTACT US
-        </p>
-
+        <p class="section-label">CONTACT US</p>
         <h1>
             We'd Love To Hear
             <span>From You</span>
         </h1>
-
         <p class="hero-description">
-
             Whether you're a school owner, teacher, parent, or simply interested
             in EduTrust, we're here to answer your questions and help you get started.
-
         </p>
-
     </div>
-
 </section>
 
-<section class="features-section">
+<!-- =========================
+     CONTACT CARDS + FORM SECTION
+========================== -->
+<section class="features-section contact-wrapper">
 
     <div class="section-heading">
-
         <h2>Get In Touch</h2>
-
         <p>
             Our team is always ready to assist you with product enquiries,
             demonstrations, technical support, and partnership opportunities.
-            Feel free to contact us using any of the details below.
         </p>
-
     </div>
 
-    <div class="features-grid">
+    <!-- Contact Details Grid -->
+    <div class="features-grid contact-info-grid">
 
         <article class="feature-card">
             <div class="feature-icon">📧</div>
             <h3>Email</h3>
-            <p>official.edutrust@gmail.com</p>
+            <p><a href="mailto:official.edutrust@gmail.com">official.edutrust@gmail.com</a></p>
+            <span class="contact-badge">24/7 Desk Support</span>
         </article>
 
         <article class="feature-card">
             <div class="feature-icon">📞</div>
-            <h3>Phone</h3>
-            <p>+234 8086205382</p>
+            <h3>Phone & WhatsApp</h3>
+            <p><a href="tel:+2348086205382">+234 808 620 5382</a></p>
+            <span class="contact-badge badge-green">Fast Response</span>
         </article>
 
         <article class="feature-card">
             <div class="feature-icon">📍</div>
-            <h3>Address</h3>
+            <h3>Location</h3>
             <p>Ilorin, Kwara State, Nigeria.</p>
+            <span class="contact-badge">Headquarters</span>
         </article>
 
+    </div>
+
+    <!-- Support & Inquiry Form -->
+    <div class="contact-form-container">
+        <div class="form-header">
+            <h3>Send Us a Direct Message</h3>
+            <p>Fill out the form below and our support team will respond within 2–4 hours.</p>
+        </div>
+
+        <form id="contactForm" class="contact-form" action="#" method="POST">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fullName">Full Name <span class="required">*</span></label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="e.g. admin@school.com" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="e.g. 08086205382">
+                </div>
+
+                <div class="form-group">
+                    <label for="userRole">I am a... <span class="required">*</span></label>
+                    <select id="userRole" name="userRole" required>
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="School Owner / Admin">School Owner / Admin</option>
+                        <option value="Teacher">Teacher</option>
+                        <option value="Parent">Parent / Guardian</option>
+                        <option value="Student">Student</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Inquiry Type <span class="required">*</span></label>
+                <select id="subject" name="subject" required>
+                    <option value="" disabled selected>Select category</option>
+                    <option value="Onboarding & Setup">Onboarding & School Setup</option>
+                    <option value="Result Processing">Result Processing & Gradebook Issue</option>
+                    <option value="Portal Access">Portal Access / Login Issue</option>
+                    <option value="Billing & Pricing">Billing & Pricing Inquiry</option>
+                    <option value="Demo Request">Request a Live Demonstration</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message Details <span class="required">*</span></label>
+                <textarea id="message" name="message" rows="5" placeholder="How can we assist you today?" required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <span>Send Message</span>
+            </button>
+
+        </form>
     </div>
 
 </section>
 
 <section class="cta-section">
-
     <div class="cta-content">
-
         <h2>Need a Demo?</h2>
-
         <p>
-
             We'd be happy to demonstrate how EduTrust can simplify your
             school's administration and fee management.
-
         </p>
-
         <a href="register.html" class="primary-button">
             Book a Demo
         </a>
-
     </div>
-
 </section>
 
 <footer class="footer">
-
     <p>
         © 2026 EduTrust. All Rights Reserved.
     </p>
-
 </footer>
 
 </body>
