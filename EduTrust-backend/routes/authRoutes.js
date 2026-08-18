@@ -16,7 +16,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 // ======================================================
 
 router.post("/register", registerSchool);
-
+router.post("/register-staff", staffController.registerStaff); // <-- Use staffController
 // ======================================================
 // LOGIN PRINCIPAL / USER
 // POST /api/auth/login
