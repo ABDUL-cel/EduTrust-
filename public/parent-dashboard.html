@@ -9,16 +9,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --border-card: #e2e8f0;
+            --topbar-bg: #ffffff;
+            --welcome-bg: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.12);
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-alt: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            --border-card: #334155;
+            --topbar-bg: #1e293b;
+            --welcome-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.5);
+        }
+
         * {
             box-sizing: border-box;
-            transition: all 0.2s ease-in-out;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
             margin: 0;
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
+            background: var(--bg-main);
+            color: var(--text-main);
             -webkit-font-smoothing: antialiased;
         }
 
@@ -29,8 +57,8 @@
         /* --- TOPBAR STYLING --- */
         .topbar {
             min-height: 72px;
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
+            background: var(--topbar-bg);
+            border-bottom: 2px solid var(--border-card);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -39,7 +67,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+            box-shadow: var(--shadow-sm);
         }
 
         .logo {
@@ -54,23 +82,43 @@
         }
 
         .logo span {
-            color: #0f172a;
+            color: var(--text-main);
         }
 
         .top-right {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle-btn {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.08);
+            border-color: #2563eb;
         }
 
         .user-profile-badge {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: #f1f5f9;
+            background: var(--bg-card-alt);
             padding: 6px 14px 6px 8px;
             border-radius: 40px;
-            border: 1px solid #e2e8f0;
+            border: 1.5px solid var(--border-color);
         }
 
         .parent-avatar {
@@ -78,8 +126,8 @@
             height: 38px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 2px solid var(--bg-card);
+            box-shadow: var(--shadow-sm);
         }
 
         .parent-avatar-placeholder {
@@ -93,13 +141,12 @@
             justify-content: center;
             font-size: 14px;
             font-weight: 700;
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
         }
 
         .parent-name {
             font-weight: 700;
             font-size: 14px;
-            color: #1e293b;
+            color: var(--text-main);
         }
 
         .logout {
@@ -116,10 +163,15 @@
             gap: 6px;
         }
 
+        [data-theme="dark"] .logout {
+            background: rgba(220, 38, 38, 0.2);
+            color: #fca5a5;
+        }
+
         .logout:hover {
             background: #ef4444;
             color: #ffffff;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         /* --- LAYOUT --- */
@@ -131,11 +183,12 @@
 
         .welcome {
             margin-bottom: 30px;
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            background: var(--welcome-bg);
+            border: 1.5px solid var(--border-color);
             padding: 32px;
             border-radius: 20px;
             color: #ffffff;
-            box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.2);
+            box-shadow: var(--shadow-sm);
         }
 
         .welcome h1 {
@@ -153,7 +206,7 @@
 
         .error {
             background: #fef2f2;
-            border: 1px solid #fecaca;
+            border: 1.5px solid #fecaca;
             color: #991b1b;
             padding: 16px 20px;
             border-radius: 12px;
@@ -163,14 +216,7 @@
             font-size: 14px;
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #64748b;
-            font-weight: 600;
-        }
-
-        /* --- STATS CARDS --- */
+        /* --- VISIBLE STATS CARDS --- */
         .stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -179,18 +225,20 @@
         }
 
         .stat-card {
-            background: #ffffff;
+            background: var(--bg-card);
             border-radius: 16px;
             padding: 22px 24px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
             position: relative;
             overflow: hidden;
+            cursor: default;
         }
 
         .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: #2563eb;
         }
 
         .stat-card::before {
@@ -198,7 +246,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
+            width: 5px;
             height: 100%;
             background: #cbd5e1;
         }
@@ -209,7 +257,7 @@
         .stat-card.suspended-stat::before { background: #ef4444; }
 
         .stat-title {
-            color: #64748b;
+            color: var(--text-muted);
             font-size: 13px;
             font-weight: 700;
             text-transform: uppercase;
@@ -220,18 +268,18 @@
         .stat-value {
             font-size: 32px;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--text-main);
             line-height: 1;
         }
 
         /* --- SECTIONS --- */
         .section {
-            background: #ffffff;
+            background: var(--bg-card);
             border-radius: 20px;
-            border: 1px solid #f1f5f9;
+            border: 2px solid var(--border-color);
             padding: 28px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            box-shadow: var(--shadow-sm);
         }
 
         .section-header {
@@ -241,18 +289,18 @@
             gap: 15px;
             margin-bottom: 24px;
             padding-bottom: 16px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 2px solid var(--border-card);
         }
 
         .section h2 {
             margin: 0;
             font-size: 20px;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--text-main);
             letter-spacing: -0.3px;
         }
 
-        /* --- CHILDREN CARDS --- */
+        /* --- VISIBLE CHILDREN CARDS --- */
         .children {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -260,18 +308,20 @@
         }
 
         .child-card {
-            border: 1px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             border-radius: 16px;
             padding: 24px;
-            background: #ffffff;
+            background: var(--bg-card);
             display: flex;
             flex-direction: column;
             position: relative;
+            box-shadow: var(--shadow-sm);
         }
 
         .child-card:hover {
-            border-color: #cbd5e1;
-            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05);
+            transform: translateY(-6px);
+            border-color: #2563eb;
+            box-shadow: var(--shadow-hover);
         }
 
         .child-card-header {
@@ -280,14 +330,14 @@
             gap: 16px;
             margin-bottom: 20px;
             padding-bottom: 16px;
-            border-bottom: 1px dashed #e2e8f0;
+            border-bottom: 1px dashed var(--border-color);
         }
 
         .child-card h3 {
             margin: 0;
             font-size: 17px;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--text-main);
             line-height: 1.3;
         }
 
@@ -296,7 +346,7 @@
             height: 60px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #2563eb;
             flex-shrink: 0;
         }
 
@@ -304,7 +354,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #eff6ff;
+            background: var(--bg-card-alt);
             color: #2563eb;
             display: flex;
             align-items: center;
@@ -312,7 +362,7 @@
             font-size: 20px;
             font-weight: 800;
             flex-shrink: 0;
-            border: 2px solid #dbeafe;
+            border: 2px solid #2563eb;
         }
 
         .child-row {
@@ -325,20 +375,20 @@
         }
 
         .child-row span:first-child {
-            color: #64748b;
+            color: var(--text-muted);
             font-weight: 500;
         }
 
         .child-row strong {
             text-align: right;
-            color: #1e293b;
+            color: var(--text-main);
             font-weight: 700;
         }
 
         .child-actions {
             margin-top: 20px;
             padding-top: 16px;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid var(--border-card);
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -367,17 +417,18 @@
 
         .btn-primary:hover {
             background: #1d4ed8;
-            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+            transform: translateY(-1px);
         }
 
         .btn-secondary {
-            background: #f1f5f9;
-            color: #334155;
+            background: var(--bg-card-alt);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background: #e2e8f0;
-            color: #0f172a;
+            border-color: #2563eb;
+            transform: translateY(-1px);
         }
 
         /* --- STATUS BADGES --- */
@@ -395,14 +446,7 @@
         .status.pending { background: #fffbeb; color: #b45309; }
         .status.suspended { background: #fef2f2; color: #b91c1c; }
         .status.graduated { background: #eff6ff; color: #1d4ed8; }
-        .status.archived { background: #f8fafc; color: #64748b; }
-
-        .empty {
-            color: #64748b;
-            padding: 30px 0;
-            text-align: center;
-            font-weight: 500;
-        }
+        .status.archived { background: var(--bg-card-alt); color: var(--text-muted); }
 
         /* --- PROFILE GRID --- */
         .profile-grid {
@@ -412,15 +456,21 @@
         }
 
         .profile-item {
-            border: 1px solid #f1f5f9;
+            border: 2px solid var(--border-color);
             border-radius: 12px;
             padding: 18px;
-            background: #f8fafc;
+            background: var(--bg-card-alt);
+        }
+
+        .profile-item:hover {
+            transform: translateY(-3px);
+            border-color: #2563eb;
+            box-shadow: var(--shadow-sm);
         }
 
         .profile-label {
             display: block;
-            color: #64748b;
+            color: var(--text-muted);
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
@@ -430,74 +480,38 @@
 
         .profile-value {
             font-weight: 700;
-            color: #0f172a;
+            color: var(--text-main);
             font-size: 15px;
             word-break: break-word;
         }
 
-        .school-info {
-            color: #475569;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
         .school-card {
-            background: #eff6ff;
-            border: 1px solid #dbeafe;
+            background: var(--bg-card-alt);
+            border: 2px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
-            color: #1e40af;
+            color: var(--text-main);
+        }
+
+        .school-card:hover {
+            transform: translateY(-3px);
+            border-color: #2563eb;
         }
 
         /* --- RESPONSIVE DESIGN --- */
         @media (max-width: 992px) {
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .children {
-                grid-template-columns: 1fr 1fr;
-            }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .children { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 640px) {
-            .topbar {
-                padding: 0 16px;
-            }
-
-            .parent-name {
-                display: none;
-            }
-
-            .user-profile-badge {
-                padding: 4px;
-                background: transparent;
-                border: none;
-            }
-
-            .container {
-                padding: 20px 16px 40px;
-            }
-
-            .welcome {
-                padding: 24px;
-                border-radius: 16px;
-            }
-
-            .stats,
-            .children,
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .welcome h1 {
-                font-size: 22px;
-            }
-
-            .section {
-                padding: 20px;
-                border-radius: 16px;
-            }
+            .topbar { padding: 0 16px; }
+            .parent-name { display: none; }
+            .user-profile-badge { padding: 4px; background: transparent; border: none; }
+            .container { padding: 20px 16px 40px; }
+            .welcome { padding: 24px; border-radius: 16px; }
+            .stats, .children, .profile-grid { grid-template-columns: 1fr; }
+            .section { padding: 20px; border-radius: 16px; }
         }
     </style>
 </head>
@@ -512,6 +526,12 @@
 
     <div class="top-right">
 
+        <!-- Theme Switcher Button -->
+        <button class="theme-toggle-btn" id="themeToggleBtn" type="button" title="Toggle Light/Dark Mode">
+            <svg id="sunIcon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <svg id="moonIcon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+
         <div class="user-profile-badge">
             <div id="parentAvatarContainer">
                 <div class="parent-avatar-placeholder" id="parentInitials">--</div>
@@ -522,7 +542,7 @@
         </div>
 
         <button class="logout" id="logoutButton" type="button">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             Logout
         </button>
 
@@ -534,135 +554,59 @@
 <main class="container">
 
     <section class="welcome">
-
-        <h1 id="welcomeTitle">
-            Parent Dashboard
-        </h1>
-
-        <p>
-            Manage your children and monitor their academic progress from one place.
-        </p>
-
+        <h1 id="welcomeTitle">Parent Dashboard</h1>
+        <p>Manage your children and monitor their academic progress from one place.</p>
     </section>
-
 
     <div id="error" class="error"></div>
 
-
     <section class="stats">
-
         <div class="stat-card children-stat">
-
-            <div class="stat-title">
-                Total Children
-            </div>
-
-            <div class="stat-value" id="childrenCount">
-                0
-            </div>
-
+            <div class="stat-title">Total Children</div>
+            <div class="stat-value" id="childrenCount">0</div>
         </div>
-
 
         <div class="stat-card active-stat">
-
-            <div class="stat-title">
-                Active
-            </div>
-
-            <div class="stat-value" id="activeCount">
-                0
-            </div>
-
+            <div class="stat-title">Active</div>
+            <div class="stat-value" id="activeCount">0</div>
         </div>
-
 
         <div class="stat-card pending-stat">
-
-            <div class="stat-title">
-                Pending
-            </div>
-
-            <div class="stat-value" id="pendingCount">
-                0
-            </div>
-
+            <div class="stat-title">Pending</div>
+            <div class="stat-value" id="pendingCount">0</div>
         </div>
-
 
         <div class="stat-card suspended-stat">
-
-            <div class="stat-title">
-                Suspended
-            </div>
-
-            <div class="stat-value" id="suspendedCount">
-                0
-            </div>
-
+            <div class="stat-title">Suspended</div>
+            <div class="stat-value" id="suspendedCount">0</div>
         </div>
-
     </section>
 
-
     <section class="section">
-
         <div class="section-header">
-
-            <h2>
-                My Children
-            </h2>
-
+            <h2>My Children</h2>
         </div>
-
-
         <div id="children" class="children">
-
-            <div class="loading">
-                Loading children...
-            </div>
-
+            <div style="color:var(--text-muted); font-weight:600;">Loading children...</div>
         </div>
-
     </section>
 
-
     <section class="section">
-
         <div class="section-header">
-
-            <h2>
-                Parent Profile
-            </h2>
-
+            <h2>Parent Profile</h2>
         </div>
-
-
         <div id="profile" class="profile-grid">
-
-            <div class="loading">
-                Loading profile...
-            </div>
-
+            <div style="color:var(--text-muted); font-weight:600;">Loading profile...</div>
         </div>
-
     </section>
 
-
     <section class="section">
-
         <div class="section-header">
-
-            <h2>
-                School Connection
-            </h2>
-
+            <h2>School Connection</h2>
         </div>
-
         <div id="schoolInfo" class="school-info">
             Loading school information...
         </div>
-
     </section>
 
 </main>
@@ -675,7 +619,35 @@
     "use strict";
 
     // =========================================================
-    // CONFIGURATION
+    // DARK MODE MANAGEMENT
+    // =========================================================
+
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const sunIcon = document.getElementById("sunIcon");
+    const moonIcon = document.getElementById("moonIcon");
+
+    const savedTheme = localStorage.getItem("edutrust_theme") || "light";
+    setTheme(savedTheme);
+
+    themeToggleBtn.addEventListener("click", () => {
+        const currentTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        setTheme(currentTheme);
+    });
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("edutrust_theme", theme);
+        if (theme === "dark") {
+            sunIcon.style.display = "block";
+            moonIcon.style.display = "none";
+        } else {
+            sunIcon.style.display = "none";
+            moonIcon.style.display = "block";
+        }
+    }
+
+    // =========================================================
+    // CONFIGURATION & API
     // =========================================================
 
     const API_BASE =
@@ -717,10 +689,7 @@
         return;
     }
 
-    // =========================================================
     // LOGOUT
-    // =========================================================
-
     logoutButton.addEventListener("click", function () {
         localStorage.removeItem("parent_token");
         localStorage.removeItem("edutrust_token");
@@ -728,10 +697,7 @@
         window.location.href = "parent-login.html";
     });
 
-    // =========================================================
     // HELPERS
-    // =========================================================
-
     function showError(message) {
         errorContainer.textContent = message || "Something went wrong.";
         errorContainer.style.display = "block";
@@ -774,10 +740,7 @@
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-    // =========================================================
     // RENDER FUNCTIONS
-    // =========================================================
-
     function renderParentAvatar(parent) {
         const name = parent.fullName || "Parent";
         const passport = parent.passport || parent.profilePicture || parent.avatar;
@@ -795,20 +758,12 @@
 
     function renderChildren(children) {
         if (!Array.isArray(children) || children.length === 0) {
-            childrenContainer.innerHTML = `
-                <div class="empty">
-                    No children are currently linked to this parent account.
-                </div>
-            `;
+            childrenContainer.innerHTML = `<div style="color:var(--text-muted); padding:20px 0;">No children linked to this parent account.</div>`;
             return;
         }
 
         childrenContainer.innerHTML = children.map(function (child) {
-            const name = child.fullName ||
-                [child.first_name, child.other_name, child.last_name]
-                    .filter(Boolean)
-                    .join(" ") || "Unnamed Student";
-
+            const name = child.fullName || [child.first_name, child.other_name, child.last_name].filter(Boolean).join(" ") || "Unnamed Student";
             const status = child.status || "Pending";
             const statusClass = getStatusClass(status);
             const passport = child.passport;
@@ -830,43 +785,16 @@
                         </div>
                     </div>
 
-                    <div class="child-row">
-                        <span>Admission No.</span>
-                        <strong>${escapeHtml(admissionNo || "-")}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Class</span>
-                        <strong>${escapeHtml(child.className || "-")}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Arm</span>
-                        <strong>${escapeHtml(child.arm || "-")}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Gender</span>
-                        <strong>${escapeHtml(child.gender || "-")}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Date of Birth</span>
-                        <strong>${escapeHtml(formatDate(child.dateOfBirth))}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Admission Date</span>
-                        <strong>${escapeHtml(formatDate(child.admissionDate))}</strong>
-                    </div>
+                    <div class="child-row"><span>Admission No.</span><strong>${escapeHtml(admissionNo || "-")}</strong></div>
+                    <div class="child-row"><span>Class</span><strong>${escapeHtml(child.className || "-")}</strong></div>
+                    <div class="child-row"><span>Arm</span><strong>${escapeHtml(child.arm || "-")}</strong></div>
+                    <div class="child-row"><span>Gender</span><strong>${escapeHtml(child.gender || "-")}</strong></div>
+                    <div class="child-row"><span>Date of Birth</span><strong>${escapeHtml(formatDate(child.dateOfBirth))}</strong></div>
+                    <div class="child-row"><span>Admission Date</span><strong>${escapeHtml(formatDate(child.admissionDate))}</strong></div>
 
                     <div class="child-actions">
-                        <a href="check-result.html?studentId=${encodeURIComponent(childId)}&admissionNo=${encodeURIComponent(admissionNo)}" class="btn-action btn-primary">
-                            Check Exam Result
-                        </a>
-                        <a href="report-card.html?studentId=${encodeURIComponent(childId)}" class="btn-action btn-secondary">
-                            View Report Sheet
-                        </a>
+                        <a href="check-result.html?studentId=${encodeURIComponent(childId)}&admissionNo=${encodeURIComponent(admissionNo)}" class="btn-action btn-primary">Check Exam Result</a>
+                        <a href="report-card.html?studentId=${encodeURIComponent(childId)}" class="btn-action btn-secondary">View Report Sheet</a>
                     </div>
                 </article>
             `;
@@ -875,58 +803,26 @@
 
     function renderProfile(parent) {
         profileContainer.innerHTML = `
-            <div class="profile-item">
-                <span class="profile-label">Full Name</span>
-                <div class="profile-value">${escapeHtml(parent.fullName || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Relationship</span>
-                <div class="profile-value">${escapeHtml(parent.relationship || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Phone</span>
-                <div class="profile-value">${escapeHtml(parent.phone || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Alternate Phone</span>
-                <div class="profile-value">${escapeHtml(parent.alternatePhone || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Email</span>
-                <div class="profile-value">${escapeHtml(parent.email || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Occupation</span>
-                <div class="profile-value">${escapeHtml(parent.occupation || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Home Address</span>
-                <div class="profile-value">${escapeHtml(parent.homeAddress || "-")}</div>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Account Status</span>
-                <div class="profile-value">
-                    <span class="status ${getStatusClass(parent.status)}">
-                        ${escapeHtml(parent.status || "-")}
-                    </span>
-                </div>
-            </div>
+            <div class="profile-item"><span class="profile-label">Full Name</span><div class="profile-value">${escapeHtml(parent.fullName || "-")}</div></div>
+            <div class="profile-item"><span class="profile-label">Relationship</span><div class="profile-value">${escapeHtml(parent.relationship || "-")}</div></div>
+            <div class="profile-item"><span class="profile-label">Phone</span><div class="profile-value">${escapeHtml(parent.phone || "-")}</div></div>
+            <div class="profile-item"><span class="profile-label">Alternate Phone</span><div class="profile-value">${escapeHtml(parent.alternatePhone || "-")}</div></div>
+            <div class="profile-item"><span class="profile-label">Email</span><div class="profile-value">${escapeHtml(parent.email || "-")}</div></div>
+            <div class="profile-item"><span class="profile-label">Occupation</span><div class="profile-value">${escapeHtml(parent.occupation || "-")}</div></div>
+            <div class="profile-item"><span class="profile-label">Home Address</span><div class="profile-value">${escapeHtml(parent.homeAddress || "-")}</div></div>
+            <div class="profile-item"><span class="profile-label">Account Status</span><div class="profile-value"><span class="status ${getStatusClass(parent.status)}">${escapeHtml(parent.status || "-")}</span></div></div>
         `;
     }
 
     function renderSchool(parent) {
         schoolInfo.innerHTML = `
             <div class="school-card">
-                Your parent account is officially connected to School ID:
-                <strong>${escapeHtml(parent.schoolId || "-")}</strong>
+                Your parent account is officially connected to School ID: <strong>${escapeHtml(parent.schoolId || "-")}</strong>
             </div>
         `;
     }
 
-    // =========================================================
     // LOAD DASHBOARD
-    // =========================================================
-
     async function loadDashboard() {
         errorContainer.style.display = "none";
 
@@ -954,13 +850,8 @@
                 return;
             }
 
-            if (!response.ok) {
-                throw new Error(data?.message || "Unable to load parent dashboard.");
-            }
-
-            if (!data || !data.success || !data.dashboard) {
-                throw new Error("Parent dashboard data was not returned.");
-            }
+            if (!response.ok) throw new Error(data?.message || "Unable to load parent dashboard.");
+            if (!data || !data.success || !data.dashboard) throw new Error("Parent dashboard data was not returned.");
 
             const dashboard = data.dashboard;
             const parent = dashboard.parent || {};
@@ -985,10 +876,6 @@
         } catch (error) {
             console.error("PARENT DASHBOARD ERROR:", error);
             showError(error.message || "Failed to load parent dashboard.");
-
-            childrenContainer.innerHTML = `<div class="empty">Unable to load children.</div>`;
-            profileContainer.innerHTML = `<div class="empty">Unable to load parent profile.</div>`;
-            schoolInfo.textContent = "Unable to load school information.";
         }
     }
 
