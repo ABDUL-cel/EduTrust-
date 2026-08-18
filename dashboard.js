@@ -497,6 +497,7 @@ function showPage(pageName) {
         case "staff":
 
             // Staff API can be connected later.
+           loadStaff();
             break;
 
 
@@ -1182,7 +1183,130 @@ async function loadStudents() {
     }
 }
 
+// =====================================================
+// LOAD STAFF & TEACHERS
+// =====================================================
 
+async function loadStaff() {
+    const table = document.querySelector("#staffPage tbody");
+
+    if (!table) return;
+
+    table.innerHTML = `
+        <tr>
+            <td colspan="5">Loading staff...</td>
+        </tr>
+    `;
+
+    try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            throw new Error("Authentication token not found.");
+        }
+
+        const response = await fetch(
+            "/api/staff",
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                "Failed to load staff."
+            );
+        }
+
+        const staff = result.staff || [];
+
+        if (!staff.length) {
+            table.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        No staff or teachers registered yet.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        table.innerHTML = staff.map(member => {
+
+            const fullName =
+                member.full_name ||
+                [
+                    member.first_name,
+                    member.last_name
+                ]
+                    .filter(Boolean)
+                    .join(" ") ||
+                "Unnamed";
+
+            return `
+                <tr>
+
+                    <td>
+                        ${escapeHtml(fullName)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            member.role || "Staff"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            member.email || "—"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            member.phone || "—"
+                        )}
+                    </td>
+
+                    <td>
+                        <span class="status-badge ${
+                            String(member.status)
+                                .toLowerCase()
+                        }">
+                            ${escapeHtml(
+                                member.status || "Unknown"
+                            )}
+                        </span>
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+
+    } catch (error) {
+
+        console.error(
+            "LOAD STAFF ERROR:",
+            error
+        );
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    Failed to load staff.
+                </td>
+            </tr>
+        `;
+    }
+}
 /* ============================================================
    PARENTS
 ============================================================ */
