@@ -363,117 +363,132 @@ function setValue(
 }
 
 
-// ============================================================
-// NAVIGATION
-// ============================================================
+// =====================================================
+// SIDEBAR PAGE NAVIGATION
+// =====================================================
 
-function showPage(
-    page
-) {
+const navItems = document.querySelectorAll(
+    ".nav-item[data-page], .submenu-item[data-page]"
+);
 
-    document
-        .querySelectorAll(
-            ".page-content"
-        )
-        .forEach(
-            element => {
+const pages = document.querySelectorAll(
+    ".page-content"
+);
 
-                element.classList.add(
-                    "hidden"
-                );
+function showPage(pageName) {
 
-            }
-        );
-
-
-    const pageElement =
-        document.getElementById(
-            `${page}Page`
-        );
-
-    if (pageElement) {
-
-        pageElement.classList.remove(
-            "hidden"
-        );
-    }
-
-
-    document
-        .querySelectorAll(
-            ".nav-item[data-page], .submenu-item[data-page]"
-        )
-        .forEach(
-            button => {
-
-                button.classList.remove(
-                    "active"
-                );
-
-                if (
-                    button.dataset.page ===
-                    page
-                ) {
-
-                    button.classList.add(
-                        "active"
-                    );
-                }
-            }
-        );
-
-
-    if (window.innerWidth <= 900) {
-
-        sidebar?.classList.remove(
-            "open"
-        );
-    }
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+    pages.forEach((page) => {
+        page.classList.add("hidden");
     });
-}
 
-// ======================================================
-// REAL STUDENTS DATA — PRINCIPAL DASHBOARD
-// ======================================================
+    const targetPage = document.getElementById(
+        `${pageName}Page`
+    );
 
-async function loadStudentsFromBackend() {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-        console.error("No authentication token found.");
-        return;
+    if (targetPage) {
+        targetPage.classList.remove("hidden");
     }
 
-    try {
-        const response = await fetch("/api/students", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        });
+    navItems.forEach((item) => {
+        item.classList.remove("active");
+    });
 
-        const data = await response.json();
+    const activeItem = document.querySelector(
+        `[data-page="${pageName}"]`
+    );
 
-        if (!response.ok || !data.success) {
-            console.error("Failed to load students:", data.message);
-            return;
+    if (activeItem) {
+        activeItem.classList.add("active");
+    }
+
+    // Load page data when required
+    if (pageName === "students") {
+        loadStudents();
+    }
+
+    if (pageName === "parents") {
+        loadParents();
+    }
+
+    if (pageName === "school" ||
+        pageName === "school-profile") {
+        loadSchool();
+    }
+}
+
+
+// Sidebar buttons
+navItems.forEach((item) => {
+
+    item.addEventListener("click", function () {
+
+        const pageName =
+            this.dataset.page;
+
+        if (!pageName) return;
+
+        showPage(pageName);
+
+    });
+
+});
+
+
+// =====================================================
+// REPORTS SUBMENU
+// =====================================================
+
+const reportsToggle =
+    document.querySelector(".reports-toggle");
+
+if (reportsToggle) {
+
+    reportsToggle.addEventListener(
+        "click",
+        function () {
+
+            const group =
+                this.closest(".nav-group");
+
+            if (!group) return;
+
+            group.classList.toggle("open");
+
         }
-
-        console.log("Students loaded:", data.students);
-
-        renderStudentsPage(data.students);
-
-    } catch (error) {
-        console.error("LOAD STUDENTS ERROR:", error);
-    }
+    );
 }
 
+
+// =====================================================
+// SETTINGS SUBMENU
+// =====================================================
+
+const settingsToggle =
+    document.querySelector(".settings-toggle");
+
+if (settingsToggle) {
+
+    settingsToggle.addEventListener(
+        "click",
+        function () {
+
+            const group =
+                this.closest(".nav-group");
+
+            if (!group) return;
+
+            group.classList.toggle("open");
+
+        }
+    );
+}
+
+
+// =====================================================
+// DEFAULT PAGE
+// =====================================================
+
+showPage("overview");
 
 // ======================================================
 // RENDER STUDENTS INTO EXISTING STUDENTS PAGE
