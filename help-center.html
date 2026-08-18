@@ -1,1 +1,83 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center - EduTrust</title>
+    <link rel="stylesheet" href="home.css">
+    <style>
+        .page-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: var(--accent-color, #2563eb);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+        .help-card {
+            background-color: var(--bg-card, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            padding: 28px;
+            text-decoration: none;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .help-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-color, #2563eb);
+        }
+        .help-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        .help-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="page-container">
+        <a href="index.html" class="back-link">&larr; Back to Home</a>
+
+        <header class="page-header">
+            <h1 style="color: var(--text-primary); font-size: 2.2rem;">Help Center</h1>
+            <p style="color: var(--text-secondary);">Select a portal guide to get step-by-step instructions.</p>
+        </header>
+
+        <div class="help-grid">
+            <div class="help-card">
+                <h3>Admin & Management</h3>
+                <p>Learn how to manage school settings, student registration, teacher access, and academic terms.</p>
+            </div>
+
+            <div class="help-card">
+                <h3>Teacher Portal Guide</h3>
+                <p>Guides on entering continuous assessments, exam marks, and managing classroom rosters.</p>
+            </div>
+
+            <div class="help-card">
+                <h3>Parent & Student Access</h3>
+                <p>Instructions for logging into family portals, checking result sheets, and tracking attendance.</p>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
