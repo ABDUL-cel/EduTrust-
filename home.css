@@ -30,7 +30,59 @@ a {
 ul {
     list-style: none;
 }
+/* ==========================================
+   FORM VALIDATION & FEEDBACK STYLES
+   ========================================== */
 
+/* Error State */
+.form-group.error input,
+.form-group.error select,
+.form-group.error textarea {
+    border-color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.03);
+}
+
+.error-msg {
+    color: #ef4444;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* Success State */
+.form-group.success input,
+.form-group.success select,
+.form-group.success textarea {
+    border-color: #22c55e;
+}
+
+/* Submission Feedback Banners */
+.form-feedback {
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.feedback-success {
+    background-color: rgba(34, 197, 94, 0.12);
+    color: #15803d;
+    border: 1px solid #22c55e;
+}
+
+.feedback-error {
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
+    border: 1px solid #ef4444;
+}
+
+/* Disabled button state while sending */
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
 /* ===================================
    ABOUT PAGE
 =================================== */
