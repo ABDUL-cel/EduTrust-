@@ -3,6 +3,115 @@ const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
 
+
+// ======================================================
+// GET ALL PENDING STAFF FOR THE PRINCIPAL'S SCHOOL
+// ======================================================
+exports.getPendingStaff = async (req, res) => {
+    try {
+        const pendingStaff = await User.find({
+            school_id: req.user.school_id,
+            status: "Pending"
+        }).select("-password");
+
+        return res.status(200).json({
+            success: true,
+            count: pendingStaff.length,
+            data: pendingStaff
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to fetch pending requests."
+        });
+    }
+};
+
+// ======================================================
+// APPROVE & ASSIGN ROLE TO STAFF
+// ======================================================
+exports.approveStaff = async (req, res) => {
+    try {
+        const { staff_id } = req.params;
+        const { role } = req.body; // e.g., "Teacher", "Bursar", "Vice Principal"
+
+        const validRoles = ["Teacher", "Bursar", "Accountant", "Secretary", "Vice Principal"];
+
+        if (!role || !validRoles.includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please specify a valid staff role to assign."
+            });
+        }
+
+        const staff = await User.findOne({
+            _id: staff_id,
+            school_id: req.user.school_id
+        });
+
+        if (!staff) {
+            return res.status(404).json({
+                success: false,
+                message: "Staff member request not found."
+            });
+        }
+
+        // Approve and assign role
+        staff.role = role;
+        staff.status = "Active";
+        await staff.save();
+
+        return res.status(200).json({
+            success: true,
+            message: `Staff member approved successfully as ${role}.`,
+            user: {
+                id: staff._id,
+                full_name: staff.full_name,
+                role: staff.role,
+                status: staff.status
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to approve staff."
+        });
+    }
+};
+
+// ======================================================
+// REJECT STAFF REQUEST
+// ======================================================
+exports.rejectStaff = async (req, res) => {
+    try {
+        const { staff_id } = req.params;
+
+        const staff = await User.findOneAndDelete({
+            _id: staff_id,
+            school_id: req.user.school_id,
+            status: "Pending"
+        });
+
+        if (!staff) {
+            return res.status(404).json({
+                success: false,
+                message: "Pending request not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Staff request rejected and removed."
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to reject request."
+        });
+    }
+};
 const STAFF_ROLES = [
     "Vice Principal",
     "Bursar",
