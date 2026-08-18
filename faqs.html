@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequently Asked Questions - EduTrust</title>
+    <link rel="stylesheet" href="home.css">
+    <style>
+        .page-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: var(--accent-color, #2563eb);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .page-header {
+            margin-bottom: 40px;
+        }
+        .page-header h1 {
+            font-size: 2.2rem;
+            color: var(--text-primary);
+        }
+        .faq-card {
+            background-color: var(--bg-card, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .faq-card h3 {
+            color: var(--text-primary);
+            font-size: 1.15rem;
+            margin-bottom: 10px;
+        }
+        .faq-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="page-container">
+        <a href="index.html" class="back-link">&larr; Back to Home</a>
+
+        <header class="page-header">
+            <h1>Frequently Asked Questions</h1>
+            <p style="color: var(--text-secondary);">Find fast answers to common questions about setting up and using EduTrust.</p>
+        </header>
+
+        <section class="faq-list">
+            <div class="faq-card">
+                <h3>How quickly can our school onboard with EduTrust?</h3>
+                <p>Onboarding usually takes under 24 hours. You can import student and teacher profiles via CSV or register accounts individually through your admin dashboard.</p>
+            </div>
+
+            <div class="faq-card">
+                <h3>Is automated grade calculation supported?</h3>
+                <p>Yes. Once continuous assessment (CA) and examination scores are entered into the gradebook, EduTrust automatically processes totals, grades, positions, and remarks.</p>
+            </div>
+
+            <div class="faq-card">
+                <h3>Can parents access student result portals on mobile devices?</h3>
+                <p>Yes. The parent dashboard is fully mobile-responsive and accessible on smartphones, tablets, or desktop web browsers.</p>
+            </div>
+
+            <div class="faq-card">
+                <h3>Is local offline network deployment supported?</h3>
+                <p>Yes, EduTrust can be deployed locally across campus local area networks (LAN) for offline operation without active internet dependency.</p>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
