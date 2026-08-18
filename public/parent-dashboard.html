@@ -4,136 +4,234 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parent Dashboard | EduTrust</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         * {
             box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
         }
 
         body {
             margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f7fb;
-            color: #172033;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
         }
 
         button {
             font-family: inherit;
         }
 
+        /* --- TOPBAR STYLING --- */
         .topbar {
-            min-height: 70px;
+            min-height: 72px;
             background: #ffffff;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
+            padding: 0 32px;
             gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
         }
 
         .logo {
-            color: #1769e0;
-            font-size: 23px;
+            color: #2563eb;
+            font-size: 24px;
             font-weight: 800;
             text-decoration: none;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .logo span {
-            color: #172033;
+            color: #0f172a;
         }
 
         .top-right {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+        }
+
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 6px 14px 6px 8px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .parent-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .parent-avatar-placeholder {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
         }
 
         .parent-name {
             font-weight: 700;
+            font-size: 14px;
+            color: #1e293b;
         }
 
         .logout {
             border: 0;
-            background: #ef4444;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 7px;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 9px 18px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 700;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .logout:hover {
-            background: #dc2626;
+            background: #ef4444;
+            color: #ffffff;
+            transform: translateY(-1px);
         }
 
+        /* --- LAYOUT --- */
         .container {
-            max-width: 1200px;
+            max-width: 1240px;
             margin: 0 auto;
-            padding: 35px 20px 60px;
+            padding: 35px 24px 60px;
         }
 
         .welcome {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            padding: 32px;
+            border-radius: 20px;
+            color: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.2);
         }
 
         .welcome h1 {
-            margin: 0 0 7px;
-            font-size: 30px;
+            margin: 0 0 8px;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .welcome p {
             margin: 0;
-            color: #667085;
+            color: #c7d2fe;
+            font-size: 15px;
         }
 
         .error {
-            background: #fff0f0;
-            border: 1px solid #f5b5b5;
-            color: #b42318;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             display: none;
+            font-weight: 600;
+            font-size: 14px;
         }
 
         .loading {
             text-align: center;
             padding: 40px;
-            color: #667085;
+            color: #64748b;
+            font-weight: 600;
         }
 
+        /* --- STATS CARDS --- */
         .stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            margin-bottom: 25px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
             background: #ffffff;
-            border-radius: 12px;
-            padding: 22px;
-            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 22px 24px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
         }
 
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #cbd5e1;
+        }
+
+        .stat-card.children-stat::before { background: #2563eb; }
+        .stat-card.active-stat::before { background: #10b981; }
+        .stat-card.pending-stat::before { background: #f59e0b; }
+        .stat-card.suspended-stat::before { background: #ef4444; }
+
         .stat-title {
-            color: #667085;
+            color: #64748b;
             font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
 
         .stat-value {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
         }
 
+        /* --- SECTIONS --- */
         .section {
             background: #ffffff;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            padding: 25px;
-            margin-bottom: 25px;
+            border-radius: 20px;
+            border: 1px solid #f1f5f9;
+            padding: 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         }
 
         .section-header {
@@ -141,182 +239,218 @@
             align-items: center;
             justify-content: space-between;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .section h2 {
             margin: 0;
-            font-size: 21px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.3px;
         }
 
+        /* --- CHILDREN CARDS --- */
         .children {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
+            gap: 22px;
         }
 
         .child-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
             background: #ffffff;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        .child-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .child-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed #e2e8f0;
         }
 
         .child-card h3 {
-            margin: 0 0 18px;
-            font-size: 18px;
+            margin: 0;
+            font-size: 17px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.3;
         }
 
         .child-passport {
-            width: 65px;
-            height: 65px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid #e5e7eb;
-            margin-bottom: 12px;
+            border: 2px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .child-placeholder {
-            width: 65px;
-            height: 65px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background: #eef4ff;
-            color: #1769e0;
+            background: #eff6ff;
+            color: #2563eb;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 25px;
+            font-size: 20px;
             font-weight: 800;
-            margin-bottom: 12px;
+            flex-shrink: 0;
+            border: 2px solid #dbeafe;
         }
 
         .child-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             gap: 15px;
-            margin: 10px 0;
-            font-size: 14px;
+            margin: 8px 0;
+            font-size: 13.5px;
         }
 
         .child-row span:first-child {
-            color: #667085;
+            color: #64748b;
+            font-weight: 500;
         }
 
         .child-row strong {
             text-align: right;
+            color: #1e293b;
+            font-weight: 700;
         }
 
         .child-actions {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed #e5e7eb;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .btn-action {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
-            padding: 10px;
-            text-align: center;
-            border-radius: 6px;
+            padding: 11px;
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 13.5px;
             text-decoration: none;
             cursor: pointer;
             border: none;
-            transition: background 0.2s;
         }
 
         .btn-primary {
-            background: #1769e0;
+            background: #2563eb;
             color: white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
         }
 
         .btn-primary:hover {
-            background: #1355b8;
+            background: #1d4ed8;
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
         }
 
         .btn-secondary {
-            background: #eef4ff;
-            color: #1769e0;
+            background: #f1f5f9;
+            color: #334155;
         }
 
         .btn-secondary:hover {
-            background: #dbe7ff;
+            background: #e2e8f0;
+            color: #0f172a;
         }
 
+        /* --- STATUS BADGES --- */
         .status {
-            display: inline-block;
-            padding: 5px 9px;
-            border-radius: 20px;
-            background: #e8f7ee;
-            color: #18794e;
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 30px;
+            background: #ecfdf5;
+            color: #047857;
             font-size: 12px;
             font-weight: 700;
         }
 
-        .status.pending {
-            background: #fff7e6;
-            color: #b54708;
-        }
-
-        .status.suspended {
-            background: #fff0f0;
-            color: #b42318;
-        }
-
-        .status.graduated {
-            background: #eef4ff;
-            color: #1769e0;
-        }
-
-        .status.archived {
-            background: #f2f4f7;
-            color: #667085;
-        }
+        .status.pending { background: #fffbeb; color: #b45309; }
+        .status.suspended { background: #fef2f2; color: #b91c1c; }
+        .status.graduated { background: #eff6ff; color: #1d4ed8; }
+        .status.archived { background: #f8fafc; color: #64748b; }
 
         .empty {
-            color: #667085;
-            padding: 20px 0;
+            color: #64748b;
+            padding: 30px 0;
             text-align: center;
+            font-weight: 500;
         }
 
+        /* --- PROFILE GRID --- */
         .profile-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 16px;
         }
 
         .profile-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 9px;
-            padding: 15px;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 18px;
+            background: #f8fafc;
         }
 
         .profile-label {
             display: block;
-            color: #667085;
+            color: #64748b;
             font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 6px;
         }
 
         .profile-value {
             font-weight: 700;
+            color: #0f172a;
+            font-size: 15px;
             word-break: break-word;
         }
 
         .school-info {
-            color: #667085;
-            font-size: 14px;
-            margin-top: 15px;
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.6;
         }
 
-        @media (max-width: 900px) {
+        .school-card {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            padding: 20px;
+            color: #1e40af;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 992px) {
             .stats {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -326,17 +460,28 @@
             }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
             .topbar {
-                padding: 0 15px;
+                padding: 0 16px;
             }
 
             .parent-name {
                 display: none;
             }
 
+            .user-profile-badge {
+                padding: 4px;
+                background: transparent;
+                border: none;
+            }
+
             .container {
-                padding: 25px 15px 50px;
+                padding: 20px 16px 40px;
+            }
+
+            .welcome {
+                padding: 24px;
+                border-radius: 16px;
             }
 
             .stats,
@@ -346,11 +491,12 @@
             }
 
             .welcome h1 {
-                font-size: 25px;
+                font-size: 22px;
             }
 
             .section {
-                padding: 18px;
+                padding: 20px;
+                border-radius: 16px;
             }
         }
     </style>
@@ -366,18 +512,17 @@
 
     <div class="top-right">
 
-        <span
-            id="parentName"
-            class="parent-name"
-        >
-            Loading...
-        </span>
+        <div class="user-profile-badge">
+            <div id="parentAvatarContainer">
+                <div class="parent-avatar-placeholder" id="parentInitials">--</div>
+            </div>
+            <span id="parentName" class="parent-name">
+                Loading...
+            </span>
+        </div>
 
-        <button
-            class="logout"
-            id="logoutButton"
-            type="button"
-        >
+        <button class="logout" id="logoutButton" type="button">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             Logout
         </button>
 
@@ -395,79 +540,63 @@
         </h1>
 
         <p>
-            Manage your children and monitor their school
-            information from one place.
+            Manage your children and monitor their academic progress from one place.
         </p>
 
     </section>
 
 
-    <div
-        id="error"
-        class="error"
-    ></div>
+    <div id="error" class="error"></div>
 
 
     <section class="stats">
 
-        <div class="stat-card">
+        <div class="stat-card children-stat">
 
             <div class="stat-title">
-                Children
+                Total Children
             </div>
 
-            <div
-                class="stat-value"
-                id="childrenCount"
-            >
+            <div class="stat-value" id="childrenCount">
                 0
             </div>
 
         </div>
 
 
-        <div class="stat-card">
+        <div class="stat-card active-stat">
 
             <div class="stat-title">
                 Active
             </div>
 
-            <div
-                class="stat-value"
-                id="activeCount"
-            >
+            <div class="stat-value" id="activeCount">
                 0
             </div>
 
         </div>
 
 
-        <div class="stat-card">
+        <div class="stat-card pending-stat">
 
             <div class="stat-title">
                 Pending
             </div>
 
-            <div
-                class="stat-value"
-                id="pendingCount"
-            >
+            <div class="stat-value" id="pendingCount">
                 0
             </div>
 
         </div>
 
 
-        <div class="stat-card">
+        <div class="stat-card suspended-stat">
 
             <div class="stat-title">
                 Suspended
             </div>
 
-            <div
-                class="stat-value"
-                id="suspendedCount"
-            >
+            <div class="stat-value" id="suspendedCount">
                 0
             </div>
 
@@ -487,10 +616,7 @@
         </div>
 
 
-        <div
-            id="children"
-            class="children"
-        >
+        <div id="children" class="children">
 
             <div class="loading">
                 Loading children...
@@ -506,16 +632,13 @@
         <div class="section-header">
 
             <h2>
-                Parent Information
+                Parent Profile
             </h2>
 
         </div>
 
 
-        <div
-            id="profile"
-            class="profile-grid"
-        >
+        <div id="profile" class="profile-grid">
 
             <div class="loading">
                 Loading profile...
@@ -531,15 +654,12 @@
         <div class="section-header">
 
             <h2>
-                School
+                School Connection
             </h2>
 
         </div>
 
-        <div
-            id="schoolInfo"
-            class="school-info"
-        >
+        <div id="schoolInfo" class="school-info">
             Loading school information...
         </div>
 
@@ -571,6 +691,7 @@
     // =========================================================
 
     const parentName = document.getElementById("parentName");
+    const parentAvatarContainer = document.getElementById("parentAvatarContainer");
     const welcomeTitle = document.getElementById("welcomeTitle");
     const childrenCount = document.getElementById("childrenCount");
     const activeCount = document.getElementById("activeCount");
@@ -657,11 +778,25 @@
     // RENDER FUNCTIONS
     // =========================================================
 
+    function renderParentAvatar(parent) {
+        const name = parent.fullName || "Parent";
+        const passport = parent.passport || parent.profilePicture || parent.avatar;
+
+        if (passport) {
+            parentAvatarContainer.innerHTML = `
+                <img class="parent-avatar" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.outerHTML='<div class=\\'parent-avatar-placeholder\\'>${escapeHtml(getInitials(name))}</div>';">
+            `;
+        } else {
+            parentAvatarContainer.innerHTML = `
+                <div class="parent-avatar-placeholder">${escapeHtml(getInitials(name))}</div>
+            `;
+        }
+    }
+
     function renderChildren(children) {
         if (!Array.isArray(children) || children.length === 0) {
             childrenContainer.innerHTML = `
                 <div class="empty">
-
                     No children are currently linked to this parent account.
                 </div>
             `;
@@ -680,16 +815,20 @@
             const childId = child._id || child.id || "";
             const admissionNo = child.admissionNumber || "";
 
-          //  ADDED loading="lazy" HERE INSIDE THE AVATAR GENERATION
-        const avatar = passport
-            ? `<img class="child-passport" loading="lazy" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-               <div class="child-placeholder" style="display:none;">${escapeHtml(getInitials(name))}</div>`
-            : `<div class="child-placeholder">${escapeHtml(getInitials(name))}</div>`;
+            const avatar = passport
+                ? `<img class="child-passport" loading="lazy" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                   <div class="child-placeholder" style="display:none;">${escapeHtml(getInitials(name))}</div>`
+                : `<div class="child-placeholder">${escapeHtml(getInitials(name))}</div>`;
 
-        return `
+            return `
                 <article class="child-card">
-                    ${avatar}
-                    <h3>${escapeHtml(name)}</h3>
+                    <div class="child-card-header">
+                        ${avatar}
+                        <div>
+                            <h3>${escapeHtml(name)}</h3>
+                            <span class="status ${statusClass}" style="margin-top: 5px;">${escapeHtml(status)}</span>
+                        </div>
+                    </div>
 
                     <div class="child-row">
                         <span>Admission No.</span>
@@ -719,11 +858,6 @@
                     <div class="child-row">
                         <span>Admission Date</span>
                         <strong>${escapeHtml(formatDate(child.admissionDate))}</strong>
-                    </div>
-
-                    <div class="child-row">
-                        <span>Status</span>
-                        <span class="status ${statusClass}">${escapeHtml(status)}</span>
                     </div>
 
                     <div class="child-actions">
@@ -782,10 +916,10 @@
 
     function renderSchool(parent) {
         schoolInfo.innerHTML = `
-            <p>
-                Your parent account is connected to school ID:
+            <div class="school-card">
+                Your parent account is officially connected to School ID:
                 <strong>${escapeHtml(parent.schoolId || "-")}</strong>
-            </p>
+            </div>
         `;
     }
 
@@ -835,7 +969,9 @@
 
             const name = parent.fullName || "Parent";
             parentName.textContent = name;
-            welcomeTitle.textContent = `Welcome, ${name}`;
+            welcomeTitle.textContent = `Welcome back, ${name}`;
+
+            renderParentAvatar(parent);
 
             childrenCount.textContent = Number(statistics.totalChildren || 0);
             activeCount.textContent = Number(statistics.activeChildren || 0);
