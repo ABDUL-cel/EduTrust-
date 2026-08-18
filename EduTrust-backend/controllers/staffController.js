@@ -245,4 +245,58 @@ exports.activateStaff = async (req, res) => {
         });
     }
 };
+// =======================================
+// Update Staff
+// =======================================
+exports.updateStaff = async (req, res) => {
+    try {
+        const { full_name, phone, role } = req.body;
+
+        if (role && !STAFF_ROLES.includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid staff role."
+            });
+        }
+
+        const staff = await User.findOne({
+            _id: req.params.id,
+            school_id: req.user.school_id,
+            role: { $in: STAFF_ROLES }
+        });
+
+        if (!staff) {
+            return res.status(404).json({
+                success: false,
+                message: "Staff member not found."
+            });
+        }
+
+        if (full_name) staff.full_name = full_name.trim();
+        if (phone) staff.phone = phone.trim();
+        if (role) staff.role = role;
+
+        await staff.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Staff member updated successfully.",
+            staff: {
+                id: staff._id,
+                full_name: staff.full_name,
+                email: staff.email,
+                phone: staff.phone,
+                role: staff.role,
+                status: staff.status
+            }
+        });
+
+    } catch (error) {
+        console.error("UPDATE STAFF ERROR:", error);
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
 
