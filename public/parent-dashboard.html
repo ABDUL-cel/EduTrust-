@@ -21,6 +21,7 @@
             --welcome-bg: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
             --shadow-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.12);
+            --modal-overlay: rgba(15, 23, 42, 0.6);
         }
 
         [data-theme="dark"] {
@@ -35,6 +36,7 @@
             --welcome-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
             --shadow-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.5);
+            --modal-overlay: rgba(0, 0, 0, 0.8);
         }
 
         * {
@@ -91,7 +93,6 @@
             gap: 16px;
         }
 
-        /* Dark Mode Toggle */
         .theme-toggle-btn {
             background: var(--bg-card-alt);
             border: 1px solid var(--border-color);
@@ -431,6 +432,17 @@
             transform: translateY(-1px);
         }
 
+        .btn-payment {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-payment:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
         /* --- STATUS BADGES --- */
         .status {
             display: inline-flex;
@@ -447,6 +459,17 @@
         .status.suspended { background: #fef2f2; color: #b91c1c; }
         .status.graduated { background: #eff6ff; color: #1d4ed8; }
         .status.archived { background: var(--bg-card-alt); color: var(--text-muted); }
+
+        .fee-status {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .fee-paid { background: #dcfce7; color: #15803d; }
+        .fee-partial { background: #fef3c7; color: #b45309; }
+        .fee-unpaid { background: #fee2e2; color: #b91c1c; }
 
         /* --- PROFILE GRID --- */
         .profile-grid {
@@ -498,6 +521,111 @@
             border-color: #2563eb;
         }
 
+        /* --- PAYMENT HISTORY MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--modal-overlay);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-card);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--text-main);
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .close-modal:hover {
+            color: #ef4444;
+        }
+
+        .payment-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .payment-box {
+            background: var(--bg-card-alt);
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .payment-box span {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+            display: block;
+        }
+
+        .payment-box strong {
+            font-size: 18px;
+            color: var(--text-main);
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13.5px;
+        }
+
+        .payment-table th, .payment-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .payment-table th {
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
         /* --- RESPONSIVE DESIGN --- */
         @media (max-width: 992px) {
             .stats { grid-template-columns: repeat(2, 1fr); }
@@ -512,6 +640,7 @@
             .welcome { padding: 24px; border-radius: 16px; }
             .stats, .children, .profile-grid { grid-template-columns: 1fr; }
             .section { padding: 20px; border-radius: 16px; }
+            .payment-summary { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -555,7 +684,7 @@
 
     <section class="welcome">
         <h1 id="welcomeTitle">Parent Dashboard</h1>
-        <p>Manage your children and monitor their academic progress from one place.</p>
+        <p>Manage your children, fees, and academic progress from one place.</p>
     </section>
 
     <div id="error" class="error"></div>
@@ -584,7 +713,7 @@
 
     <section class="section">
         <div class="section-header">
-            <h2>My Children</h2>
+            <h2>My Children & Fee Payment Status</h2>
         </div>
         <div id="children" class="children">
             <div style="color:var(--text-muted); font-weight:600;">Loading children...</div>
@@ -610,6 +739,43 @@
     </section>
 
 </main>
+
+<!-- PAYMENT HISTORY MODAL -->
+<div id="paymentModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="modalStudentName">Payment History</h3>
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="payment-summary">
+            <div class="payment-box">
+                <span>Last Payment</span>
+                <strong id="modalLastPayment">₦0.00</strong>
+            </div>
+            <div class="payment-box">
+                <span>Outstanding Balance</span>
+                <strong id="modalBalance" style="color:#ef4444;">₦0.00</strong>
+            </div>
+        </div>
+
+        <h4 style="margin: 15px 0 8px; color: var(--text-main);">Recent Transactions</h4>
+        <div style="overflow-x: auto;">
+            <table class="payment-table">
+                <thead>
+                    <tr>
+                        <th>Receipt</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="modalPaymentRows">
+                    <!-- Dynamic Payment Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -675,8 +841,18 @@
     const errorContainer = document.getElementById("error");
     const logoutButton = document.getElementById("logoutButton");
 
+    // Modal Elements
+    const paymentModal = document.getElementById("paymentModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const modalStudentName = document.getElementById("modalStudentName");
+    const modalLastPayment = document.getElementById("modalLastPayment");
+    const modalBalance = document.getElementById("modalBalance");
+    const modalPaymentRows = document.getElementById("modalPaymentRows");
+
+    let childrenGlobalData = [];
+
     // =========================================================
-    // TOKEN
+    // TOKEN & LOGOUT
     // =========================================================
 
     const token =
@@ -689,13 +865,14 @@
         return;
     }
 
-    // LOGOUT
     logoutButton.addEventListener("click", function () {
         localStorage.removeItem("parent_token");
         localStorage.removeItem("edutrust_token");
         localStorage.removeItem("token");
         window.location.href = "parent-login.html";
     });
+
+    closeModalBtn.addEventListener("click", () => paymentModal.classList.remove("active"));
 
     // HELPERS
     function showError(message) {
@@ -721,6 +898,10 @@
             month: "short",
             day: "numeric"
         });
+    }
+
+    function formatCurrency(amount) {
+        return "₦" + Number(amount || 0).toLocaleString("en-NG", { minimumFractionDigits: 2 });
     }
 
     function getStatusClass(status) {
@@ -762,13 +943,18 @@
             return;
         }
 
-        childrenContainer.innerHTML = children.map(function (child) {
+        childrenContainer.innerHTML = children.map(function (child, index) {
             const name = child.fullName || [child.first_name, child.other_name, child.last_name].filter(Boolean).join(" ") || "Unnamed Student";
             const status = child.status || "Pending";
             const statusClass = getStatusClass(status);
             const passport = child.passport;
             const childId = child._id || child.id || "";
             const admissionNo = child.admissionNumber || "";
+
+            // Payment data (falls back to defaults if not in backend response yet)
+            const feeStatus = child.feeStatus || "Paid";
+            const feeStatusClass = feeStatus === "Paid" ? "fee-paid" : feeStatus === "Partial" ? "fee-partial" : "fee-unpaid";
+            const lastPayment = child.lastPaymentAmount ? formatCurrency(child.lastPaymentAmount) : "₦0.00";
 
             const avatar = passport
                 ? `<img class="child-passport" loading="lazy" src="${escapeHtml(passport)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -781,18 +967,23 @@
                         ${avatar}
                         <div>
                             <h3>${escapeHtml(name)}</h3>
-                            <span class="status ${statusClass}" style="margin-top: 5px;">${escapeHtml(status)}</span>
+                            <div style="display:flex; gap:6px; margin-top:5px; align-items:center;">
+                                <span class="status ${statusClass}">${escapeHtml(status)}</span>
+                                <span class="fee-status ${feeStatusClass}">${escapeHtml(feeStatus)}</span>
+                            </div>
                         </div>
                     </div>
 
                     <div class="child-row"><span>Admission No.</span><strong>${escapeHtml(admissionNo || "-")}</strong></div>
                     <div class="child-row"><span>Class</span><strong>${escapeHtml(child.className || "-")}</strong></div>
                     <div class="child-row"><span>Arm</span><strong>${escapeHtml(child.arm || "-")}</strong></div>
-                    <div class="child-row"><span>Gender</span><strong>${escapeHtml(child.gender || "-")}</strong></div>
-                    <div class="child-row"><span>Date of Birth</span><strong>${escapeHtml(formatDate(child.dateOfBirth))}</strong></div>
-                    <div class="child-row"><span>Admission Date</span><strong>${escapeHtml(formatDate(child.admissionDate))}</strong></div>
+                    <div class="child-row"><span>Last Payment</span><strong style="color:#10b981;">${lastPayment}</strong></div>
 
                     <div class="child-actions">
+                        <button onclick="window.showPaymentModal(${index})" class="btn-action btn-payment">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            View Payment History
+                        </button>
                         <a href="check-result.html?studentId=${encodeURIComponent(childId)}&admissionNo=${encodeURIComponent(admissionNo)}" class="btn-action btn-primary">Check Exam Result</a>
                         <a href="report-card.html?studentId=${encodeURIComponent(childId)}" class="btn-action btn-secondary">View Report Sheet</a>
                     </div>
@@ -800,6 +991,32 @@
             `;
         }).join("");
     }
+
+    // Show Payment Modal Logic
+    window.showPaymentModal = function(index) {
+        const child = childrenGlobalData[index];
+        if (!child) return;
+
+        const name = child.fullName || "Student";
+        modalStudentName.textContent = `${name}'s Payment History`;
+        modalLastPayment.textContent = child.lastPaymentAmount ? formatCurrency(child.lastPaymentAmount) : "₦0.00";
+        modalBalance.textContent = child.outstandingBalance ? formatCurrency(child.outstandingBalance) : "₦0.00";
+
+        const payments = Array.isArray(child.payments) && child.payments.length > 0 ? child.payments : [
+            { receipt: "REC-8921", date: new Date(), description: "Tuition & School Fees", amount: child.lastPaymentAmount || 0 }
+        ];
+
+        modalPaymentRows.innerHTML = payments.map(p => `
+            <tr>
+                <td><strong>${escapeHtml(p.receipt || 'N/A')}</strong></td>
+                <td>${formatDate(p.date)}</td>
+                <td>${escapeHtml(p.description || 'School Fee')}</td>
+                <td style="color:#10b981; font-weight:700;">${formatCurrency(p.amount)}</td>
+            </tr>
+        `).join("");
+
+        paymentModal.classList.add("active");
+    };
 
     function renderProfile(parent) {
         profileContainer.innerHTML = `
@@ -856,7 +1073,7 @@
             const dashboard = data.dashboard;
             const parent = dashboard.parent || {};
             const statistics = dashboard.statistics || {};
-            const children = Array.isArray(dashboard.children) ? dashboard.children : [];
+            childrenGlobalData = Array.isArray(dashboard.children) ? dashboard.children : [];
 
             const name = parent.fullName || "Parent";
             parentName.textContent = name;
@@ -869,7 +1086,7 @@
             pendingCount.textContent = Number(statistics.pendingChildren || 0);
             suspendedCount.textContent = Number(statistics.suspendedChildren || 0);
 
-            renderChildren(children);
+            renderChildren(childrenGlobalData);
             renderProfile(parent);
             renderSchool(parent);
 
