@@ -11,6 +11,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const connectDB = require("./config/db");
 
 // Routes
+const adminRoutes = require('./routes/adminRoutes');
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const schoolRoutes = require("./routes/schoolRoutes");
@@ -111,6 +112,7 @@ app.get("/", (req, res) => {
 });
 
 // Authentication & Core Routes
+app.use('/api', adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/school", schoolRoutes);
