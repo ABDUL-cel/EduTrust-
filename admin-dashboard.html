@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - EduTrust</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="icon" type="image/png" href="logo-icon.png">
+</head>
+<body class="admin-body">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="logo">
+                <img src="logo-icon.png" alt="EduTrust Logo" class="logo-icon">
+                <span>Edu<span>Trust</span></span>
+            </a>
+            <span class="admin-badge">SUPER ADMIN</span>
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="#" class="menu-item active">
+                <span class="icon">📊</span> Overview
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">🏫</span> Schools Management
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">📩</span> Support Inquiries
+                <span class="menu-count">3</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">📜</span> System Logs
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">⚙️</span> Settings
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="admin-profile">
+                <div class="avatar">A</div>
+                <div class="profile-info">
+                    <p class="admin-name">Abdulazeez K.</p>
+                    <p class="admin-role">Platform Admin</p>
+                </div>
+            </div>
+            <a href="index.html" class="logout-btn" title="Logout">🚪</a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- Top Header Bar -->
+        <header class="topbar">
+            <div class="page-title">
+                <h1>Overview & Dashboard</h1>
+                <p>Monitor platform performance, onboarded schools, and incoming support requests.</p>
+            </div>
+            <div class="topbar-actions">
+                <div class="system-status">
+                    <span class="status-indicator"></span>
+                    <span>Backend Server Live</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Metric Cards Grid -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Total Onboarded Schools</span>
+                    <span class="metric-icon">🏫</span>
+                </div>
+                <div class="metric-value">12</div>
+                <div class="metric-subtext positive">+2 new this month</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Active Platform Users</span>
+                    <span class="metric-icon">👥</span>
+                </div>
+                <div class="metric-value">2,450</div>
+                <div class="metric-subtext">Admins, Teachers, Parents & Students</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Results Processed</span>
+                    <span class="metric-icon">📄</span>
+                </div>
+                <div class="metric-value">8,920</div>
+                <div class="metric-subtext positive">Term 3 Gradebooks</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Open Support Inquiries</span>
+                    <span class="metric-icon">💬</span>
+                </div>
+                <div class="metric-value">3</div>
+                <div class="metric-subtext urgent">Requires Action</div>
+            </div>
+        </section>
+
+        <!-- Dashboard Two-Column Layout -->
+        <div class="dashboard-columns">
+
+            <!-- Recent Inquiries Table -->
+            <section class="panel main-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Recent Contact & Support Inquiries</h2>
+                        <p>Messages received from contact.html form</p>
+                    </div>
+                    <a href="#" class="view-all-link">View All</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sender</th>
+                                <th>Role</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Dr. Olatunji M.</strong><br>
+                                    <small>olatunji@greenoak.edu.ng</small>
+                                </td>
+                                <td>School Owner</td>
+                                <td>Onboarding & Setup</td>
+                                <td>Today, 09:15 AM</td>
+                                <td><span class="status-pill pending">New</span></td>
+                                <td><button class="action-btn">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Amina Lawal</strong><br>
+                                    <small>a.lawal@gmail.com</small>
+                                </td>
+                                <td>Parent</td>
+                                <td>Portal Access</td>
+                                <td>Yesterday</td>
+                                <td><span class="status-pill active">In Progress</span></td>
+                                <td><button class="action-btn">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>David Bello</strong><br>
+                                    <small>david@victorycollege.com</small>
+                                </td>
+                                <td>Teacher</td>
+                                <td>Result Processing</td>
+                                <td>16 Aug 2026</td>
+                                <td><span class="status-pill resolved">Resolved</span></td>
+                                <td><button class="action-btn">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- System Activity Feed -->
+            <section class="panel side-panel">
+                <div class="panel-header">
+                    <h2>Live Activity Feed</h2>
+                </div>
+                <ul class="activity-feed">
+                    <li class="feed-item">
+                        <span class="feed-icon green">✓</span>
+                        <div class="feed-details">
+                            <p><strong>Victory College</strong> published 140 student report cards.</p>
+                            <small>25 mins ago</small>
+                        </div>
+                    </li>
+                    <li class="feed-item">
+                        <span class="feed-icon blue">+</span>
+                        <div class="feed-details">
+                            <p>New school registration requested by <strong>Green Oak Prep</strong>.</p>
+                            <small>2 hours ago</small>
+                        </div>
+                    </li>
+                    <li class="feed-item">
+                        <span class="feed-icon orange">⚙️</span>
+                        <div class="feed-details">
+                            <p>Express backend deployed successfully on Render.</p>
+                            <small>5 hours ago</small>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
