@@ -356,13 +356,13 @@ exports.searchSchools = async (
 };
 
 // ============================================================
-// PARENT LOGIN
+// PARENT LOGIN CONTROLLER
 // ============================================================
 exports.loginParent = async (req, res) => {
     try {
         const { phone, email, emailOrPhone, identity, password } = req.body;
 
-        // Support single identity field or separate phone/email inputs
+        // Extract input from any field format sent by frontend
         const targetIdentity = (emailOrPhone || identity || email || phone || "").trim();
 
         if (!targetIdentity) {
@@ -381,20 +381,33 @@ exports.loginParent = async (req, res) => {
 
         const normalizedInput = targetIdentity.toLowerCase();
 
-        // 1. Find user matching email OR phone AND specifically having the 'Parent' role
-        const parentUser = await User.findOne({
-            $and: [
-                {
-                    $or: [
-                        { email: normalizedInput },
-                        { phone: targetIdentity }
-                    ]
-                },
-                { role: { $regex: /^parent$/i } } // Matches "Parent" or "parent" case-insensitively
-            ]
-        });
+        // 1. Check Parent Collection first
+        let parentUser = null;
+        if (typeof Parent !== "undefined") {
+            parentUser = await Parent.findOne({
+                $or: [
+                    { email: normalizedInput },
+                    { phone: targetIdentity }
+                ]
+            });
+        }
 
-        // If no parent record is found with those credentials
+        // 2. If not found in Parent model, fallback to User collection where role is 'Parent'
+        if (!parentUser && typeof User !== "undefined") {
+            parentUser = await User.findOne({
+                $and: [
+                    {
+                        $or: [
+                            { email: normalizedInput },
+                            { phone: targetIdentity }
+                        ]
+                    },
+                    { role: { $regex: /^parent$/i } }
+                ]
+            });
+        }
+
+        // 3. Handle missing parent account
         if (!parentUser) {
             return res.status(404).json({
                 success: false,
@@ -402,7 +415,7 @@ exports.loginParent = async (req, res) => {
             });
         }
 
-        // 2. Verify password
+        // 4. Verify Password
         const isMatch = await bcrypt.compare(password, parentUser.password);
         if (!isMatch) {
             return res.status(401).json({
@@ -411,23 +424,28 @@ exports.loginParent = async (req, res) => {
             });
         }
 
-        // 3. Generate Auth Token
+        // 5. Generate Auth Token
         const token = jwt.sign(
-            { id: parentUser._id, role: parentUser.role, school_id: parentUser.school_id },
+            { 
+                id: parentUser._id, 
+                role: parentUser.role || "Parent", 
+                school_id: parentUser.school_id 
+            },
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
 
+        // 6. Return Success Response
         return res.status(200).json({
             success: true,
             message: "Login successful.",
-            token,
+            token: token,
             parent: {
                 id: parentUser._id,
-                full_name: parentUser.full_name || `${parentUser.first_name} ${parentUser.last_name}`,
+                full_name: parentUser.full_name || `${parentUser.first_name || ""} ${parentUser.last_name || ""}`.trim(),
                 email: parentUser.email,
                 phone: parentUser.phone,
-                role: parentUser.role
+                role: parentUser.role || "Parent"
             }
         });
 
@@ -439,7 +457,6 @@ exports.loginParent = async (req, res) => {
         });
     }
 };
-
         // ==================================================
         // FIND PARENT
         // ==================================================
