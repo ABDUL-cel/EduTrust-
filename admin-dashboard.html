@@ -84,70 +84,59 @@
             </div>
         </header>
 
-        <!-- Metric Cards Grid -->
-        <section class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Onboarded Schools</span>
-                    <span class="metric-icon">🏫</span>
-                </div>
-                <div class="metric-value">12</div>
-                <div class="metric-subtext positive">+2 new this month</div>
-            </div>
+<!-- Metric Cards Grid -->
+<section class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-header">
+            <span class="metric-title">Onboarded Schools</span>
+            <span class="metric-icon">🏫</span>
+        </div>
+        <div class="metric-value" id="totalSchoolsCount">0</div>
+        <div class="metric-subtext positive">+2 new this month</div>
+    </div>
 
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Active Users</span>
-                    <span class="metric-icon">👥</span>
-                </div>
-                <div class="metric-value">2,450</div>
-                <div class="metric-subtext">Admins, Teachers, Parents</div>
-            </div>
+    <div class="metric-card">
+        <div class="metric-header">
+            <span class="metric-title">Active Users</span>
+            <span class="metric-icon">👥</span>
+        </div>
+        <div class="metric-value" id="totalUsersCount">0</div>
+        <div class="metric-subtext">Admins, Teachers, Parents</div>
+    </div>
 
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Results Processed</span>
-                    <span class="metric-icon">📄</span>
-                </div>
-                <div class="metric-value">8,920</div>
-                <div class="metric-subtext positive">Term 3 Gradebooks</div>
-            </div>
+    <div class="metric-card">
+        <div class="metric-header">
+            <span class="metric-title">Results Processed</span>
+            <span class="metric-icon">📄</span>
+        </div>
+        <div class="metric-value" id="resultsProcessedCount">0</div>
+        <div class="metric-subtext positive">Term 3 Gradebooks</div>
+    </div>
 
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Open Inquiries</span>
-                    <span class="metric-icon">💬</span>
-                </div>
-                <div class="metric-value">3</div>
-                <div class="metric-subtext urgent">Requires Action</div>
-            </div>
-        </section>
+    <div class="metric-card">
+        <div class="metric-header">
+            <span class="metric-title">Open Inquiries</span>
+            <span class="metric-icon">💬</span>
+        </div>
+        <div class="metric-value" id="openInquiriesCount">0</div>
+        <div class="metric-subtext urgent">Requires Action</div>
+    </div>
+</section>
 
-        <!-- Two-Column Layout -->
-        <div class="dashboard-columns">
-
-            <!-- Recent Inquiries Section -->
-            <section class="panel main-panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>Contact & Support Messages</h2>
-                        <p>Messages from contact.html</p>
-                    </div>
-                    <a href="#" class="view-all-link">View All</a>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Sender</th>
-                                <th>Role</th>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+<!-- Table Body Container -->
+<div class="table-responsive">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Role</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="inquiriesTableBody">
+  
                             <tr>
                                 <td>
                                     <strong>Dr. Olatunji M.</strong><br>
@@ -226,6 +215,8 @@
             overlay.classList.toggle('active');
         }
     </script>
-
+  
+<!-- Include admin.js script at bottom -->
+<script src="admin.js"></script>
 </body>
 </html>
