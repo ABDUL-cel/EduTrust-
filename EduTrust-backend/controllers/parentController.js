@@ -358,55 +358,87 @@ exports.searchSchools = async (
 // ============================================================
 // PARENT LOGIN
 // ============================================================
-
-exports.loginParent = async (
-    req,
-    res
-) => {
+exports.loginParent = async (req, res) => {
     try {
+        const { phone, email, emailOrPhone, identity, password } = req.body;
 
-        const {
-            phone,
-            email,
-            password
-        } = req.body;
+        // Support single identity field or separate phone/email inputs
+        const targetIdentity = (emailOrPhone || identity || email || phone || "").trim();
 
-        if (
-            !phone?.trim() &&
-            !email?.trim()
-        ) {
+        if (!targetIdentity) {
             return res.status(400).json({
                 success: false,
-                message:
-                    "Phone or email is required."
+                message: "Email or phone number is required."
             });
         }
 
         if (!password) {
             return res.status(400).json({
                 success: false,
-                message:
-                    "Password is required."
+                message: "Password is required."
             });
         }
 
-        const conditions = [];
+        const normalizedInput = targetIdentity.toLowerCase();
 
-        if (phone?.trim()) {
-            conditions.push({
-                phone:
-                    phone.trim()
+        // 1. Find user matching email OR phone AND specifically having the 'Parent' role
+        const parentUser = await User.findOne({
+            $and: [
+                {
+                    $or: [
+                        { email: normalizedInput },
+                        { phone: targetIdentity }
+                    ]
+                },
+                { role: { $regex: /^parent$/i } } // Matches "Parent" or "parent" case-insensitively
+            ]
+        });
+
+        // If no parent record is found with those credentials
+        if (!parentUser) {
+            return res.status(404).json({
+                success: false,
+                message: "No active Parent account found with these credentials. If you are a staff member, please use the staff portal."
             });
         }
 
-        if (email?.trim()) {
-            conditions.push({
-                email:
-                    email
-                        .trim()
-                        .toLowerCase()
+        // 2. Verify password
+        const isMatch = await bcrypt.compare(password, parentUser.password);
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid login credentials."
             });
         }
+
+        // 3. Generate Auth Token
+        const token = jwt.sign(
+            { id: parentUser._id, role: parentUser.role, school_id: parentUser.school_id },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful.",
+            token,
+            parent: {
+                id: parentUser._id,
+                full_name: parentUser.full_name || `${parentUser.first_name} ${parentUser.last_name}`,
+                email: parentUser.email,
+                phone: parentUser.phone,
+                role: parentUser.role
+            }
+        });
+
+    } catch (error) {
+        console.error("PARENT LOGIN ERROR:", error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || "An error occurred during parent login."
+        });
+    }
+};
 
         // ==================================================
         // FIND PARENT
