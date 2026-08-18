@@ -5,6 +5,169 @@ const User = require("../models/User");
 
 
 // ======================================================
+// REGISTER STAFF (SELF-REGISTRATION VIA SCHOOL CODE)
+// ======================================================
+exports.registerStaff = async (req, res) => {
+    try {
+        const { full_name, email, phone, password, school_code } = req.body;
+
+        if (!full_name || !email || !password || !school_code) {
+            return res.status(400).json({
+                success: false,
+                message: "Full name, email, password, and school code are required."
+            });
+        }
+
+        if (String(password).length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 6 characters long."
+            });
+        }
+
+        const normalizedEmail = String(email).trim().toLowerCase();
+        const normalizedCode = String(school_code).trim().toUpperCase();
+
+        // 1. Check if user already exists
+        const existingUser = await User.findOne({ email: normalizedEmail });
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message: "An account with this email already exists."
+            });
+        }
+
+        // 2. Validate School Code
+        const school = await School.findOne({ school_code: normalizedCode });
+        if (!school) {
+            return res.status(404).json({
+                success: false,
+                message: "Invalid school code. Please verify with your principal."
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const nameParts = full_name.trim().split(" ");
+
+        // 3. Create Staff with 'Pending' status
+        const staffUser = await User.create({
+            first_name: nameParts[0] || "",
+            last_name: nameParts.slice(1).join(" ") || "",
+            full_name: full_name.trim(),
+            email: normalizedEmail,
+            phone: phone || "",
+            password: hashedPassword,
+            role: "PendingStaff", // Temporary role until approved
+            status: "Pending",     // Pending approval
+            school_id: school._id
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Registration submitted successfully! Please wait for your Principal to approve your account."
+        });
+
+    } catch (error) {
+        console.error("STAFF REGISTER ERROR:", error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Staff registration failed."
+        });
+    }
+};
+
+// ======================================================
+// UPDATED LOGIN (CHECK FOR PENDING STATUS)
+// ======================================================
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required."
+            });
+        }
+
+        const normalizedEmail = String(email).trim().toLowerCase();
+        const user = await User.findOne({ email: normalizedEmail });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password."
+            });
+        }
+
+        // Check account approval status
+        if (user.status === "Pending") {
+            return res.status(403).json({
+                success: false,
+                message: "Your account is awaiting approval from your school principal."
+            });
+        }
+
+        if (user.status !== "Active") {
+            return res.status(403).json({
+                success: false,
+                message: "This account has been deactivated. Contact your school administrator."
+            });
+        }
+
+        // Verify password
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password."
+            });
+        }
+
+        // Check active school link
+        const school = await School.findById(user.school_id).lean();
+        if (user.role !== "SuperAdmin" && (!school || school.status !== "Active")) {
+            return res.status(403).json({
+                success: false,
+                message: "Connected school account is inactive or invalid."
+            });
+        }
+
+        // Sign JWT
+        const token = jwt.sign(
+            {
+                id: user._id,
+                school_id: user.school_id,
+                role: user.role
+            },
+            JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful.",
+            token,
+            user: {
+                id: user._id,
+                full_name: user.full_name,
+                email: user.email,
+                role: user.role,
+                school_id: user.school_id
+            },
+            school
+        });
+
+    } catch (error) {
+        console.error("LOGIN ERROR:", error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Login failed."
+        });
+    }
+};
+
+// ======================================================
 // GET ALL PENDING STAFF FOR THE PRINCIPAL'S SCHOOL
 // ======================================================
 exports.getPendingStaff = async (req, res) => {
