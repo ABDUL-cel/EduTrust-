@@ -1,23 +1,37 @@
+const express = require("express");
+const router = express.Router();
 
-const roleMiddleware = (...allowedRoles) => {
-    return (req, res, next) => {
-        if (!req.user) {
-            return res.status(401).json({
-                success: false,
-                message: "Authentication required."
-            });
-        }
+const authController = require("../controllers/authController");
+const staffController = require("../controllers/staffController");
 
-        if (!allowedRoles.includes(req.user.role)) {
-            return res.status(403).json({
-                success: false,
-                message: "You do not have permission to perform this action."
-            });
-        }
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
-        next();
-    };
-};
+// Public Auth Routes
+router.post("/register-school", authController.registerSchool);
+router.post("/register-staff", authController.registerStaff);
+router.post("/login", authController.login);
 
-module.exports = roleMiddleware;
+// Protected Principal Routes (Approval Flow)
+router.get(
+    "/principal/pending-staff",
+    authMiddleware,
+    roleMiddleware("Principal", "SuperAdmin"),
+    staffController.getPendingStaff
+);
 
+router.patch(
+    "/principal/approve-staff/:staff_id",
+    authMiddleware,
+    roleMiddleware("Principal", "SuperAdmin"),
+    staffController.approveStaff
+);
+
+router.delete(
+    "/principal/reject-staff/:staff_id",
+    authMiddleware,
+    roleMiddleware("Principal", "SuperAdmin"),
+    staffController.rejectStaff
+);
+
+module.exports = router;
