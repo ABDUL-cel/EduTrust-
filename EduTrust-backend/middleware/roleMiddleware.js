@@ -7,12 +7,18 @@ const staffController = require("../controllers/staffController");
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
-// Public Auth Routes
+// ======================================================
+// PUBLIC AUTH ROUTES
+// ======================================================
+
 router.post("/register-school", authController.registerSchool);
-router.post("/register-staff", authController.registerStaff);
+router.post("/register-staff", staffController.registerStaff); // Fix: use staffController
 router.post("/login", authController.login);
 
-// Protected Principal Routes (Approval Flow)
+// ======================================================
+// PROTECTED PRINCIPAL ROUTES (APPROVAL FLOW)
+// ======================================================
+
 router.get(
     "/principal/pending-staff",
     authMiddleware,
