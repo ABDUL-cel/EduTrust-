@@ -1215,15 +1215,15 @@ async function loadStaff() {
                 }
             }
         );
+if (!response.ok || !result.success) {
+    console.log("STAFF API STATUS:", response.status);
+    console.log("STAFF API RESPONSE:", result);
 
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-            throw new Error(
-                result.message ||
-                "Failed to load staff."
-            );
-        }
+    throw new Error(
+        result.message ||
+        "Failed to load staff."
+    );
+}
 
         const staff = result.staff || [];
 
