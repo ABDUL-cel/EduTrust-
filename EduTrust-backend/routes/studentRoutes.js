@@ -24,7 +24,7 @@ const {
     getStudentDashboardData
 } = require("../controllers/studentController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+ const { authMiddleware } = require("../middleware/authMiddleware");
 
 // Rate limiter: Max 5 registrations per hour per IP address
 const registrationLimiter = rateLimit({
