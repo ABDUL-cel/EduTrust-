@@ -1216,18 +1216,6 @@ async function loadStaff() {
         if (!token) {
             throw new Error("Authentication token not found.");
         }
-
-        const response = await fetch(
-            "/api/staff",
-            {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
         const data =
             await apiRequest("/staff");
 
