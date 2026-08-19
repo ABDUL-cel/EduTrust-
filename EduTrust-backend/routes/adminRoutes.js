@@ -9,7 +9,7 @@ const {
     updateInquiryStatus
 } = require('../controllers/adminController');
 
-const { loginAdmin, seedSuperAdmin } = require('../controllers/adminAuthController');
+const { loginAdmin, seedSuperAdmin } = require('../controllers/authController');
 
 // Middleware
 const { protectAdmin } = require('../middleware/authMiddleware');
