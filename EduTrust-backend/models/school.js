@@ -102,7 +102,8 @@ const SchoolSchema = new mongoose.Schema(
 // ======================================================
 // INDEXES
 // ======================================================
-
+// Index name and status for fast public search
+SchoolSchema.index({ status: 1, name: 1 });
 SchoolSchema.index({
     email: 1
 });
