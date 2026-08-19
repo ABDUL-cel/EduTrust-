@@ -15,23 +15,16 @@ const { loginAdmin, seedSuperAdmin } = require('../controllers/authController');
 const { protectAdmin } = require('../middleware/authMiddleware');
 
 // ==========================================
-// 1. PUBLIC ROUTES (No Token Needed)
+// 1. PUBLIC ROUTES
 // ==========================================
-
-// Contact form submission from landing page / contact.html
 router.post('/contact', submitContactForm);
-
-// Super Admin login & initial seed setup
 router.post('/admin/login', loginAdmin);
-router.post('/admin/seed', seedSuperAdmin); // Run once to create initial admin account
-
+router.post('/admin/seed', seedSuperAdmin);
 
 // ==========================================
-// 2. PROTECTED SUPER ADMIN ROUTES (Token Required)
+// 2. PROTECTED ROUTES
 // ==========================================
-
-// Any route listed below requires 'Authorization: Bearer <token>' header
-router.use('/admin', protectAdmin);
+router.use('/admin', protectAdmin); // Protects all /admin sub-routes below
 
 router.get('/admin/dashboard-stats', getDashboardStats);
 router.get('/admin/inquiries', getAllInquiries);
