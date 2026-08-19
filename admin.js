@@ -1,78 +1,38 @@
 /**
- * EduTrust Super Admin Dashboard Script
- * Handles real-time API fetches for dashboard metrics and inquiry tables.
+ * Global cache for currently loaded inquiries
  */
-
-const API_BASE_URL = 'https://edutrust-backend.onrender.com/api'; // Replace with your backend URL if different
-
-document.addEventListener('DOMContentLoaded', () => {
-    fetchDashboardStats();
-    fetchInquiries();
-});
+let cachedInquiries = [];
+let activeInquiryId = null;
 
 /**
- * Fetch and display top summary metrics (Cards)
- */
-async function fetchDashboardStats() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/admin/dashboard-stats`, {
-            headers: {
-                'Content-Type': 'application/json',
-                // Include authorization header if JWT auth is enabled
-                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.success && result.data) {
-            const { totalSchools, totalUsers, resultsProcessed, openInquiries } = result.data;
-
-            // Update UI elements dynamically
-            animateCounter('totalSchoolsCount', totalSchools);
-            animateCounter('totalUsersCount', totalUsers);
-            animateCounter('resultsProcessedCount', resultsProcessed);
-            animateCounter('openInquiriesCount', openInquiries);
-        }
-    } catch (error) {
-        console.error('Failed to load dashboard metrics:', error);
-    }
-}
-
-/**
- * Fetch and populate the recent contact/support inquiries table
+ * Fetch and render inquiry list
  */
 async function fetchInquiries() {
     const tableBody = document.getElementById('inquiriesTableBody');
     if (!tableBody) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/inquiries?limit=10`, {
+        const response = await fetch(`${API_BASE_URL}/admin/inquiries?limit=15`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             }
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
         const result = await response.json();
 
         if (result.success && result.data) {
-            renderInquiriesTable(result.data);
+            cachedInquiries = result.data; // Cache array for fast modal lookup
+            renderInquiriesTable(cachedInquiries);
         }
     } catch (error) {
-        console.error('Failed to load inquiries:', error);
+        console.error('Failed to fetch inquiries:', error);
         tableBody.innerHTML = `
             <tr>
                 <td colspan="5" style="text-align: center; color: #ef4444; padding: 20px;">
-                    Failed to load inquiries from server.
+                    Failed to load inquiries.
                 </td>
             </tr>
         `;
@@ -80,7 +40,7 @@ async function fetchInquiries() {
 }
 
 /**
- * Render array of inquiry records into HTML table rows
+ * Populate the inquiries summary table
  */
 function renderInquiriesTable(inquiries) {
     const tableBody = document.getElementById('inquiriesTableBody');
@@ -97,15 +57,6 @@ function renderInquiriesTable(inquiries) {
     }
 
     tableBody.innerHTML = inquiries.map(item => {
-        // Date formatting
-        const formattedDate = new Date(item.createdAt).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
-        // Pill status styling mapping
         let statusClass = 'pending';
         if (item.status === 'In Progress') statusClass = 'active';
         if (item.status === 'Resolved') statusClass = 'resolved';
@@ -117,11 +68,11 @@ function renderInquiriesTable(inquiries) {
                     <small class="text-muted">${escapeHTML(item.email)}</small>
                 </td>
                 <td>${escapeHTML(item.userRole)}</td>
-                <td>${escapeHTML(item.subject || 'General')}</td>
+                <td>${escapeHTML(item.subject || 'General Inquiry')}</td>
                 <td><span class="status-pill ${statusClass}">${escapeHTML(item.status)}</span></td>
                 <td>
-                    <button class="action-btn" onclick="openInquiryModal('${item._id}', '${escapeHTML(item.fullName)}', '${escapeHTML(item.message)}')">
-                        View
+                    <button class="action-btn" onclick="openInquiryModal('${item._id}')">
+                        View Details
                     </button>
                 </td>
             </tr>
@@ -130,11 +81,64 @@ function renderInquiriesTable(inquiries) {
 }
 
 /**
- * Update an inquiry status (New -> In Progress -> Resolved)
+ * Open Modal and Populate Inquiry Details
  */
-async function updateStatus(inquiryId, newStatus) {
+function openInquiryModal(inquiryId) {
+    const item = cachedInquiries.find(i => i._id === inquiryId);
+    if (!item) return;
+
+    activeInquiryId = item._id;
+
+    // Populate modal DOM fields
+    document.getElementById('modalSenderName').textContent = item.fullName || 'N/A';
+    document.getElementById('modalSenderEmail').textContent = item.email || 'N/A';
+    document.getElementById('modalSenderPhone').textContent = item.phone || 'Not Provided';
+    document.getElementById('modalUserRole').textContent = item.userRole || 'User';
+    document.getElementById('modalSubject').textContent = item.subject || 'General Inquiry';
+    document.getElementById('modalMessageBody').textContent = item.message || '';
+    document.getElementById('modalStatusSelect').value = item.status || 'Pending';
+
+    // Format creation timestamp
+    const dateObj = new Date(item.createdAt);
+    document.getElementById('modalSubmittedDate').textContent = dateObj.toLocaleString('en-GB', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+    });
+
+    // Configure mailto link for direct reply
+    const mailtoSubject = encodeURIComponent(`Re: [EduTrust] ${item.subject || 'Your Inquiry'}`);
+    const mailtoBody = encodeURIComponent(`\n\n--- Original Message ---\nFrom: ${item.fullName}\nMessage: ${item.message}`);
+    document.getElementById('emailReplyBtn').href = `mailto:${item.email}?subject=${mailtoSubject}&body=${mailtoBody}`;
+
+    // Attach save event listener
+    document.getElementById('updateStatusBtn').onclick = handleStatusUpdate;
+
+    // Display overlay
+    document.getElementById('inquiryModal').style.display = 'flex';
+}
+
+/**
+ * Close Modal
+ */
+function closeInquiryModal() {
+    document.getElementById('inquiryModal').style.display = 'none';
+    activeInquiryId = null;
+}
+
+/**
+ * Save updated ticket status to backend
+ */
+async function handleStatusUpdate() {
+    if (!activeInquiryId) return;
+
+    const newStatus = document.getElementById('modalStatusSelect').value;
+    const saveBtn = document.getElementById('updateStatusBtn');
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/inquiries/${inquiryId}/status`, {
+        const response = await fetch(`${API_BASE_URL}/admin/inquiries/${activeInquiryId}/status`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -145,45 +149,27 @@ async function updateStatus(inquiryId, newStatus) {
 
         const result = await response.json();
 
-        if (result.success) {
-            // Refresh counts and inquiry table
-            fetchDashboardStats();
+        if (response.ok && result.success) {
+            closeInquiryModal();
+            // Refresh table and counter metrics
             fetchInquiries();
+            if (typeof fetchDashboardStats === 'function') fetchDashboardStats();
         } else {
-            alert(result.message || 'Status update failed.');
+            alert(result.message || 'Failed to update inquiry status.');
         }
     } catch (error) {
         console.error('Error updating inquiry status:', error);
+        alert('Network error while updating status.');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Status';
     }
 }
 
-/**
- * Helper function for number counter animation
- */
-function animateCounter(elementId, targetValue) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    let currentValue = 0;
-    const increment = Math.ceil(targetValue / 25) || 1;
-
-    const timer = setInterval(() => {
-        currentValue += increment;
-        if (currentValue >= targetValue) {
-            element.textContent = Number(targetValue).toLocaleString();
-            clearInterval(timer);
-        } else {
-            element.textContent = currentValue.toLocaleString();
-        }
-    }, 20);
-}
-
-/**
- * Utility to prevent XSS string injections
- */
-function escapeHTML(str) {
-    if (!str) return '';
-    return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-}
+// Close modal when user clicks backdrop outside modal-card
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('inquiryModal');
+    if (e.target === modal) {
+        closeInquiryModal();
+    }
+});
