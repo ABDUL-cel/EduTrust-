@@ -8,10 +8,7 @@ const {
     searchSchools
 } = require("../controllers/schoolController");
 
-const authMiddleware =
-    require("../middleware/authMiddleware");
-
-
+ const { authMiddleware } = require("../middleware/authMiddleware");
 // =======================================
 // CURRENT SCHOOL
 // =======================================
