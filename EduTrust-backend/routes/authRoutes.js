@@ -11,8 +11,8 @@ const {
 // 2. Import staffController for staff registration
 const staffController = require("../controllers/staffController");
 
-// 3. Import Middleware
-const authMiddleware = require("../middleware/authMiddleware");
+// 3. DESTRUCTURE authMiddleware HERE (Line 13)
+const { authMiddleware } = require("../middleware/authMiddleware");
 
 // ======================================================
 // REGISTER SCHOOL + PRINCIPAL & STAFF
@@ -33,6 +33,7 @@ router.post("/login", login);
 // GET /api/auth/profile
 // ======================================================
 
+// Line 36: authMiddleware is now a valid middleware function!
 router.get("/profile", authMiddleware, getProfile);
 
 module.exports = router;
