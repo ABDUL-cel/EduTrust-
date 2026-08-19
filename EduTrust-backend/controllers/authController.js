@@ -4,7 +4,109 @@ const mongoose = require("mongoose");
 
 const School = require("../models/school");
 const User = require("../models/User");
+const Admin = require('../models/Admin');
 
+
+/**
+ * Generate signed JWT Token helper
+ */
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET || 'edutrust_secret_key_2026', {
+        expiresIn: '1d' // Token expires in 24 hours
+    });
+};
+
+/**
+ * @desc    Super Admin Login
+ * @route   POST /api/admin/login
+ * @access  Public
+ */
+exports.loginAdmin = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide both username and password.'
+            });
+        }
+
+        // Find admin and explicitly include hidden password field for validation
+        const admin = await Admin.findOne({ 
+            $or: [{ username: username.toLowerCase() }, { email: username.toLowerCase() }] 
+        }).select('+password');
+
+        if (!admin) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid admin credentials.'
+            });
+        }
+
+        // Verify password
+        const isMatch = await admin.matchPassword(password);
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid admin credentials.'
+            });
+        }
+
+        // Issue JWT token
+        const token = generateToken(admin._id);
+
+        res.status(200).json({
+            success: true,
+            message: 'Admin login successful.',
+            token,
+            admin: {
+                id: admin._id,
+                username: admin.username,
+                email: admin.email,
+                role: admin.role
+            }
+        });
+    } catch (error) {
+        console.error('Admin Login Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error during login processing.'
+        });
+    }
+};
+
+/**
+ * @desc    Initial Seeder to create default Super Admin if none exists
+ * @route   POST /api/admin/seed
+ * @access  Public (Should be disabled after setup)
+ */
+exports.seedSuperAdmin = async (req, res) => {
+    try {
+        const count = await Admin.countDocuments();
+        if (count > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Admin user already exists. Seeding aborted.'
+            });
+        }
+
+        const admin = await Admin.create({
+            username: req.body.username || 'superadmin',
+            email: req.body.email || 'admin@edutrust.com',
+            password: req.body.password || 'EduTrust@2026Secret',
+            role: 'Super Admin'
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Initial Super Admin account created successfully.',
+            username: admin.username
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 const JWT_SECRET = process.env.JWT_SECRET || "edutrust_fallback_secret_key";
 
 // ======================================================
