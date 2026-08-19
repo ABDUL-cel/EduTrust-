@@ -15,7 +15,7 @@ const {
     getParentDashboard
 } = require("../controllers/parentController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+    const { authMiddleware } = require("../middleware/authMiddleware");
 
 // PUBLIC PARENT REGISTRATION
 router.post("/register", registerParent);
