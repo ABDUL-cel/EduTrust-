@@ -3,7 +3,53 @@ const ContactMessage = require('../models/ContactMessage');
 const School = require('../models/school');
 const User = require('../models/User');
 const Result = require('../models/result');
+const Contact = require('../models/Contact');
 
+/**
+ * @desc    Update inquiry status (Pending, In Progress, Resolved)
+ * @route   PATCH /api/admin/inquiries/:id/status
+ * @access  Private (Admin)
+ */
+exports.updateInquiryStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        // Validate status enum values
+        const validStatuses = ['Pending', 'In Progress', 'Resolved'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid status value provided.'
+            });
+        }
+
+        const updatedInquiry = await Contact.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedInquiry) {
+            return res.status(404).json({
+                success: false,
+                message: 'Inquiry ticket not found.'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Inquiry status updated successfully.',
+            data: updatedInquiry
+        });
+    } catch (error) {
+        console.error('Error updating inquiry status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while updating status.'
+        });
+    }
+};
 // @desc    Get top-level dashboard metrics
 // @route   GET /api/admin/dashboard-stats
 // @access  Private (Super Admin)
