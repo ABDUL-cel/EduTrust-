@@ -21,6 +21,12 @@ const StudentSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
+        matric_number: {
+    type: String,
+    default: "",
+    trim: true,
+    index: true
+},
 
         first_name: {
             type: String,
