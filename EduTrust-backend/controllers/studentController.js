@@ -251,6 +251,7 @@ exports.approveStudent = async (req, res) => {
         );
 
         studentToApprove.admission_number = officialAdmissionNumber;
+        studentToApprove.matric_number = officialMatricNumber;
         studentToApprove.status = "Active";
         studentToApprove.approved_by = user_id;
         studentToApprove.approved_at = new Date();
