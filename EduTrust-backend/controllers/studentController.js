@@ -250,7 +250,7 @@ exports.approveStudent = async (req, res) => {
             studentToApprove.department
         );
 
-        studentToApprove.admission_number = officialAdmissionNumber;
+       
         studentToApprove.matric_number = officialMatricNumber;
         studentToApprove.status = "Active";
         studentToApprove.approved_by = user_id;
@@ -262,7 +262,7 @@ exports.approveStudent = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Student approved successfully.",
-            official_admission_number: officialAdmissionNumber,
+            official_matric_number: officialAdmissionNumber,
             student: studentToApprove
         });
 
