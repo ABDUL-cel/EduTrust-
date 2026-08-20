@@ -885,20 +885,179 @@
                 id="studentsPage"
             >
 
-                <div class="page-introduction">
+              <div
+    class="page-content hidden"
+    id="studentsPage"
+>
 
-                    <div>
+    <div class="page-introduction">
 
-                        <h2>
-                            Students
-                        </h2>
+        <div>
+            <h2>
+                Students
+            </h2>
 
-                        <p>
-                            Manage students registered in your school.
-                        </p>
+            <p>
+                Manage students registered in your school.
+            </p>
+        </div>
 
-                    </div>
+        <button
+            class="primary-button"
+            id="studentsAddButton"
+            type="button"
+        >
+            + Register Student
+        </button>
 
+    </div>
+
+
+    <!-- =====================================================
+         STUDENT SEARCH & FILTER
+    ====================================================== -->
+
+    <div class="dashboard-card student-toolbar">
+
+        <div class="student-search-box">
+
+            <span class="search-icon">
+                🔍
+            </span>
+
+            <input
+                type="text"
+                id="studentSearchInput"
+                placeholder="Search by admission number, name, class..."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <select
+            id="studentStatusFilter"
+            class="student-filter"
+        >
+
+            <option value="all">
+                All Students
+            </option>
+
+            <option value="Pending">
+                Pending
+            </option>
+
+            <option value="Active">
+                Active
+            </option>
+
+            <option value="Rejected">
+                Rejected
+            </option>
+
+            <option value="Suspended">
+                Suspended
+            </option>
+
+            <option value="Graduated">
+                Graduated
+            </option>
+
+            <option value="Archived">
+                Archived
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- =====================================================
+         STUDENT RECORDS
+    ====================================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Student Records
+                </h3>
+
+                <p>
+                    Students belonging to your school.
+                </p>
+
+            </div>
+
+            <span id="studentResultCount">
+                0 students
+            </span>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Admission No.
+                        </th>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Gender
+                        </th>
+
+                        <th>
+                            Class
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="studentsTable">
+
+                    <tr>
+
+                        <td colspan="6">
+
+                            Loading students...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
                     <button
                         class="primary-button"
                         id="studentsAddButton"
