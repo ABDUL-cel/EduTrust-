@@ -16,17 +16,27 @@ const StudentSchema = new mongoose.Schema(
             index: true
         },
 
+        // =================================================
+        // INITIAL REGISTRATION / TRACKING NUMBER
+        // Example: EDU749279
+        // =================================================
         admission_number: {
             type: String,
             required: true,
             trim: true
         },
+
+        // =================================================
+        // OFFICIAL SCHOOL MATRIC NUMBER
+        // Example: INT/JSS1/A/2026/0001
+        //
+        // This is generated ONLY after approval.
+        // =================================================
         matric_number: {
-    type: String,
-    default: "",
-    trim: true,
-    index: true
-},
+            type: String,
+            default: "",
+            trim: true
+        },
 
         first_name: {
             type: String,
@@ -44,6 +54,24 @@ const StudentSchema = new mongoose.Schema(
             type: String,
             default: "",
             trim: true
+        },
+
+        email: {
+            type: String,
+            default: "",
+            trim: true,
+            lowercase: true
+        },
+
+        phone: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        password: {
+            type: String,
+            default: ""
         },
 
         gender: {
@@ -151,6 +179,7 @@ const StudentSchema = new mongoose.Schema(
             default: null
         }
     },
+
     {
         timestamps: {
             createdAt: "created_at",
@@ -160,10 +189,10 @@ const StudentSchema = new mongoose.Schema(
 );
 
 // ======================================================
-// INDEXES FOR QUERY OPTIMIZATION
+// INDEXES
 // ======================================================
 
-// Ensure admission numbers are unique per school
+// EDU number unique within school
 StudentSchema.index(
     {
         school_id: 1,
@@ -174,16 +203,34 @@ StudentSchema.index(
     }
 );
 
-// Fast lookups for filtering students by school & status
+// Official matric number unique within school
+StudentSchema.index(
+    {
+        school_id: 1,
+        matric_number: 1
+    },
+    {
+        unique: true,
+        sparse: true
+    }
+);
+
+// Fast school/status searches
 StudentSchema.index({
     school_id: 1,
     status: 1
 });
 
-// Fast parent lookups
+// Parent searches
 StudentSchema.index({
     school_id: 1,
     parent_id: 1
+});
+
+// Matric lookup
+StudentSchema.index({
+    school_id: 1,
+    matric_number: 1
 });
 
 module.exports = mongoose.model("Student", StudentSchema);
