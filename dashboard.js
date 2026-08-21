@@ -122,6 +122,33 @@ function showToast(message, type = "success") {
 
 
 /* ============================================================
+   STUDENT APPROVAL HANDLER
+============================================================ */
+
+async function handleApproveStudent(studentId) {
+    if (!confirm("Are you sure you want to approve this student and generate their official matric number?")) {
+        return;
+    }
+
+    try {
+        const data = await apiRequest(`/students/${studentId}/approve`, {
+            method: "PATCH"
+        });
+
+        if (data.success) {
+            showToast(`Student approved successfully! Official Matric No: ${data.official_matric_number}`);
+            loadStudents();
+        } else {
+            showToast(data.message || "Approval failed.", "error");
+        }
+    } catch (error) {
+        console.error("APPROVE STUDENT ERROR:", error);
+        showToast(error.message || "Failed to approve student.", "error");
+    }
+}
+
+
+/* ============================================================
    SCHOOL / USER DATA
 ============================================================ */
 
@@ -329,41 +356,8 @@ function setValue(id, value) {
 
 
 /* ============================================================
-   ============================================================
    MAIN PAGE NAVIGATION
-   ============================================================
 ============================================================ */
-
-/*
-    IMPORTANT:
-
-    Every sidebar button has:
-
-        data-page="students"
-
-    or:
-
-        data-page="parents"
-
-    or:
-
-        data-page="school"
-
-    etc.
-
-    The matching main content page has:
-
-        id="studentsPage"
-
-        id="parentsPage"
-
-        id="schoolPage"
-
-    etc.
-
-    showPage() controls ALL of this.
-*/
-
 
 const navItems =
     document.querySelectorAll(
@@ -384,11 +378,6 @@ function showPage(pageName) {
         pageName
     );
 
-
-    /* --------------------------------------------------------
-       1. HIDE EVERY MAIN CONTENT PAGE
-    -------------------------------------------------------- */
-
     pages.forEach(page => {
 
         page.classList.add("hidden");
@@ -397,20 +386,10 @@ function showPage(pageName) {
 
     });
 
-
-    /* --------------------------------------------------------
-       2. FIND THE PAGE WE WANT
-    -------------------------------------------------------- */
-
     const targetPage =
         document.getElementById(
             `${pageName}Page`
         );
-
-
-    /* --------------------------------------------------------
-       3. OPEN THE PAGE
-    -------------------------------------------------------- */
 
     if (!targetPage) {
 
@@ -431,10 +410,6 @@ function showPage(pageName) {
 
     targetPage.style.display = "block";
 
-
-    /* --------------------------------------------------------
-       4. UPDATE ACTIVE SIDEBAR BUTTON
-    -------------------------------------------------------- */
 
     document
         .querySelectorAll(
@@ -459,10 +434,6 @@ function showPage(pageName) {
 
     });
 
-
-    /* --------------------------------------------------------
-       5. LOAD DATA FOR THAT PAGE
-    -------------------------------------------------------- */
 
     switch (pageName) {
 
@@ -496,32 +467,28 @@ function showPage(pageName) {
 
         case "staff":
 
-            // Staff API can be connected later.
-           loadStaff();
+            loadStaff();
+
             break;
 
 
         case "fees":
 
-            // Fee API can be connected later.
             break;
 
 
         case "fee-structures":
 
-            // Fee structure API can be connected later.
             break;
 
 
         case "payments":
 
-            // Payment API can be connected later.
             break;
 
 
         case "outstanding":
 
-            // Outstanding API can be connected later.
             break;
 
 
@@ -574,10 +541,6 @@ function showPage(pageName) {
     }
 
 
-    /* --------------------------------------------------------
-       6. CLOSE MOBILE SIDEBAR
-    -------------------------------------------------------- */
-
     if (
         window.innerWidth <= 900 &&
         sidebar
@@ -592,12 +555,6 @@ function showPage(pageName) {
 /* ============================================================
    SIDEBAR CLICK EVENTS
 ============================================================ */
-
-/*
-    THIS IS THE ONLY SIDEBAR NAVIGATION LISTENER.
-
-    Do NOT add another [data-page] listener elsewhere.
-*/
 
 navItems.forEach(item => {
 
@@ -1058,7 +1015,7 @@ async function loadStudents() {
 
     table.innerHTML = `
         <tr>
-            <td colspan="5" style="text-align:center;">
+            <td colspan="6" style="text-align:center;">
                 Loading students...
             </td>
         </tr>
@@ -1087,7 +1044,7 @@ async function loadStudents() {
 
             table.innerHTML = `
                 <tr>
-                    <td colspan="5" style="text-align:center;">
+                    <td colspan="6" style="text-align:center;">
                         No students found.
                     </td>
                 </tr>
@@ -1110,15 +1067,19 @@ async function loadStudents() {
                             .filter(Boolean)
                             .join(" ");
 
+                    const regNo =
+                        student.matric_number ||
+                        student.admission_number ||
+                        "";
+
+                    const isPending =
+                        String(student.status || "").toLowerCase() === "pending";
 
                     return `
                         <tr>
 
                             <td>
-                                ${escapeHtml(
-                                    student.admission_number ||
-                                    ""
-                                )}
+                                ${escapeHtml(regNo)}
                             </td>
 
                             <td>
@@ -1157,6 +1118,20 @@ async function loadStudents() {
 
                             </td>
 
+                            <td>
+                                ${
+                                    isPending
+                                        ? `<button 
+                                                class="btn-approve" 
+                                                onclick="handleApproveStudent('${student._id}')"
+                                                style="padding: 4px 8px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 4px;"
+                                           >
+                                                Approve
+                                           </button>`
+                                        : `<span style="color: #6c757d; font-size: 0.85rem;">Approved</span>`
+                                }
+                            </td>
+
                         </tr>
                     `;
 
@@ -1174,7 +1149,7 @@ async function loadStudents() {
 
         table.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align:center;">
+                <td colspan="6" style="text-align:center;">
                     Unable to load students.
                 </td>
             </tr>
@@ -1183,12 +1158,10 @@ async function loadStudents() {
     }
 }
 
-// =====================================================
-// LOAD STAFF & TEACHERS
-// =====================================================
-// =====================================================
-// LOAD STAFF & TEACHERS
-// =====================================================
+
+/* ============================================================
+   STAFF & TEACHERS
+============================================================ */
 
 async function loadStaff() {
 
@@ -1201,7 +1174,6 @@ async function loadStaff() {
         return;
     }
 
-    // Show loading state
     table.innerHTML = `
         <tr>
             <td colspan="5" style="text-align:center;">
@@ -1219,32 +1191,6 @@ async function loadStaff() {
         const data =
             await apiRequest("/staff");
 
-// Add this function after your apiRequest helper:
-async function handleApproveStudent(studentId) {
-    if (!confirm("Are you sure you want to approve this student and generate their official matric number?")) {
-        return;
-    }
-
-    try {
-        const data = await apiRequest(`/students/${studentId}/approve`, {
-            method: "PATCH"
-        });
-
-        if (data.success) {
-            showToast(`Student approved! Matric No: ${data.official_matric_number}`);
-            if (typeof loadStudents === "function") loadStudents();
-        } else {
-            showToast(data.message || "Approval failed.", "error");
-        }
-    } catch (error) {
-        console.error("APPROVE STUDENT ERROR:", error);
-        showToast(error.message || "Failed to approve student.", "error");
-    }
-}
-        // =================================================
-        // CHECK RESPONSE
-        // =================================================
-
         if (!data.success) {
 
             throw new Error(
@@ -1254,24 +1200,13 @@ async function handleApproveStudent(studentId) {
 
         }
 
-
-        // =================================================
-        // GET STAFF ARRAY
-        // =================================================
-
         const staff =
             data.staff || [];
-
 
         console.log(
             "STAFF LOADED:",
             staff
         );
-
-
-        // =================================================
-        // UPDATE STAFF TABLE
-        // =================================================
 
         if (!staff.length) {
 
@@ -1288,11 +1223,6 @@ async function handleApproveStudent(studentId) {
 
             return;
         }
-
-
-        // =================================================
-        // RENDER STAFF
-        // =================================================
 
         table.innerHTML =
             staff
@@ -1389,6 +1319,7 @@ async function handleApproveStudent(studentId) {
     }
 
 }
+
 
 /* ============================================================
    PARENTS
@@ -1541,13 +1472,6 @@ async function loadParents() {
 
 async function loadDashboardOverview() {
 
-    /*
-        Students and parents are already loaded when needed.
-
-        This function exists so Overview is a proper page
-        just like Students, Parents, School, etc.
-    */
-
     try {
 
         await Promise.allSettled([
@@ -1679,13 +1603,6 @@ const studentsAddButton =
 
 function openAddStudent() {
 
-    /*
-        For now this opens the Students page.
-
-        Later we can replace this with
-        your Add Student modal/form.
-    */
-
     showPage("students");
 
 }
@@ -1736,21 +1653,14 @@ if (addParentButton) {
 
 
 /* ============================================================
-   INITIALIZE DASHBOARD
+   GLOBAL EXPORTS & INITIALIZATION
 ============================================================ */
+
+window.handleApproveStudent = handleApproveStudent;
 
 async function initializeDashboard() {
 
-    /*
-        First make Overview visible.
-    */
-
     showPage("overview");
-
-
-    /*
-        Then load profile.
-    */
 
     await loadProfile();
 
