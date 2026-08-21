@@ -1,377 +1,297 @@
-const Student = require("../models/student");
-const Parent = require("../models/Parent");
-const User = require("../models/User");
-const School = require("../models/school");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
-// =====================================================
-// HELPER: GET SCHOOL ID
-// =====================================================
-const getSchoolId = (req) => {
-    return req.user?.school_id || req.user?.schoolId || null;
+const Student = require("../models/student");
+const User = require("../models/User");
+const Parent = require("../models/Parent");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
+
+const JWT_SECRET = process.env.JWT_SECRET || "edutrust_secret_key";
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const generateAdmissionNumber = () => {
+    const number = Math.floor(100000 + Math.random() * 900000);
+    return `EDU${number}`;
 };
 
-// Helper to generate initial tracking number: EDU + 6 random digits
-function generateInitialRegNumber() {
-    const randomDigits = Math.floor(100000 + Math.random() * 900000);
-    return `EDU${randomDigits}`;
-}
+const generateMatricNumber = async (schoolId, className) => {
+    const sessionYear = new Date().getFullYear();
 
-// Helper to safely escape special characters in regular expressions
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+    const cleanClass = String(className || "STUDENT")
+        .replace(/\s+/g, "")
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .toUpperCase();
 
-// =====================================================
-// HELPER: GENERATE SCHOOL-BRANDED ADMISSION NUMBER
-// =====================================================
-async function generateOfficialAdmissionNo(school, className, arm = "", department = "") {
-    // 1. Get 3-letter prefix from School Name or Code
-    let schoolPrefix = "SCH";
-    
-    if (school?.school_code && school.school_code.trim().length >= 3) {
-        schoolPrefix = school.school_code.trim().slice(0, 3).toUpperCase();
-    } else if (school?.name) {
-        const cleanName = school.name.trim().replace(/[^a-zA-Z0-9]/g, "");
-        if (cleanName.length >= 3) {
-            schoolPrefix = cleanName.slice(0, 3).toUpperCase();
+    const prefix = `INT/${cleanClass}/${sessionYear}/`;
+
+    const lastStudent = await Student.findOne({
+        school_id: schoolId,
+        matric_number: {
+            $regex: `^${prefix}`
+        }
+    })
+        .sort({ matric_number: -1 })
+        .lean();
+
+    let nextNumber = 1;
+
+    if (lastStudent?.matric_number) {
+        const match = lastStudent.matric_number.match(/(\d+)$/);
+
+        if (match) {
+            nextNumber = Number(match[1]) + 1;
         }
     }
 
-    // 2. Parse Class Level, Streams, and Departments
-    const rawClass = (className || "").toUpperCase().trim();
-    let categoryCode = "GEN";
+    return `${prefix}${String(nextNumber).padStart(4, "0")}`;
+};
 
-    // --- SENIOR SECONDARY (SS / SENIOR) ---
-    if (rawClass.includes("SS") || rawClass.includes("SENIOR")) {
-        const ssLevelMatch = rawClass.match(/SS[1-3]/);
-        const ssLevel = ssLevelMatch ? ssLevelMatch[0] : "SS";
+const getSchoolId = (req) => {
+    return (
+        req.user?.school_id ||
+        req.admin?.school_id ||
+        null
+    );
+};
 
-        let dept = (department || "").toUpperCase().trim();
-        if (!dept) {
-            if (rawClass.includes("ART") || rawClass.includes("ARTS") || rawClass.includes("HUMANITY")) {
-                dept = "ART";
-            } else if (rawClass.includes("SCI") || rawClass.includes("SCIENCE")) {
-                dept = "SCI";
-            } else if (rawClass.includes("COM") || rawClass.includes("COMMERCE") || rawClass.includes("BUSINESS")) {
-                dept = "COM";
-            }
-        }
+const getActorId = (req) => {
+    return (
+        req.user?._id ||
+        req.user?.id ||
+        req.admin?._id ||
+        req.admin?.id ||
+        null
+    );
+};
 
-        categoryCode = dept ? `${ssLevel}/${dept}` : ssLevel;
-    } 
-    // --- JUNIOR SECONDARY (JSS) - INCLUDES ARM/STREAM ---
-    else if (rawClass.includes("JSS") || rawClass.includes("JUNIOR")) {
-        const jssMatch = rawClass.match(/JSS[1-3]/);
-        const level = jssMatch ? jssMatch[0] : "JSS";
+const safeStudent = (student) => {
+    if (!student) return null;
 
-        let armLetter = (arm || "").toUpperCase().trim();
-        if (!armLetter) {
-            const armMatch = rawClass.match(/\b([A-Z])\b/);
-            armLetter = armMatch ? armMatch[1] : "";
-        }
+    const obj =
+        typeof student.toObject === "function"
+            ? student.toObject()
+            : { ...student };
 
-        categoryCode = armLetter ? `${level}/${armLetter}` : level;
-    }
-    // --- PRIMARY / NURSERY / CRECHE ---
-    else {
-        const lowerLevelMatch = rawClass.match(/(PRM[1-6]|PRIMARY[1-6]|NUR[1-3]|NURSERY[1-3]|CRECHE)/);
-        
-        if (lowerLevelMatch) {
-            categoryCode = lowerLevelMatch[0]
-                .replace("PRIMARY", "PRM")
-                .replace("NURSERY", "NUR");
-        } else {
-            categoryCode = "GEN";
-        }
-    }
+    delete obj.password;
 
-    // 3. Current Registration Year
-    const year = new Date().getFullYear();
+    return obj;
+};
 
-    // 4. Build pattern regex dynamically (escaped)
-    const basePrefix = `${schoolPrefix}/${categoryCode}/${year}/`;
-    const pattern = new RegExp(`^${escapeRegExp(basePrefix)}`);
+/* =========================================================
+   REGISTER STUDENT
+   POST /api/students/register
+========================================================= */
 
-    const count = await Student.countDocuments({
-        school_id: school._id,
-        $or: [
-            { admission_number: { $regex: pattern } },
-            { matric_number: { $regex: pattern } }
-        ]
-    });
-
-    // 5. Build 4-digit sequence (0001, 0002...)
-    const nextSeq = (count + 1).toString().padStart(4, "0");
-
-    return `${basePrefix}${nextSeq}`;
-}
-
-// =====================================================
-// REGISTER STUDENT
-// =====================================================
-exports.registerStudent = async (req, res) => {
+const registerStudent = async (req, res) => {
     try {
-        let school_id = typeof getSchoolId === "function" ? getSchoolId(req) : null;
-
         const {
-            school_code,
-            parent_id,
-            admission_number,
             first_name,
             last_name,
             other_name,
+            email,
+            phone,
+            password,
             gender,
             date_of_birth,
             class_name,
-            current_class,
             arm,
             department,
+            academic_session,
+            admission_date,
+            passport,
             home_address,
             medical_information,
-            passport,
-            email,
-            phone,
-            password
+            parent_id
         } = req.body;
 
-        if (!school_id) {
-            if (!school_code || !school_code.trim()) {
-                return res.status(400).json({
-                    success: false,
-                    message: "School code is required."
-                });
-            }
-
-            const school = await School.findOne({
-                school_code: { $regex: new RegExp(`^${escapeRegExp(school_code.trim())}$`, "i") }
-            });
-
-            if (!school) {
-                return res.status(404).json({
-                    success: false,
-                    message: "School account could not be identified with the provided code."
-                });
-            }
-
-            school_id = school._id;
-        }
-
-        const selectedClass = (class_name || current_class || "").trim();
-
-        if (!first_name?.trim() || !last_name?.trim() || !selectedClass) {
+        if (!first_name || !last_name || !class_name) {
             return res.status(400).json({
                 success: false,
-                message: "First name, last name, and class/grade are required."
+                message: "First name, last name and class are required."
             });
         }
 
-        const initialRegNumber = admission_number?.trim() || generateInitialRegNumber();
+        const school_id =
+            req.body.school_id ||
+            req.user?.school_id ||
+            req.admin?.school_id;
 
-        const existingStudent = await Student.findOne({
-            school_id,
-            admission_number: initialRegNumber
-        });
-
-        if (existingStudent) {
-            return res.status(409).json({
+        if (!school_id) {
+            return res.status(400).json({
                 success: false,
-                message: "A student with this tracking code already exists. Please submit again."
+                message: "School ID is required."
             });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(school_id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid school ID."
+            });
+        }
+
+        let admission_number = req.body.admission_number;
+
+        if (!admission_number) {
+            let exists = true;
+
+            while (exists) {
+                admission_number = generateAdmissionNumber();
+
+                exists = await Student.exists({
+                    school_id,
+                    admission_number
+                });
+            }
+        } else {
+            const existing = await Student.findOne({
+                school_id,
+                admission_number: admission_number.trim()
+            });
+
+            if (existing) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Admission number already exists."
+                });
+            }
         }
 
         let hashedPassword = "";
+
         if (password) {
-            const salt = await bcrypt.genSalt(10);
-            hashedPassword = await bcrypt.hash(password, salt);
+            hashedPassword = await bcrypt.hash(password, 10);
         }
 
         const student = await Student.create({
             school_id,
             parent_id: parent_id || null,
-            admission_number: initialRegNumber,
+
+            admission_number,
+
             first_name: first_name.trim(),
             last_name: last_name.trim(),
             other_name: other_name?.trim() || "",
-            email: email?.trim() || "",
+
+            email: email?.trim().toLowerCase() || "",
             phone: phone?.trim() || "",
+
             password: hashedPassword,
+
             gender: gender || "Not Specified",
             date_of_birth: date_of_birth || null,
-            class_name: selectedClass,
+
+            class_name: class_name.trim(),
             arm: arm?.trim() || "",
             department: department?.trim() || "",
-            home_address: home_address || "",
-            medical_information: medical_information || "",
+
+            academic_session: academic_session?.trim() || "",
+
+            admission_date:
+                admission_date || new Date(),
+
             passport: passport || "",
+            home_address: home_address || "",
+            medical_information:
+                medical_information || "",
+
             status: "Pending"
         });
 
         return res.status(201).json({
             success: true,
-            message: "Registration submitted successfully!",
-            registration_code: initialRegNumber,
-            student
+            message: "Student registered successfully. Awaiting approval.",
+            student: safeStudent(student)
         });
 
     } catch (error) {
         console.error("REGISTER STUDENT ERROR:", error);
+
+        if (error.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: "A student with this admission number already exists."
+            });
+        }
+
         return res.status(500).json({
             success: false,
-            message: "Failed to register student.",
+            message: "Unable to register student.",
             error: error.message
         });
     }
 };
 
-// =====================================================
-// APPROVE STUDENT
-// =====================================================
-exports.approveStudent = async (req, res) => {
-    try {
-        const school_id = getSchoolId(req);
-        const user_id = req.user?.id || req.user?._id || null;
+/* =========================================================
+   STUDENT LOGIN
+   POST /api/students/login
+========================================================= */
 
-        if (!school_id) {
+const loginStudent = async (req, res) => {
+    try {
+        const { admission_number, password } = req.body;
+
+        if (!admission_number || !password) {
             return res.status(400).json({
                 success: false,
-                message: "Your account is not connected to a school."
+                message: "Admission number and password are required."
             });
         }
 
-        const studentToApprove = await Student.findOne({
-            _id: req.params.id,
-            school_id
+        const student = await Student.findOne({
+            admission_number: admission_number.trim()
         });
-
-        if (!studentToApprove) {
-            return res.status(404).json({
-                success: false,
-                message: "Student record not found."
-            });
-        }
-
-        const school = await School.findById(school_id);
-
-        const officialAdmissionNumber = await generateOfficialAdmissionNo(
-            school,
-            studentToApprove.class_name,
-            studentToApprove.arm,
-            studentToApprove.department
-        );
-
-        studentToApprove.matric_number = officialAdmissionNumber;
-        studentToApprove.status = "Active";
-        studentToApprove.approved_by = user_id;
-        studentToApprove.approved_at = new Date();
-
-        await studentToApprove.save();
-        await studentToApprove.populate("parent_id");
-
-        return res.status(200).json({
-            success: true,
-            message: "Student approved successfully.",
-            official_matric_number: officialAdmissionNumber,
-            student: studentToApprove
-        });
-
-    } catch (error) {
-        console.error("APPROVE STUDENT ERROR:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to approve student.",
-            error: error.message
-        });
-    }
-};
-
-// =====================================================
-// REJECT STUDENT
-// =====================================================
-exports.rejectStudent = async (req, res) => {
-    try {
-        const school_id = getSchoolId(req);
-
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id },
-            { status: "Rejected" },
-            { new: true, runValidators: true }
-        );
-
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student record not found."
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Student application rejected.",
-            student
-        });
-
-    } catch (error) {
-        console.error("REJECT STUDENT ERROR:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to reject student.",
-            error: error.message
-        });
-    }
-};
-
-// =====================================================
-// LOGIN STUDENT
-// =====================================================
-exports.loginStudent = async (req, res) => {
-    try {
-        const { admission_number, email, password } = req.body;
-
-        const identifier = (admission_number || email || "").trim();
-        if (!identifier || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide your Admission Number/Email and Password."
-            });
-        }
-
-        const query = {
-            $or: [
-                { admission_number: identifier },
-                { matric_number: identifier },
-                { email: identifier.toLowerCase() }
-            ]
-        };
-
-        const student = await Student.findOne(query);
 
         if (!student) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid login credentials."
+                message: "Invalid admission number or password."
             });
         }
 
         if (!student.password) {
-            return res.status(400).json({
+            return res.status(401).json({
                 success: false,
-                message: "Password not set for this student account."
+                message: "Student account does not have a password yet."
             });
         }
 
-        let isMatch = false;
-        if (student.password.startsWith("$2a$") || student.password.startsWith("$2b$")) {
-            isMatch = await bcrypt.compare(password, student.password);
-        } else {
-            isMatch = student.password === password;
-        }
+        const passwordMatch = await bcrypt.compare(
+            password,
+            student.password
+        );
 
-        if (!isMatch) {
+        if (!passwordMatch) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid login credentials."
+                message: "Invalid admission number or password."
+            });
+        }
+
+        if (student.status === "Pending") {
+            return res.status(403).json({
+                success: false,
+                message: "Your account is still awaiting approval."
+            });
+        }
+
+        if (
+            student.status === "Suspended" ||
+            student.status === "Archived"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: `Account is ${student.status.toLowerCase()}. Access denied.`
+            });
+        }
+
+        if (student.status === "Rejected") {
+            return res.status(403).json({
+                success: false,
+                message: "Your student registration was rejected."
             });
         }
 
@@ -382,87 +302,157 @@ exports.loginStudent = async (req, res) => {
                 school_id: student.school_id,
                 role: "student"
             },
-            process.env.JWT_SECRET || "edutrust_secret_key",
-            { expiresIn: "1d" }
+            JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
         );
 
-        return res.status(200).json({
+        return res.json({
             success: true,
-            message: "Student logged in successfully!",
+            message: "Student login successful.",
             token,
-            student: {
-                id: student._id,
-                first_name: student.first_name,
-                last_name: student.last_name,
-                admission_number: student.admission_number,
-                matric_number: student.matric_number,
-                class_name: student.class_name,
-                school_id: student.school_id,
-                role: "student"
+            student: safeStudent(student)
+        });
+
+    } catch (error) {
+        console.error("STUDENT LOGIN ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to login student."
+        });
+    }
+};
+
+/* =========================================================
+   GET ALL STUDENTS
+   GET /api/students
+========================================================= */
+
+const getStudents = async (req, res) => {
+    try {
+        const school_id = getSchoolId(req);
+
+        if (!school_id) {
+            return res.status(403).json({
+                success: false,
+                message: "School access is required."
+            });
+        }
+
+        const {
+            search,
+            status,
+            class_name,
+            page = 1,
+            limit = 50
+        } = req.query;
+
+        const filter = {
+            school_id
+        };
+
+        if (status && status !== "all") {
+            filter.status = status;
+        }
+
+        if (class_name) {
+            filter.class_name = class_name;
+        }
+
+        if (search?.trim()) {
+            const searchRegex = new RegExp(
+                search.trim(),
+                "i"
+            );
+
+            filter.$or = [
+                { admission_number: searchRegex },
+                { matric_number: searchRegex },
+                { first_name: searchRegex },
+                { last_name: searchRegex },
+                { other_name: searchRegex },
+                { class_name: searchRegex }
+            ];
+        }
+
+        const pageNumber = Math.max(
+            Number(page) || 1,
+            1
+        );
+
+        const limitNumber = Math.min(
+            Math.max(Number(limit) || 50, 1),
+            100
+        );
+
+        const skip =
+            (pageNumber - 1) * limitNumber;
+
+        const [students, total] =
+            await Promise.all([
+                Student.find(filter)
+                    .select("-password")
+                    .sort({
+                        created_at: -1
+                    })
+                    .skip(skip)
+                    .limit(limitNumber)
+                    .lean(),
+
+                Student.countDocuments(filter)
+            ]);
+
+        return res.json({
+            success: true,
+            students,
+            pagination: {
+                page: pageNumber,
+                limit: limitNumber,
+                total,
+                pages: Math.ceil(
+                    total / limitNumber
+                )
             }
         });
 
     } catch (error) {
-        console.error("LOGIN STUDENT ERROR:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to log in student.",
-            error: error.message
-        });
-    }
-};
-
-// =====================================================
-// GET ALL STUDENTS
-// =====================================================
-exports.getStudents = async (req, res) => {
-    try {
-        const school_id = getSchoolId(req);
-
-        if (!school_id) {
-            return res.status(400).json({
-                success: false,
-                message: "Your account is not connected to a school."
-            });
-        }
-
-        const students = await Student.find({ school_id })
-            .populate("parent_id")
-            .sort({ created_at: -1 })
-            .lean();
-
-        return res.status(200).json({
-            success: true,
-            count: students.length,
-            students
-        });
-
-    } catch (error) {
         console.error("GET STUDENTS ERROR:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Failed to load students.",
-            error: error.message
+            message: "Unable to fetch students."
         });
     }
 };
 
-// =====================================================
-// GET SINGLE STUDENT
-// =====================================================
-exports.getStudent = async (req, res) => {
+/* =========================================================
+   GET SINGLE STUDENT
+   GET /api/students/:id
+========================================================= */
+
+const getStudent = async (req, res) => {
     try {
+        const { id } = req.params;
         const school_id = getSchoolId(req);
 
-        if (!school_id) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 success: false,
-                message: "Your account is not connected to a school."
+                message: "Invalid student ID."
             });
         }
 
-        const student = await Student.findOne({ _id: req.params.id, school_id })
-            .populate("parent_id")
+        const student = await Student.findOne({
+            _id: id,
+            ...(school_id ? { school_id } : {})
+        })
+            .select("-password")
+            .populate(
+                "parent_id",
+                "-password"
+            )
             .lean();
 
         if (!student) {
@@ -472,131 +462,282 @@ exports.getStudent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({ success: true, student });
+        return res.json({
+            success: true,
+            student
+        });
 
     } catch (error) {
         console.error("GET STUDENT ERROR:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Failed to load student.",
-            error: error.message
+            message: "Unable to fetch student."
         });
     }
 };
 
-// =====================================================
-// GET PENDING STUDENTS
-// =====================================================
-exports.getPendingStudents = async (req, res) => {
+/* =========================================================
+   GET PENDING STUDENTS
+   GET /api/students/pending
+========================================================= */
+
+const getPendingStudents = async (req, res) => {
     try {
         const school_id = getSchoolId(req);
 
-        const students = await Student.find({ school_id, status: "Pending" })
-            .populate("parent_id")
+        const students = await Student.find({
+            school_id,
+            status: "Pending"
+        })
+            .select("-password")
             .sort({ created_at: -1 })
             .lean();
 
-        return res.status(200).json({
+        return res.json({
             success: true,
             count: students.length,
             students
         });
 
     } catch (error) {
-        console.error("GET PENDING STUDENTS ERROR:", error);
+        console.error(
+            "GET PENDING STUDENTS ERROR:",
+            error
+        );
+
         return res.status(500).json({
             success: false,
-            message: "Failed to load pending students.",
-            error: error.message
+            message: "Unable to fetch pending students."
         });
     }
 };
 
-// =====================================================
-// GET ACTIVE STUDENTS
-// =====================================================
-exports.getActiveStudents = async (req, res) => {
+/* =========================================================
+   GET ACTIVE STUDENTS
+   GET /api/students/active
+========================================================= */
+
+const getActiveStudents = async (req, res) => {
     try {
         const school_id = getSchoolId(req);
 
-        const students = await Student.find({ school_id, status: "Active" })
-            .populate("parent_id")
-            .sort({ created_at: -1 })
+        const students = await Student.find({
+            school_id,
+            status: "Active"
+        })
+            .select("-password")
+            .sort({
+                last_name: 1,
+                first_name: 1
+            })
             .lean();
 
-        return res.status(200).json({
+        return res.json({
             success: true,
             count: students.length,
             students
         });
 
     } catch (error) {
-        console.error("GET ACTIVE STUDENTS ERROR:", error);
+        console.error(
+            "GET ACTIVE STUDENTS ERROR:",
+            error
+        );
+
         return res.status(500).json({
             success: false,
-            message: "Failed to load active students.",
+            message: "Unable to fetch active students."
+        });
+    }
+};
+
+/* =========================================================
+   APPROVE STUDENT
+   PATCH /api/students/:id/approve
+========================================================= */
+
+const approveStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const school_id = getSchoolId(req);
+        const actorId = getActorId(req);
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid student ID."
+            });
+        }
+
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        if (student.status === "Archived") {
+            return res.status(400).json({
+                success: false,
+                message: "Archived students cannot be approved."
+            });
+        }
+
+        if (student.status === "Active") {
+            return res.status(400).json({
+                success: false,
+                message: "Student is already active."
+            });
+        }
+
+        const matric_number =
+            student.matric_number ||
+            await generateMatricNumber(
+                school_id,
+                student.class_name
+            );
+
+        student.status = "Active";
+        student.matric_number = matric_number;
+        student.approved_by = actorId;
+        student.approved_at = new Date();
+
+        await student.save();
+
+        return res.json({
+            success: true,
+            message: "Student approved successfully.",
+            student: safeStudent(student)
+        });
+
+    } catch (error) {
+        console.error("APPROVE STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to approve student.",
             error: error.message
         });
     }
 };
 
-// =====================================================
-// UPDATE STUDENT
-// =====================================================
-exports.updateStudent = async (req, res) => {
+/* =========================================================
+   REJECT STUDENT
+   PATCH /api/students/:id/reject
+========================================================= */
+
+const rejectStudent = async (req, res) => {
     try {
+        const { id } = req.params;
         const school_id = getSchoolId(req);
+
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        student.status = "Rejected";
+
+        await student.save();
+
+        return res.json({
+            success: true,
+            message: "Student registration rejected.",
+            student: safeStudent(student)
+        });
+
+    } catch (error) {
+        console.error("REJECT STUDENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to reject student."
+        });
+    }
+};
+
+/* =========================================================
+   UPDATE STUDENT
+   PUT /api/students/:id
+========================================================= */
+
+const updateStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const school_id = getSchoolId(req);
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid student ID."
+            });
+        }
 
         const allowedFields = [
-            "admission_number",
             "first_name",
             "last_name",
             "other_name",
+            "email",
+            "phone",
             "gender",
             "date_of_birth",
             "class_name",
             "arm",
             "department",
+            "academic_session",
+            "admission_date",
+            "passport",
             "home_address",
             "medical_information",
-            "passport"
+            "parent_id"
         ];
 
         const updates = {};
-        allowedFields.forEach((field) => {
-            if (req.body[field] !== undefined) {
+
+        for (const field of allowedFields) {
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    req.body,
+                    field
+                )
+            ) {
                 updates[field] = req.body[field];
-            }
-        });
-
-        if (updates.admission_number) updates.admission_number = updates.admission_number.trim();
-        if (updates.first_name) updates.first_name = updates.first_name.trim();
-        if (updates.last_name) updates.last_name = updates.last_name.trim();
-        if (updates.other_name) updates.other_name = updates.other_name.trim();
-        if (updates.class_name) updates.class_name = updates.class_name.trim();
-        if (updates.arm) updates.arm = updates.arm.trim();
-        if (updates.department) updates.department = updates.department.trim();
-
-        if (updates.admission_number) {
-            const duplicate = await Student.findOne({
-                school_id,
-                admission_number: updates.admission_number,
-                _id: { $ne: req.params.id }
-            });
-
-            if (duplicate) {
-                return res.status(409).json({
-                    success: false,
-                    message: "Another student already uses this admission number."
-                });
             }
         }
 
+        if (updates.email) {
+            updates.email =
+                String(updates.email)
+                    .trim()
+                    .toLowerCase();
+        }
+
         const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id },
-            updates,
-            { new: true, runValidators: true }
-        ).populate("parent_id");
+            {
+                _id: id,
+                school_id
+            },
+            {
+                $set: updates
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select("-password");
 
         if (!student) {
             return res.status(404).json({
@@ -605,7 +746,7 @@ exports.updateStudent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
+        return res.json({
             success: true,
             message: "Student updated successfully.",
             student
@@ -613,30 +754,30 @@ exports.updateStudent = async (req, res) => {
 
     } catch (error) {
         console.error("UPDATE STUDENT ERROR:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Failed to update student.",
+            message: "Unable to update student.",
             error: error.message
         });
     }
 };
 
-// =====================================================
-// SUSPEND STUDENT
-// =====================================================
-exports.suspendStudent = async (req, res) => {
-    try {
-        const school_id = getSchoolId(req);
+/* =========================================================
+   SUSPEND STUDENT
+   PATCH /api/students/:id/suspend
+========================================================= */
 
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id },
-            {
-                status: "Suspended",
-                suspended_by: req.user?.id || req.user?._id || null,
-                suspended_at: new Date()
-            },
-            { new: true, runValidators: true }
-        ).populate("parent_id");
+const suspendStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const school_id = getSchoolId(req);
+        const actorId = getActorId(req);
+
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
 
         if (!student) {
             return res.status(404).json({
@@ -645,39 +786,53 @@ exports.suspendStudent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
+        if (student.status !== "Active") {
+            return res.status(400).json({
+                success: false,
+                message: "Only active students can be suspended."
+            });
+        }
+
+        student.status = "Suspended";
+        student.suspended_by = actorId;
+        student.suspended_at = new Date();
+        student.suspension_reason =
+            req.body.reason ||
+            req.body.suspension_reason ||
+            "";
+
+        await student.save();
+
+        return res.json({
             success: true,
             message: "Student suspended successfully.",
-            student
+            student: safeStudent(student)
         });
 
     } catch (error) {
         console.error("SUSPEND STUDENT ERROR:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Failed to suspend student.",
-            error: error.message
+            message: "Unable to suspend student."
         });
     }
 };
 
-// =====================================================
-// REINSTATE STUDENT
-// =====================================================
-exports.reinstateStudent = async (req, res) => {
+/* =========================================================
+   REINSTATE STUDENT
+   PATCH /api/students/:id/reinstate
+========================================================= */
+
+const reinstateStudent = async (req, res) => {
     try {
+        const { id } = req.params;
         const school_id = getSchoolId(req);
 
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id },
-            {
-                status: "Active",
-                suspended_by: null,
-                suspended_at: null,
-                suspension_reason: ""
-            },
-            { new: true, runValidators: true }
-        ).populate("parent_id");
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
 
         if (!student) {
             return res.status(404).json({
@@ -686,34 +841,50 @@ exports.reinstateStudent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
+        if (student.status !== "Suspended") {
+            return res.status(400).json({
+                success: false,
+                message: "Only suspended students can be reinstated."
+            });
+        }
+
+        student.status = "Active";
+        student.suspended_by = null;
+        student.suspended_at = null;
+        student.suspension_reason = "";
+
+        await student.save();
+
+        return res.json({
             success: true,
             message: "Student reinstated successfully.",
-            student
+            student: safeStudent(student)
         });
 
     } catch (error) {
         console.error("REINSTATE STUDENT ERROR:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Failed to reinstate student.",
-            error: error.message
+            message: "Unable to reinstate student."
         });
     }
 };
 
-// =====================================================
-// GRADUATE STUDENT
-// =====================================================
-exports.graduateStudent = async (req, res) => {
+/* =========================================================
+   GRADUATE STUDENT
+   PATCH /api/students/:id/graduate
+========================================================= */
+
+const graduateStudent = async (req, res) => {
     try {
+        const { id } = req.params;
         const school_id = getSchoolId(req);
 
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id },
-            { status: "Graduated" },
-            { new: true, runValidators: true }
-        ).populate("parent_id");
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
 
         if (!student) {
             return res.status(404).json({
@@ -722,38 +893,51 @@ exports.graduateStudent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
+        if (
+            student.status !== "Active" &&
+            student.status !== "Suspended"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Only active or suspended students can graduate."
+            });
+        }
+
+        student.status = "Graduated";
+
+        await student.save();
+
+        return res.json({
             success: true,
             message: "Student graduated successfully.",
-            student
+            student: safeStudent(student)
         });
 
     } catch (error) {
         console.error("GRADUATE STUDENT ERROR:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Failed to graduate student.",
-            error: error.message
+            message: "Unable to graduate student."
         });
     }
 };
 
-// =====================================================
-// ARCHIVE STUDENT
-// =====================================================
-exports.archiveStudent = async (req, res) => {
-    try {
-        const school_id = getSchoolId(req);
+/* =========================================================
+   ARCHIVE STUDENT
+   PATCH /api/students/:id/archive
+========================================================= */
 
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id },
-            {
-                status: "Archived",
-                archived_by: req.user?.id || req.user?._id || null,
-                archived_at: new Date()
-            },
-            { new: true, runValidators: true }
-        ).populate("parent_id");
+const archiveStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const school_id = getSchoolId(req);
+        const actorId = getActorId(req);
+
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
 
         if (!student) {
             return res.status(404).json({
@@ -762,30 +946,49 @@ exports.archiveStudent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
+        if (student.status === "Archived") {
+            return res.status(400).json({
+                success: false,
+                message: "Student is already archived."
+            });
+        }
+
+        student.status = "Archived";
+        student.archived_by = actorId;
+        student.archived_at = new Date();
+
+        await student.save();
+
+        return res.json({
             success: true,
             message: "Student archived successfully.",
-            student
+            student: safeStudent(student)
         });
 
     } catch (error) {
         console.error("ARCHIVE STUDENT ERROR:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Failed to archive student.",
-            error: error.message
+            message: "Unable to archive student."
         });
     }
 };
 
-// =====================================================
-// DELETE STUDENT
-// =====================================================
-exports.deleteStudent = async (req, res) => {
+/* =========================================================
+   DELETE STUDENT
+   DELETE /api/students/:id
+========================================================= */
+
+const deleteStudent = async (req, res) => {
     try {
+        const { id } = req.params;
         const school_id = getSchoolId(req);
 
-        const student = await Student.findOneAndDelete({ _id: req.params.id, school_id });
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
 
         if (!student) {
             return res.status(404).json({
@@ -794,35 +997,36 @@ exports.deleteStudent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
+        await Student.deleteOne({
+            _id: id,
+            school_id
+        });
+
+        return res.json({
             success: true,
             message: "Student deleted successfully."
         });
 
     } catch (error) {
         console.error("DELETE STUDENT ERROR:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Failed to delete student.",
-            error: error.message
+            message: "Unable to delete student."
         });
     }
 };
 
-// =====================================================
-// LINK PARENT TO STUDENT
-// =====================================================
-exports.linkParentToStudent = async (req, res) => {
-    try {
-        const school_id = getSchoolId(req);
-        const { parent_id } = req.body;
+/* =========================================================
+   LINK PARENT
+   PATCH /api/students/:id/parent
+========================================================= */
 
-        if (!school_id) {
-            return res.status(400).json({
-                success: false,
-                message: "Your account is not connected to a school."
-            });
-        }
+const linkParentToStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { parent_id } = req.body;
+        const school_id = getSchoolId(req);
 
         if (!parent_id) {
             return res.status(400).json({
@@ -831,24 +1035,17 @@ exports.linkParentToStudent = async (req, res) => {
             });
         }
 
-        const parent = await Parent.findOne({
-            _id: parent_id,
-            school_id,
-            status: "Active"
-        });
-
-        if (!parent) {
-            return res.status(404).json({
+        if (!mongoose.Types.ObjectId.isValid(parent_id)) {
+            return res.status(400).json({
                 success: false,
-                message: "Parent not found in this school or account is inactive."
+                message: "Invalid parent ID."
             });
         }
 
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id },
-            { parent_id: parent._id },
-            { new: true, runValidators: true }
-        ).populate("parent_id");
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
 
         if (!student) {
             return res.status(404).json({
@@ -857,66 +1054,59 @@ exports.linkParentToStudent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
+        // If Parent model exists in the project,
+        // verify the parent belongs to the same school.
+        if (Parent) {
+            const parent = await Parent.findOne({
+                _id: parent_id,
+                school_id
+            }).lean();
+
+            if (!parent) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Parent not found in this school."
+                });
+            }
+        }
+
+        student.parent_id = parent_id;
+
+        await student.save();
+
+        return res.json({
             success: true,
             message: "Parent linked to student successfully.",
-            student
+            student: safeStudent(student)
         });
 
     } catch (error) {
-        console.error("LINK PARENT ERROR:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to link parent.",
-            error: error.message
-        });
-    }
-};
-
-// =====================================================
-// UNLINK PARENT FROM STUDENT
-// =====================================================
-exports.unlinkParentFromStudent = async (req, res) => {
-    try {
-        const school_id = getSchoolId(req);
-
-        const student = await Student.findOneAndUpdate(
-            { _id: req.params.id, school_id },
-            { parent_id: null },
-            { new: true }
+        console.error(
+            "LINK PARENT ERROR:",
+            error
         );
 
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student not found."
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Parent unlinked successfully.",
-            student
-        });
-
-    } catch (error) {
-        console.error("UNLINK PARENT ERROR:", error);
         return res.status(500).json({
             success: false,
-            message: "Failed to unlink parent.",
-            error: error.message
+            message: "Unable to link parent."
         });
     }
 };
 
-// =====================================================
-// GET STUDENT'S PARENT
-// =====================================================
-exports.getStudentParent = async (req, res) => {
+/* =========================================================
+   UNLINK PARENT
+   DELETE /api/students/:id/parent
+========================================================= */
+
+const unlinkParentFromStudent = async (req, res) => {
     try {
+        const { id } = req.params;
         const school_id = getSchoolId(req);
 
-        const student = await Student.findOne({ _id: req.params.id, school_id }).populate("parent_id");
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        });
 
         if (!student) {
             return res.status(404).json({
@@ -925,41 +1115,100 @@ exports.getStudentParent = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
+        student.parent_id = null;
+
+        await student.save();
+
+        return res.json({
+            success: true,
+            message: "Parent unlinked successfully.",
+            student: safeStudent(student)
+        });
+
+    } catch (error) {
+        console.error(
+            "UNLINK PARENT ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to unlink parent."
+        });
+    }
+};
+
+/* =========================================================
+   GET STUDENT PARENT
+   GET /api/students/:id/parent
+========================================================= */
+
+const getStudentParent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const school_id = getSchoolId(req);
+
+        const student = await Student.findOne({
+            _id: id,
+            school_id
+        })
+            .populate(
+                "parent_id",
+                "-password"
+            )
+            .lean();
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        return res.json({
             success: true,
             parent: student.parent_id || null
         });
 
     } catch (error) {
-        console.error("GET STUDENT PARENT ERROR:", error);
+        console.error(
+            "GET STUDENT PARENT ERROR:",
+            error
+        );
+
         return res.status(500).json({
             success: false,
-            message: "Failed to load student's parent.",
-            error: error.message
+            message: "Unable to fetch student's parent."
         });
     }
 };
 
-// =====================================================
-// GET LOGGED-IN STUDENT PROFILE
-// =====================================================
-exports.getStudentProfile = async (req, res) => {
+/* =========================================================
+   GET STUDENT PROFILE
+   GET /api/students/me/profile
+========================================================= */
+
+const getStudentProfile = async (req, res) => {
     try {
-        const userId = req.user?.id || req.user?._id;
-        const studentId = req.user?.student_id;
+        const userId =
+            req.user?.student_id ||
+            req.user?._id ||
+            req.user?.id;
 
-        let student = null;
-
-        if (studentId) {
-            student = await Student.findById(studentId).populate("parent_id").lean();
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Student identity not found."
+            });
         }
 
-        if (!student && userId) {
-            const user = await User.findById(userId).lean();
-            if (user?.student_id) {
-                student = await Student.findById(user.student_id).populate("parent_id").lean();
-            }
-        }
+        const student = await Student.findById(userId)
+            .select("-password")
+            .populate(
+                "parent_id",
+                "-password"
+            )
+            .lean();
 
         if (!student) {
             return res.status(404).json({
@@ -968,100 +1217,151 @@ exports.getStudentProfile = async (req, res) => {
             });
         }
 
-        if (
-            req.user?.school_id &&
-            student.school_id &&
-            String(req.user.school_id) !== String(student.school_id)
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "You are not authorized to access this student profile."
-            });
-        }
-
-        return res.status(200).json({ success: true, student });
+        return res.json({
+            success: true,
+            student
+        });
 
     } catch (error) {
-        console.error("GET STUDENT PROFILE ERROR:", error);
+        console.error(
+            "GET STUDENT PROFILE ERROR:",
+            error
+        );
+
         return res.status(500).json({
             success: false,
-            message: "Failed to load student profile.",
-            error: error.message
+            message: "Unable to fetch student profile."
         });
     }
 };
 
-// =====================================================
-// GET LOGGED-IN STUDENT DASHBOARD
-// =====================================================
-exports.getStudentDashboardData = async (req, res) => {
+/* =========================================================
+   STUDENT DASHBOARD DATA
+   GET /api/students/me/dashboard
+========================================================= */
+
+const getStudentDashboardData = async (req, res) => {
     try {
-        const userId = req.user?.id || req.user?._id;
-        const studentId = req.user?.student_id;
+        const userId =
+            req.user?.student_id ||
+            req.user?._id ||
+            req.user?.id;
 
-        let student = null;
-
-        if (studentId) {
-            student = await Student.findById(studentId).populate("parent_id").lean();
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Student identity not found."
+            });
         }
 
-        if (!student && userId) {
-            const user = await User.findById(userId).lean();
-            if (user?.student_id) {
-                student = await Student.findById(user.student_id).populate("parent_id").lean();
-            }
-        }
+        const student = await Student.findById(userId)
+            .select("-password")
+            .populate(
+                "parent_id",
+                "-password"
+            )
+            .lean();
 
         if (!student) {
             return res.status(404).json({
                 success: false,
-                message: "Student record not found."
+                message: "Student account not found."
             });
         }
 
-        if (
-            req.user?.school_id &&
-            student.school_id &&
-            String(req.user.school_id) !== String(student.school_id)
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "You are not authorized to access this student dashboard."
-            });
-        }
-
-        const fullName = [student.first_name, student.other_name, student.last_name]
-            .filter(Boolean)
-            .join(" ");
-
-        return res.status(200).json({
+        return res.json({
             success: true,
-            dashboard: {
-                studentInfo: {
-                    id: student._id,
-                    fullName,
-                    admissionNumber: student.admission_number,
-                    matricNumber: student.matric_number || "",
-                    className: student.class_name,
-                    arm: student.arm,
-                    department: student.department,
-                    gender: student.gender,
-                    dateOfBirth: student.date_of_birth,
-                    admissionDate: student.created_at || student.admission_date,
-                    status: student.status,
-                    passport: student.passport,
-                    school_id: student.school_id
-                },
-                parent: student.parent_id || null
-            }
+
+            student: {
+                id: student._id,
+                admission_number:
+                    student.admission_number,
+                matric_number:
+                    student.matric_number,
+                first_name:
+                    student.first_name,
+                last_name:
+                    student.last_name,
+                other_name:
+                    student.other_name,
+                full_name: [
+                    student.first_name,
+                    student.other_name,
+                    student.last_name
+                ]
+                    .filter(Boolean)
+                    .join(" "),
+                gender:
+                    student.gender,
+                class_name:
+                    student.class_name,
+                arm:
+                    student.arm,
+                department:
+                    student.department,
+                academic_session:
+                    student.academic_session,
+                status:
+                    student.status,
+                passport:
+                    student.passport
+            },
+
+            parent:
+                student.parent_id || null,
+
+            fees: {
+                total: 0,
+                paid: 0,
+                outstanding: 0
+            },
+
+            recentPayments: [],
+
+            notifications: []
         });
 
     } catch (error) {
-        console.error("GET STUDENT DASHBOARD ERROR:", error);
+        console.error(
+            "GET STUDENT DASHBOARD ERROR:",
+            error
+        );
+
         return res.status(500).json({
             success: false,
-            message: "Failed to load student dashboard.",
-            error: error.message
+            message: "Unable to load student dashboard."
         });
     }
+};
+
+/* =========================================================
+   EXPORTS
+========================================================= */
+
+module.exports = {
+    registerStudent,
+    loginStudent,
+
+    getStudents,
+    getStudent,
+    getPendingStudents,
+    getActiveStudents,
+
+    approveStudent,
+    rejectStudent,
+
+    updateStudent,
+
+    suspendStudent,
+    reinstateStudent,
+    graduateStudent,
+    archiveStudent,
+    deleteStudent,
+
+    linkParentToStudent,
+    unlinkParentFromStudent,
+    getStudentParent,
+
+    getStudentProfile,
+    getStudentDashboardData
 };
