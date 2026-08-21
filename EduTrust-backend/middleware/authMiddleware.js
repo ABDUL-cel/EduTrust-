@@ -16,14 +16,20 @@ const protectAdmin = async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, JWT_SECRET);
 
-            req.admin = await Admin.findById(decoded.id).select('-password');
+            const admin = await Admin.findById(decoded.id).select('-password').lean();
 
-            if (!req.admin) {
+            if (!admin) {
                 return res.status(401).json({
                     success: false,
                     message: 'Not authorized: Admin user no longer exists.'
                 });
             }
+
+            req.admin = admin;
+            req.user = {
+                ...admin,
+                role: admin.role || "superadmin"
+            };
 
             return next();
         } catch (error) {
@@ -44,7 +50,7 @@ const protectAdmin = async (req, res, next) => {
 };
 
 /**
- * Standard User Middleware: Verifies tokens against User or Student collections
+ * Standard User Middleware: Verifies tokens against Student, User, or Admin collections
  */
 const authMiddleware = async (req, res, next) => {
     try {
@@ -68,7 +74,7 @@ const authMiddleware = async (req, res, next) => {
 
         const decoded = jwt.verify(token, JWT_SECRET);
 
-        // Check if Student token
+        // 1. Check if Student token
         if (decoded.role === "student" || decoded.student_id) {
             const student = await Student.findById(decoded.id || decoded.student_id).lean();
 
@@ -99,24 +105,36 @@ const authMiddleware = async (req, res, next) => {
             return next();
         }
 
-        // Check User collection (Staff/Admin/Parent)
-        const user = await User.findById(decoded.id).select("-password").lean();
+        // 2. Check User collection (Staff / SchoolAdmin / Parent / Admin)
+        let user = await User.findById(decoded.id).select("-password").lean();
 
+        // 3. Fallback check for Admin collection if not found in User collection
         if (!user) {
+            const admin = await Admin.findById(decoded.id).select("-password").lean();
+            if (admin) {
+                req.user = {
+                    ...admin,
+                    role: admin.role || "superadmin"
+                };
+                req.admin = admin;
+                return next();
+            }
+
             return res.status(401).json({
                 success: false,
                 message: "User account no longer exists."
             });
         }
 
-        if (user.status !== "Active") {
+        if (user.status && user.status !== "Active") {
             return res.status(403).json({
                 success: false,
                 message: "This account is not active."
             });
         }
 
-        if (user.role !== "SuperAdmin" && !user.school_id) {
+        const userRoleLower = (user.role || "").toLowerCase();
+        if (userRoleLower !== "superadmin" && userRoleLower !== "admin" && !user.school_id) {
             return res.status(403).json({
                 success: false,
                 message: "This account is not connected to a school."
@@ -155,8 +173,9 @@ const authMiddleware = async (req, res, next) => {
  */
 const authorizeRoles = (...allowedRoles) => {
     return (req, res, next) => {
-        const userRole = (req.user?.role || req.admin?.role || "").toLowerCase();
-        const normalizedAllowed = allowedRoles.map(r => r.toLowerCase());
+        const rawRole = req.user?.role || req.admin?.role || "";
+        const userRole = String(rawRole).toLowerCase().trim();
+        const normalizedAllowed = allowedRoles.map(r => String(r).toLowerCase().trim());
 
         if (!userRole || !normalizedAllowed.includes(userRole)) {
             return res.status(403).json({
