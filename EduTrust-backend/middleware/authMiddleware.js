@@ -1,8 +1,10 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Admin = require("../models/Admin");
+const Student = require("../models/student");
 
-const JWT_SECRET = process.env.JWT_SECRET || "edutrust_fallback_secret_key";
+// Standardized fallback key across controllers and middleware
+const JWT_SECRET = process.env.JWT_SECRET || "edutrust_secret_key";
 
 /**
  * Super Admin Middleware: Verifies admin tokens against Admin collection
@@ -43,7 +45,7 @@ const protectAdmin = async (req, res, next) => {
 };
 
 /**
- * Standard User Middleware: Verifies user tokens against User collection (Staff/Student/Parent)
+ * Standard User Middleware: Verifies tokens against User or Student collections
  */
 const authMiddleware = async (req, res, next) => {
     try {
@@ -66,6 +68,39 @@ const authMiddleware = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
+
+        // 1. Check if token belongs to a Student account
+        if (decoded.role === "student" || decoded.student_id) {
+            const student = await Student.findById(decoded.id || decoded.student_id).lean();
+
+            if (!student) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Student account no longer exists."
+                });
+            }
+
+            if (student.status === "Suspended" || student.status === "Archived") {
+                return res.status(403).json({
+                    success: false,
+                    message: `Account is ${student.status.toLowerCase()}. Access denied.`
+                });
+            }
+
+            req.user = {
+                id: student._id,
+                _id: student._id,
+                student_id: student._id,
+                school_id: student.school_id,
+                role: "student",
+                first_name: student.first_name,
+                last_name: student.last_name
+            };
+
+            return next();
+        }
+
+        // 2. Otherwise check User collection (Staff/Admin/Parent)
         const user = await User.findById(decoded.id).select("-password").lean();
 
         if (!user) {
@@ -116,7 +151,6 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
-// Export BOTH middlewares so both `adminRoutes.js` and `schoolRoutes.js` work seamlessly
 module.exports = {
     protectAdmin,
     authMiddleware
