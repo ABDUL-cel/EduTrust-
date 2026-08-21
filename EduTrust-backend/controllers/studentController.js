@@ -2,8 +2,8 @@ const Student = require("../models/student");
 const Parent = require("../models/Parent");
 const User = require("../models/User");
 const School = require("../models/school");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // =====================================================
 // HELPER: GET SCHOOL ID
@@ -27,6 +27,7 @@ function escapeRegExp(string) {
 // HELPER: GENERATE SCHOOL-BRANDED ADMISSION NUMBER
 // =====================================================
 async function generateOfficialAdmissionNo(school, className, arm = "", department = "") {
+    // 1. Get 3-letter prefix from School Name or Code
     let schoolPrefix = "SCH";
     
     if (school?.school_code && school.school_code.trim().length >= 3) {
@@ -38,9 +39,11 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
         }
     }
 
+    // 2. Parse Class Level, Streams, and Departments
     const rawClass = (className || "").toUpperCase().trim();
     let categoryCode = "GEN";
 
+    // --- SENIOR SECONDARY (SS / SENIOR) ---
     if (rawClass.includes("SS") || rawClass.includes("SENIOR")) {
         const ssLevelMatch = rawClass.match(/SS[1-3]/);
         const ssLevel = ssLevelMatch ? ssLevelMatch[0] : "SS";
@@ -58,6 +61,7 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
 
         categoryCode = dept ? `${ssLevel}/${dept}` : ssLevel;
     } 
+    // --- JUNIOR SECONDARY (JSS) - INCLUDES ARM/STREAM ---
     else if (rawClass.includes("JSS") || rawClass.includes("JUNIOR")) {
         const jssMatch = rawClass.match(/JSS[1-3]/);
         const level = jssMatch ? jssMatch[0] : "JSS";
@@ -70,6 +74,7 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
 
         categoryCode = armLetter ? `${level}/${armLetter}` : level;
     }
+    // --- PRIMARY / NURSERY / CRECHE ---
     else {
         const lowerLevelMatch = rawClass.match(/(PRM[1-6]|PRIMARY[1-6]|NUR[1-3]|NURSERY[1-3]|CRECHE)/);
         
@@ -82,15 +87,22 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
         }
     }
 
+    // 3. Current Registration Year
     const year = new Date().getFullYear();
+
+    // 4. Build pattern regex dynamically (escaped)
     const basePrefix = `${schoolPrefix}/${categoryCode}/${year}/`;
     const pattern = new RegExp(`^${escapeRegExp(basePrefix)}`);
 
     const count = await Student.countDocuments({
         school_id: school._id,
-        matric_number: { $regex: pattern }
+        $or: [
+            { admission_number: { $regex: pattern } },
+            { matric_number: { $regex: pattern } }
+        ]
     });
 
+    // 5. Build 4-digit sequence (0001, 0002...)
     const nextSeq = (count + 1).toString().padStart(4, "0");
 
     return `${basePrefix}${nextSeq}`;
@@ -169,6 +181,12 @@ exports.registerStudent = async (req, res) => {
             });
         }
 
+        let hashedPassword = "";
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            hashedPassword = await bcrypt.hash(password, salt);
+        }
+
         const student = await Student.create({
             school_id,
             parent_id: parent_id || null,
@@ -178,7 +196,7 @@ exports.registerStudent = async (req, res) => {
             other_name: other_name?.trim() || "",
             email: email?.trim() || "",
             phone: phone?.trim() || "",
-            password: password || "",
+            password: hashedPassword,
             gender: gender || "Not Specified",
             date_of_birth: date_of_birth || null,
             class_name: selectedClass,
@@ -322,6 +340,7 @@ exports.loginStudent = async (req, res) => {
         const query = {
             $or: [
                 { admission_number: identifier },
+                { matric_number: identifier },
                 { email: identifier.toLowerCase() }
             ]
         };
@@ -376,6 +395,7 @@ exports.loginStudent = async (req, res) => {
                 first_name: student.first_name,
                 last_name: student.last_name,
                 admission_number: student.admission_number,
+                matric_number: student.matric_number,
                 class_name: student.class_name,
                 school_id: student.school_id,
                 role: "student"
@@ -1021,7 +1041,7 @@ exports.getStudentDashboardData = async (req, res) => {
                     id: student._id,
                     fullName,
                     admissionNumber: student.admission_number,
-                    matricNumber: student.matric_number,
+                    matricNumber: student.matric_number || "",
                     className: student.class_name,
                     arm: student.arm,
                     department: student.department,
