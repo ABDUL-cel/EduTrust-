@@ -29,12 +29,12 @@ const StudentSchema = new mongoose.Schema(
         // =================================================
         // OFFICIAL SCHOOL MATRIC NUMBER
         // Example: INT/JSS1/A/2026/0001
-        //
-        // This is generated ONLY after approval.
+        // Generated ONLY after approval.
+        // Set to null by default so sparse indexing works properly.
         // =================================================
         matric_number: {
             type: String,
-            default: "",
+            default: null,
             trim: true
         },
 
@@ -107,6 +107,12 @@ const StudentSchema = new mongoose.Schema(
             trim: true
         },
 
+        academic_session: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
         admission_date: {
             type: Date,
             default: Date.now
@@ -141,6 +147,9 @@ const StudentSchema = new mongoose.Schema(
             index: true
         },
 
+        // =================================================
+        // APPROVAL & AUDIT TRAIL
+        // =================================================
         approved_by: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -184,15 +193,26 @@ const StudentSchema = new mongoose.Schema(
         timestamps: {
             createdAt: "created_at",
             updatedAt: "updated_at"
-        }
+        },
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
     }
 );
+
+// ======================================================
+// VIRTUALS
+// ======================================================
+StudentSchema.virtual("full_name").get(function () {
+    return [this.first_name, this.other_name, this.last_name]
+        .filter(Boolean)
+        .join(" ");
+});
 
 // ======================================================
 // INDEXES
 // ======================================================
 
-// EDU number unique within school
+// Tracking number unique per school
 StudentSchema.index(
     {
         school_id: 1,
@@ -203,7 +223,7 @@ StudentSchema.index(
     }
 );
 
-// Official matric number unique within school
+// Official matric number unique per school (sparse allows multiple nulls)
 StudentSchema.index(
     {
         school_id: 1,
@@ -215,22 +235,16 @@ StudentSchema.index(
     }
 );
 
-// Fast school/status searches
+// Fast status queries per school
 StudentSchema.index({
     school_id: 1,
     status: 1
 });
 
-// Parent searches
+// Fast parent relationship queries per school
 StudentSchema.index({
     school_id: 1,
     parent_id: 1
-});
-
-// Matric lookup
-StudentSchema.index({
-    school_id: 1,
-    matric_number: 1
 });
 
 module.exports = mongoose.model("Student", StudentSchema);
