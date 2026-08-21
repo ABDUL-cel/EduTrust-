@@ -27,11 +27,13 @@ const {
 // Import Auth and Role Authorization Middlewares
 const { authMiddleware, authorizeRoles } = require("../middleware/authMiddleware");
 
+// Common Admin Roles Helper Array
+const ADMIN_ROLES = ["admin", "superadmin", "schooladmin"];
+
 // =====================================================
 // RATE LIMITERS
 // =====================================================
 
-// Registration limiter: Max 5 registrations per hour per IP
 const registrationLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 5,
@@ -43,7 +45,6 @@ const registrationLimiter = rateLimit({
     legacyHeaders: false
 });
 
-// Login limiter: Max 10 attempts per 15 minutes to prevent brute-force attacks
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 10,
@@ -56,157 +57,142 @@ const loginLimiter = rateLimit({
 });
 
 // =====================================================
-// PUBLIC ROUTES
+// 1. PUBLIC ROUTES
 // =====================================================
 
-// Student Registration
-router.post(
-    "/register",
-    registrationLimiter,
-    registerStudent
-);
-
-// Student Login
-router.post(
-    "/login",
-    loginLimiter,
-    loginStudent
-);
+router.post("/register", registrationLimiter, registerStudent);
+router.post("/login", loginLimiter, loginStudent);
 
 // =====================================================
-// LOGGED-IN STUDENT PROFILE & DASHBOARD
-// (Accessible by authenticated Students)
+// 2. STATIC AUTHENTICATED ROUTES (Must come before /:id)
 // =====================================================
+
+// Student Self Routes
 router.get(
     "/me/profile",
     authMiddleware,
-    authorizeRoles("student", "admin", "superadmin"),
+    authorizeRoles("student", ...ADMIN_ROLES),
     getStudentProfile
 );
 
 router.get(
     "/me/dashboard",
     authMiddleware,
-    authorizeRoles("student", "admin", "superadmin"),
+    authorizeRoles("student", ...ADMIN_ROLES),
     getStudentDashboardData
 );
 
-// =====================================================
-// FILTERED & BULK STUDENT LISTS
-// (Accessible by Admin / School Staff)
-// =====================================================
+// Admin & Staff Lists
 router.get(
     "/",
     authMiddleware,
-    authorizeRoles("admin", "superadmin", "teacher", "accountant"),
+    authorizeRoles(...ADMIN_ROLES, "teacher", "accountant"),
     getStudents
 );
 
 router.get(
     "/pending",
     authMiddleware,
-    authorizeRoles("admin", "superadmin", "teacher"),
+    authorizeRoles(...ADMIN_ROLES, "teacher"),
     getPendingStudents
 );
 
 router.get(
     "/active",
     authMiddleware,
-    authorizeRoles("admin", "superadmin", "teacher", "accountant"),
+    authorizeRoles(...ADMIN_ROLES, "teacher", "accountant"),
     getActiveStudents
 );
 
 // =====================================================
-// PARENT-STUDENT LINKING
+// 3. PARAMETERIZED ROUTES (/:id)
 // =====================================================
+
+// Parent-Student Linking
 router.get(
     "/:id/parent",
     authMiddleware,
-    authorizeRoles("admin", "superadmin", "teacher", "parent"),
+    authorizeRoles(...ADMIN_ROLES, "teacher", "parent"),
     getStudentParent
 );
 
 router.patch(
     "/:id/parent",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     linkParentToStudent
 );
 
 router.delete(
     "/:id/parent",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     unlinkParentFromStudent
 );
 
-// =====================================================
-// STUDENT LIFECYCLE MANAGEMENT (ADMIN / SUPERADMIN ONLY)
-// =====================================================
+// Student Lifecycle Actions
 router.patch(
     "/:id/approve",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     approveStudent
 );
 
 router.patch(
     "/:id/reject",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     rejectStudent
-);
-
-router.put(
-    "/:id",
-    authMiddleware,
-    authorizeRoles("admin", "superadmin"),
-    updateStudent
 );
 
 router.patch(
     "/:id/suspend",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     suspendStudent
 );
 
 router.patch(
     "/:id/reinstate",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     reinstateStudent
 );
 
 router.patch(
     "/:id/graduate",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     graduateStudent
 );
 
 router.patch(
     "/:id/archive",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     archiveStudent
+);
+
+// Single Student CRUD
+router.get(
+    "/:id",
+    authMiddleware,
+    authorizeRoles(...ADMIN_ROLES, "teacher"),
+    getStudent
+);
+
+router.put(
+    "/:id",
+    authMiddleware,
+    authorizeRoles(...ADMIN_ROLES),
+    updateStudent
 );
 
 router.delete(
     "/:id",
     authMiddleware,
-    authorizeRoles("admin", "superadmin"),
+    authorizeRoles(...ADMIN_ROLES),
     deleteStudent
-);
-
-// =====================================================
-// GET SINGLE STUDENT
-// =====================================================
-router.get(
-    "/:id",
-    authMiddleware,
-    authorizeRoles("admin", "superadmin", "teacher"),
-    getStudent
 );
 
 module.exports = router;
