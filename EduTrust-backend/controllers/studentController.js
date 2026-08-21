@@ -2,6 +2,8 @@ const Student = require("../models/student");
 const Parent = require("../models/Parent");
 const User = require("../models/User");
 const School = require("../models/school");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 // =====================================================
 // HELPER: GET SCHOOL ID
@@ -25,7 +27,6 @@ function escapeRegExp(string) {
 // HELPER: GENERATE SCHOOL-BRANDED ADMISSION NUMBER
 // =====================================================
 async function generateOfficialAdmissionNo(school, className, arm = "", department = "") {
-    // 1. Get 3-letter prefix from School Name or Code
     let schoolPrefix = "SCH";
     
     if (school?.school_code && school.school_code.trim().length >= 3) {
@@ -37,11 +38,9 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
         }
     }
 
-    // 2. Parse Class Level, Streams, and Departments
     const rawClass = (className || "").toUpperCase().trim();
     let categoryCode = "GEN";
 
-    // --- SENIOR SECONDARY (SS / SENIOR) ---
     if (rawClass.includes("SS") || rawClass.includes("SENIOR")) {
         const ssLevelMatch = rawClass.match(/SS[1-3]/);
         const ssLevel = ssLevelMatch ? ssLevelMatch[0] : "SS";
@@ -59,7 +58,6 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
 
         categoryCode = dept ? `${ssLevel}/${dept}` : ssLevel;
     } 
-    // --- JUNIOR SECONDARY (JSS) - INCLUDES ARM/STREAM ---
     else if (rawClass.includes("JSS") || rawClass.includes("JUNIOR")) {
         const jssMatch = rawClass.match(/JSS[1-3]/);
         const level = jssMatch ? jssMatch[0] : "JSS";
@@ -72,7 +70,6 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
 
         categoryCode = armLetter ? `${level}/${armLetter}` : level;
     }
-    // --- PRIMARY / NURSERY / CRECHE ---
     else {
         const lowerLevelMatch = rawClass.match(/(PRM[1-6]|PRIMARY[1-6]|NUR[1-3]|NURSERY[1-3]|CRECHE)/);
         
@@ -85,19 +82,15 @@ async function generateOfficialAdmissionNo(school, className, arm = "", departme
         }
     }
 
-    // 3. Current Registration Year
     const year = new Date().getFullYear();
-
-    // 4. Build pattern regex dynamically (escaped)
     const basePrefix = `${schoolPrefix}/${categoryCode}/${year}/`;
     const pattern = new RegExp(`^${escapeRegExp(basePrefix)}`);
 
     const count = await Student.countDocuments({
         school_id: school._id,
-        admission_number: { $regex: pattern }
+        matric_number: { $regex: pattern }
     });
 
-    // 5. Build 4-digit sequence (0001, 0002...)
     const nextSeq = (count + 1).toString().padStart(4, "0");
 
     return `${basePrefix}${nextSeq}`;
@@ -250,8 +243,7 @@ exports.approveStudent = async (req, res) => {
             studentToApprove.department
         );
 
-       
-        studentToApprove.matric_number = officialMatricNumber;
+        studentToApprove.matric_number = officialAdmissionNumber;
         studentToApprove.status = "Active";
         studentToApprove.approved_by = user_id;
         studentToApprove.approved_at = new Date();
@@ -319,7 +311,6 @@ exports.loginStudent = async (req, res) => {
     try {
         const { admission_number, email, password } = req.body;
 
-        // 1. Validate Input
         const identifier = (admission_number || email || "").trim();
         if (!identifier || !password) {
             return res.status(400).json({
@@ -328,7 +319,6 @@ exports.loginStudent = async (req, res) => {
             });
         }
 
-        // 2. Find Student by Admission Number or Email
         const query = {
             $or: [
                 { admission_number: identifier },
@@ -345,7 +335,6 @@ exports.loginStudent = async (req, res) => {
             });
         }
 
-        // 3. Verify Password
         if (!student.password) {
             return res.status(400).json({
                 success: false,
@@ -357,7 +346,7 @@ exports.loginStudent = async (req, res) => {
         if (student.password.startsWith("$2a$") || student.password.startsWith("$2b$")) {
             isMatch = await bcrypt.compare(password, student.password);
         } else {
-            isMatch = student.password === password; // Plaintext fallback if not yet hashed
+            isMatch = student.password === password;
         }
 
         if (!isMatch) {
@@ -367,7 +356,6 @@ exports.loginStudent = async (req, res) => {
             });
         }
 
-        // 4. Generate JWT Token
         const token = jwt.sign(
             {
                 id: student._id,
@@ -379,7 +367,6 @@ exports.loginStudent = async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        // 5. Send Success Response
         return res.status(200).json({
             success: true,
             message: "Student logged in successfully!",
@@ -404,6 +391,7 @@ exports.loginStudent = async (req, res) => {
         });
     }
 };
+
 // =====================================================
 // GET ALL STUDENTS
 // =====================================================
@@ -1033,6 +1021,7 @@ exports.getStudentDashboardData = async (req, res) => {
                     id: student._id,
                     fullName,
                     admissionNumber: student.admission_number,
+                    matricNumber: student.matric_number,
                     className: student.class_name,
                     arm: student.arm,
                     department: student.department,
