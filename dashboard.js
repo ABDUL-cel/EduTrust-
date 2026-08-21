@@ -1219,7 +1219,28 @@ async function loadStaff() {
         const data =
             await apiRequest("/staff");
 
+// Add this function after your apiRequest helper:
+async function handleApproveStudent(studentId) {
+    if (!confirm("Are you sure you want to approve this student and generate their official matric number?")) {
+        return;
+    }
 
+    try {
+        const data = await apiRequest(`/students/${studentId}/approve`, {
+            method: "PATCH"
+        });
+
+        if (data.success) {
+            showToast(`Student approved! Matric No: ${data.official_matric_number}`);
+            if (typeof loadStudents === "function") loadStudents();
+        } else {
+            showToast(data.message || "Approval failed.", "error");
+        }
+    } catch (error) {
+        console.error("APPROVE STUDENT ERROR:", error);
+        showToast(error.message || "Failed to approve student.", "error");
+    }
+}
         // =================================================
         // CHECK RESPONSE
         // =================================================
