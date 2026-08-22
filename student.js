@@ -1,685 +1,874 @@
 
-// student.js
-// Complete Students page frontend logic for dashboard.html
-
 "use strict";
 
-const StudentManager = (() => {
-    const API_BASE = "/api/students";
+/*
+=========================================================
+ EDU TRUST - STUDENT MANAGEMENT FRONTEND
+ File: student.js
+=========================================================
 
-    let students = [];
-    let filteredStudents = [];
+ Connects dashboard.html to:
 
-    const elements = {};
+ GET    /api/students
+ GET    /api/students/:id
+ POST   /api/students/register
+ PUT    /api/students/:id
+ PATCH  /api/students/:id/approve
+ PATCH  /api/students/:id/reject
+ PATCH  /api/students/:id/suspend
+ PATCH  /api/students/:id/reinstate
+ PATCH  /api/students/:id/graduate
+ PATCH  /api/students/:id/archive
+ DELETE /api/students/:id
+ GET    /api/students/:id/parent
+ PATCH  /api/students/:id/parent
+ DELETE /api/students/:id/parent
+=========================================================
+*/
 
-    function cacheElements() {
-        elements.page = document.getElementById("studentsPage");
-        elements.table = document.getElementById("studentsTable");
-        elements.search = document.getElementById("studentSearchInput");
-        elements.statusFilter = document.getElementById("studentStatusFilter");
-        elements.resultCount = document.getElementById("studentResultCount");
-        elements.addButton = document.getElementById("studentsAddButton");
+const STUDENT_API = "/api/students";
+
+let allStudents = [];
+let filteredStudents = [];
+let editingStudentId = null;
+
+/* ======================================================
+   AUTH
+====================================================== */
+
+function getAuthToken() {
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("authToken") ||
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("token") ||
+        sessionStorage.getItem("authToken") ||
+        ""
+    );
+}
+
+function authHeaders(json = true) {
+    const headers = {};
+
+    const token = getAuthToken();
+
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
     }
 
-    function getToken() {
-        return (
-            localStorage.getItem("token") ||
-            localStorage.getItem("accessToken") ||
-            sessionStorage.getItem("token") ||
-            sessionStorage.getItem("accessToken")
-        );
+    if (json) {
+        headers["Content-Type"] = "application/json";
     }
 
-    function authHeaders() {
-        const token = getToken();
+    return headers;
+}
 
-        return {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-        };
-    }
+/* ======================================================
+   API HELPER
+====================================================== */
 
-    async function apiRequest(url, options = {}) {
-        const response = await fetch(url, {
+async function studentApiRequest(
+    endpoint,
+    options = {}
+) {
+    const response = await fetch(
+        `${STUDENT_API}${endpoint}`,
+        {
             ...options,
             headers: {
-                ...authHeaders(),
+                ...authHeaders(
+                    options.body !== undefined
+                ),
                 ...(options.headers || {})
             }
-        });
-
-        let data = {};
-
-        try {
-            data = await response.json();
-        } catch {
-            data = {};
         }
+    );
 
-        if (!response.ok) {
-            throw new Error(
-                data.message ||
-                data.error ||
-                `Request failed with status ${response.status}`
-            );
-        }
+    let data = null;
 
-        return data;
+    try {
+        data = await response.json();
+    } catch {
+        data = {};
     }
 
-    function escapeHtml(value) {
-        if (value === null || value === undefined) {
-            return "";
-        }
+    if (response.status === 401) {
+        showStudentToast(
+            "Your session has expired. Please log in again.",
+            "error"
+        );
 
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        return null;
     }
 
-    function getFullName(student) {
-        if (student.full_name) {
-            return student.full_name;
-        }
-
-        return [
-            student.first_name,
-            student.other_name,
-            student.last_name
-        ]
-            .filter(Boolean)
-            .join(" ");
+    if (!response.ok) {
+        throw new Error(
+            data?.message ||
+            "Something went wrong."
+        );
     }
 
-    function formatStatus(status) {
-        const safeStatus = status || "Pending";
+    return data;
+}
 
-        return `
-            <span class="status-badge status-${safeStatus
-                .toLowerCase()
-                .replace(/\s+/g, "-")}">
-                ${escapeHtml(safeStatus)}
-            </span>
-        `;
+/* ======================================================
+   DOM READY
+====================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        initializeStudentManagement();
     }
+);
 
-    function showToast(message, type = "success") {
-        const toast = document.getElementById("toast");
+/* ======================================================
+   INITIALIZE
+====================================================== */
 
-        if (!toast) {
-            return;
-        }
+function initializeStudentManagement() {
+    bindStudentEvents();
 
-        toast.textContent = message;
-        toast.className = `toast ${type}`;
+    /*
+     * Load immediately if the Students page already exists.
+     */
+    const studentsPage =
+        document.getElementById("studentsPage");
 
-        requestAnimationFrame(() => {
-            toast.classList.add("show");
-        });
-
-        setTimeout(() => {
-            toast.classList.remove("show");
-        }, 3000);
+    if (
+        studentsPage &&
+        !studentsPage.classList.contains("hidden")
+    ) {
+        loadStudents();
     }
+}
 
-    function renderLoading() {
-        if (!elements.table) {
-            return;
-        }
+/* ======================================================
+   EVENTS
+====================================================== */
 
-        elements.table.innerHTML = `
-            <tr>
-                <td colspan="6">
-                    Loading students...
-                </td>
-            </tr>
-        `;
-    }
+function bindStudentEvents() {
 
-    function renderEmpty(message = "No students found.") {
-        if (!elements.table) {
-            return;
-        }
+    /* Register student button */
+    const addButton =
+        document.getElementById(
+            "studentsAddButton"
+        );
 
-        elements.table.innerHTML = `
-            <tr>
-                <td colspan="6">
-                    ${escapeHtml(message)}
-                </td>
-            </tr>
-        `;
-    }
-
-    function renderStudents() {
-        if (!elements.table) {
-            return;
-        }
-
-        if (!filteredStudents.length) {
-            renderEmpty(
-                students.length
-                    ? "No students match your search or filter."
-                    : "No students registered yet."
-            );
-            updateResultCount();
-            return;
-        }
-
-        elements.table.innerHTML = filteredStudents
-            .map(student => {
-                const id = student._id || student.id;
-
-                const admissionNumber =
-                    student.admission_number || "—";
-
-                const fullName =
-                    getFullName(student) || "Unnamed Student";
-
-                const gender =
-                    student.gender || "Not Specified";
-
-                const className =
-                    student.class_name || "—";
-
-                const status =
-                    student.status || "Pending";
-
-                return `
-                    <tr data-student-id="${escapeHtml(id)}">
-
-                        <td>
-                            <strong>
-                                ${escapeHtml(admissionNumber)}
-                            </strong>
-                        </td>
-
-                        <td>
-                            <div class="student-table-name">
-
-                                <div class="student-mini-avatar">
-                                    ${escapeHtml(
-                                        getInitials(fullName)
-                                    )}
-                                </div>
-
-                                <div>
-                                    <strong>
-                                        ${escapeHtml(fullName)}
-                                    </strong>
-
-                                    ${
-                                        student.matric_number
-                                            ? `
-                                                <small>
-                                                    ${escapeHtml(
-                                                        student.matric_number
-                                                    )}
-                                                </small>
-                                            `
-                                            : ""
-                                    }
-                                </div>
-
-                            </div>
-                        </td>
-
-                        <td>
-                            ${escapeHtml(gender)}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(className)}
-                            ${
-                                student.arm
-                                    ? `
-                                        <small class="student-arm">
-                                            ${escapeHtml(student.arm)}
-                                        </small>
-                                    `
-                                    : ""
-                            }
-                        </td>
-
-                        <td>
-                            ${formatStatus(status)}
-                        </td>
-
-                        <td>
-
-                            <div class="student-actions">
-
-                                <button
-                                    type="button"
-                                    class="student-action-button view-student"
-                                    data-id="${escapeHtml(id)}"
-                                    title="View student"
-                                >
-                                    👁️
-                                </button>
-
-                                ${
-                                    status === "Pending"
-                                        ? `
-                                            <button
-                                                type="button"
-                                                class="student-action-button approve-student"
-                                                data-id="${escapeHtml(id)}"
-                                                title="Approve student"
-                                            >
-                                                ✓
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                class="student-action-button reject-student"
-                                                data-id="${escapeHtml(id)}"
-                                                title="Reject student"
-                                            >
-                                                ✕
-                                            </button>
-                                        `
-                                        : ""
-                                }
-
-                                ${
-                                    status === "Active"
-                                        ? `
-                                            <button
-                                                type="button"
-                                                class="student-action-button suspend-student"
-                                                data-id="${escapeHtml(id)}"
-                                                title="Suspend student"
-                                            >
-                                                ⏸
-                                            </button>
-                                        `
-                                        : ""
-                                }
-
-                                ${
-                                    status === "Suspended"
-                                        ? `
-                                            <button
-                                                type="button"
-                                                class="student-action-button reinstate-student"
-                                                data-id="${escapeHtml(id)}"
-                                                title="Reinstate student"
-                                            >
-                                                ▶
-                                            </button>
-                                        `
-                                        : ""
-                                }
-
-                                <button
-                                    type="button"
-                                    class="student-action-button edit-student"
-                                    data-id="${escapeHtml(id)}"
-                                    title="Edit student"
-                                >
-                                    ✏️
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-                `;
-            })
-            .join("");
-
-        updateResultCount();
-    }
-
-    function getInitials(name) {
-        const parts = String(name)
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean);
-
-        if (!parts.length) {
-            return "ST";
-        }
-
-        if (parts.length === 1) {
-            return parts[0].substring(0, 2).toUpperCase();
-        }
-
-        return (
-            parts[0].charAt(0) +
-            parts[parts.length - 1].charAt(0)
-        ).toUpperCase();
-    }
-
-    function updateResultCount() {
-        if (!elements.resultCount) {
-            return;
-        }
-
-        const count = filteredStudents.length;
-
-        elements.resultCount.textContent =
-            `${count} ${count === 1 ? "student" : "students"}`;
-    }
-
-    function applyFilters() {
-        const searchTerm =
-            (elements.search?.value || "")
-                .trim()
-                .toLowerCase();
-
-        const status =
-            elements.statusFilter?.value || "all";
-
-        filteredStudents = students.filter(student => {
-            const fullName = getFullName(student).toLowerCase();
-
-            const searchableText = [
-                student.admission_number,
-                student.matric_number,
-                student.first_name,
-                student.last_name,
-                student.other_name,
-                student.class_name,
-                student.arm,
-                student.department,
-                student.gender
-            ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-
-            const matchesSearch =
-                !searchTerm ||
-                fullName.includes(searchTerm) ||
-                searchableText.includes(searchTerm);
-
-            const matchesStatus =
-                status === "all" ||
-                String(student.status || "").toLowerCase() ===
-                    status.toLowerCase();
-
-            return matchesSearch && matchesStatus;
-        });
-
-        renderStudents();
-    }
-
-    async function loadStudents() {
-        renderLoading();
-
-        try {
-            const data = await apiRequest(API_BASE);
-
-            if (Array.isArray(data)) {
-                students = data;
-            } else if (Array.isArray(data.students)) {
-                students = data.students;
-            } else if (Array.isArray(data.data)) {
-                students = data.data;
-            } else {
-                students = [];
+    if (addButton) {
+        addButton.addEventListener(
+            "click",
+            () => {
+                openStudentModal();
             }
+        );
+    }
 
-            filteredStudents = [...students];
+    /* Overview Add Student button */
+    const overviewAddButton =
+        document.getElementById(
+            "addStudentButton"
+        );
 
-            renderStudents();
+    if (overviewAddButton) {
+        overviewAddButton.addEventListener(
+            "click",
+            () => {
+                openStudentModal();
+            }
+        );
+    }
 
-        } catch (error) {
-            console.error("Load students error:", error);
+    /* Search */
+    const searchInput =
+        document.getElementById(
+            "studentSearchInput"
+        );
 
-            if (error.message.toLowerCase().includes("token") ||
-                error.message.toLowerCase().includes("authentication")) {
-                renderEmpty("Your session has expired. Please log in again.");
-            } else {
-                renderEmpty(
-                    `Unable to load students: ${error.message}`
+    if (searchInput) {
+        searchInput.addEventListener(
+            "input",
+            () => {
+                applyStudentFilters();
+            }
+        );
+    }
+
+    /* Status filter */
+    const statusFilter =
+        document.getElementById(
+            "studentStatusFilter"
+        );
+
+    if (statusFilter) {
+        statusFilter.addEventListener(
+            "change",
+            () => {
+                applyStudentFilters();
+            }
+        );
+    }
+
+    /*
+     * Listen for dashboard navigation.
+     * dashboard.js should already handle page switching.
+     */
+    document.querySelectorAll(
+        "[data-page='students']"
+    ).forEach(button => {
+        button.addEventListener(
+            "click",
+            () => {
+                setTimeout(
+                    () => {
+                        loadStudents();
+                    },
+                    50
                 );
             }
-        }
-    }
+        );
+    });
 
-    async function getStudent(id) {
-        return apiRequest(`${API_BASE}/${id}`);
-    }
+    /*
+     * Global navigation buttons that may
+     * lead back to students.
+     */
+    document.querySelectorAll(
+        "[data-page]"
+    ).forEach(button => {
+        button.addEventListener(
+            "click",
+            () => {
+                if (
+                    button.dataset.page ===
+                    "students"
+                ) {
+                    setTimeout(
+                        loadStudents,
+                        100
+                    );
+                }
+            }
+        );
+    });
+}
 
-    async function approveStudent(id) {
-        if (!confirm("Approve this student?")) {
-            return;
-        }
+/* ======================================================
+   LOAD STUDENTS
+====================================================== */
 
-        try {
-            await apiRequest(`${API_BASE}/${id}/approve`, {
-                method: "PATCH"
-            });
+async function loadStudents() {
 
-            showToast("Student approved successfully.");
-
-            await loadStudents();
-
-        } catch (error) {
-            console.error("Approve student error:", error);
-            showToast(error.message, "error");
-        }
-    }
-
-    async function rejectStudent(id) {
-        const reason = prompt(
-            "Enter a reason for rejecting this student (optional):"
+    const table =
+        document.getElementById(
+            "studentsTable"
         );
 
-        if (reason === null) {
-            return;
-        }
+    if (!table) return;
 
-        try {
-            await apiRequest(`${API_BASE}/${id}/reject`, {
-                method: "PATCH",
-                body: JSON.stringify({
-                    reason: reason.trim()
-                })
-            });
+    table.innerHTML = `
+        <tr>
+            <td colspan="6">
+                Loading students...
+            </td>
+        </tr>
+    `;
 
-            showToast("Student rejected.");
+    try {
 
-            await loadStudents();
-
-        } catch (error) {
-            console.error("Reject student error:", error);
-            showToast(error.message, "error");
-        }
-    }
-
-    async function suspendStudent(id) {
-        const reason = prompt(
-            "Enter the reason for suspending this student:"
-        );
-
-        if (reason === null) {
-            return;
-        }
-
-        if (!reason.trim()) {
-            showToast(
-                "A suspension reason is required.",
-                "error"
+        const data =
+            await studentApiRequest(
+                ""
             );
-            return;
-        }
 
-        try {
-            await apiRequest(`${API_BASE}/${id}/suspend`, {
-                method: "PATCH",
-                body: JSON.stringify({
-                    reason: reason.trim()
-                })
-            });
+        if (!data) return;
 
-            showToast("Student suspended.");
+        allStudents =
+            Array.isArray(data.students)
+                ? data.students
+                : [];
 
-            await loadStudents();
+        filteredStudents =
+            [...allStudents];
 
-        } catch (error) {
-            console.error("Suspend student error:", error);
-            showToast(error.message, "error");
-        }
+        renderStudents();
+
+        updateStudentResultCount();
+
+    } catch (error) {
+
+        console.error(
+            "LOAD STUDENTS ERROR:",
+            error
+        );
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="6">
+                    Unable to load students.
+                </td>
+            </tr>
+        `;
+
+        showStudentToast(
+            error.message ||
+            "Unable to load students.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   FILTER STUDENTS
+====================================================== */
+
+function applyStudentFilters() {
+
+    const searchInput =
+        document.getElementById(
+            "studentSearchInput"
+        );
+
+    const statusFilter =
+        document.getElementById(
+            "studentStatusFilter"
+        );
+
+    const search =
+        (
+            searchInput?.value ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+    const status =
+        statusFilter?.value ||
+        "all";
+
+    filteredStudents =
+        allStudents.filter(
+            student => {
+
+                const fullName = [
+                    student.first_name,
+                    student.other_name,
+                    student.last_name
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                const matchesSearch =
+                    !search ||
+                    String(
+                        student.admission_number ||
+                        ""
+                    )
+                        .toLowerCase()
+                        .includes(search) ||
+
+                    String(
+                        student.matric_number ||
+                        ""
+                    )
+                        .toLowerCase()
+                        .includes(search) ||
+
+                    fullName.includes(
+                        search
+                    ) ||
+
+                    String(
+                        student.class_name ||
+                        ""
+                    )
+                        .toLowerCase()
+                        .includes(search);
+
+                const matchesStatus =
+                    status === "all" ||
+                    student.status === status;
+
+                return (
+                    matchesSearch &&
+                    matchesStatus
+                );
+            }
+        );
+
+    renderStudents();
+    updateStudentResultCount();
+}
+
+/* ======================================================
+   RENDER STUDENTS
+====================================================== */
+
+function renderStudents() {
+
+    const table =
+        document.getElementById(
+            "studentsTable"
+        );
+
+    if (!table) return;
+
+    if (
+        !filteredStudents.length
+    ) {
+        table.innerHTML = `
+            <tr>
+                <td colspan="6">
+                    No students found.
+                </td>
+            </tr>
+        `;
+
+        return;
     }
 
-    async function reinstateStudent(id) {
-        if (!confirm("Reinstate this student?")) {
-            return;
-        }
+    table.innerHTML =
+        filteredStudents
+            .map(
+                student =>
+                    createStudentRow(
+                        student
+                    )
+            )
+            .join("");
+}
 
-        try {
-            await apiRequest(`${API_BASE}/${id}/reinstate`, {
-                method: "PATCH"
-            });
+/* ======================================================
+   STUDENT ROW
+====================================================== */
 
-            showToast("Student reinstated.");
+function createStudentRow(student) {
 
-            await loadStudents();
+    const id =
+        student._id ||
+        student.id;
 
-        } catch (error) {
-            console.error("Reinstate student error:", error);
-            showToast(error.message, "error");
-        }
-    }
+    const fullName = [
+        student.first_name,
+        student.other_name,
+        student.last_name
+    ]
+        .filter(Boolean)
+        .join(" ");
 
-    async function graduateStudent(id) {
-        if (!confirm(
-            "Mark this student as graduated?"
-        )) {
-            return;
-        }
+    const admissionNumber =
+        escapeHtml(
+            student.admission_number ||
+            "—"
+        );
 
-        try {
-            await apiRequest(`${API_BASE}/${id}/graduate`, {
-                method: "PATCH"
-            });
+    const gender =
+        escapeHtml(
+            student.gender ||
+            "Not Specified"
+        );
 
-            showToast("Student marked as graduated.");
+    const className =
+        escapeHtml(
+            student.class_name ||
+            "—"
+        );
 
-            await loadStudents();
+    const status =
+        student.status ||
+        "Pending";
 
-        } catch (error) {
-            console.error("Graduate student error:", error);
-            showToast(error.message, "error");
-        }
-    }
+    return `
+        <tr data-student-id="${id}">
 
-    async function archiveStudent(id) {
-        if (!confirm(
-            "Archive this student? This will remove them from active student records."
-        )) {
-            return;
-        }
+            <td>
+                <strong>
+                    ${admissionNumber}
+                </strong>
 
-        try {
-            await apiRequest(`${API_BASE}/${id}/archive`, {
-                method: "PATCH"
-            });
+                ${
+                    student.matric_number
+                        ? `
+                            <small class="student-matric">
+                                ${escapeHtml(
+                                    student.matric_number
+                                )}
+                            </small>
+                          `
+                        : ""
+                }
+            </td>
 
-            showToast("Student archived.");
+            <td>
+                <div class="student-name-cell">
 
-            await loadStudents();
-
-        } catch (error) {
-            console.error("Archive student error:", error);
-            showToast(error.message, "error");
-        }
-    }
-
-    async function deleteStudent(id) {
-        if (!confirm(
-            "Delete this student permanently? This action cannot be undone."
-        )) {
-            return;
-        }
-
-        try {
-            await apiRequest(`${API_BASE}/${id}`, {
-                method: "DELETE"
-            });
-
-            showToast("Student deleted successfully.");
-
-            await loadStudents();
-
-        } catch (error) {
-            console.error("Delete student error:", error);
-            showToast(error.message, "error");
-        }
-    }
-
-    function createStudentModal() {
-        if (document.getElementById("studentModal")) {
-            return;
-        }
-
-        const modal = document.createElement("div");
-
-        modal.id = "studentModal";
-        modal.className = "modal-overlay hidden";
-
-        modal.innerHTML = `
-            <div class="modal student-modal">
-
-                <div class="modal-header">
+                    <div class="student-mini-avatar">
+                        ${getInitials(
+                            fullName
+                        )}
+                    </div>
 
                     <div>
-                        <h3 id="studentModalTitle">
-                            Register Student
-                        </h3>
+                        <strong>
+                            ${escapeHtml(
+                                fullName
+                            )}
+                        </strong>
 
-                        <p>
-                            Enter the student's information.
-                        </p>
+                        ${
+                            student.email
+                                ? `
+                                    <small>
+                                        ${escapeHtml(
+                                            student.email
+                                        )}
+                                    </small>
+                                  `
+                                : ""
+                        }
                     </div>
+
+                </div>
+            </td>
+
+            <td>
+                ${gender}
+            </td>
+
+            <td>
+                ${className}
+
+                ${
+                    student.arm
+                        ? `
+                            <small class="student-arm">
+                                ${escapeHtml(
+                                    student.arm
+                                )}
+                            </small>
+                          `
+                        : ""
+                }
+            </td>
+
+            <td>
+                <span class="student-status ${getStatusClass(
+                    status
+                )}">
+                    ${escapeHtml(status)}
+                </span>
+            </td>
+
+            <td>
+                <div class="student-actions">
 
                     <button
                         type="button"
-                        class="modal-close"
-                        id="studentModalClose"
+                        class="student-action-button view"
+                        onclick="viewStudent('${id}')"
+                        title="View student"
                     >
-                        ×
+                        👁️
+                    </button>
+
+                    <button
+                        type="button"
+                        class="student-action-button edit"
+                        onclick="editStudent('${id}')"
+                        title="Edit student"
+                    >
+                        ✏️
+                    </button>
+
+                    ${getLifecycleActions(
+                        student
+                    )}
+
+                    <button
+                        type="button"
+                        class="student-action-button delete"
+                        onclick="deleteStudent('${id}')"
+                        title="Delete student"
+                    >
+                        🗑️
                     </button>
 
                 </div>
+            </td>
 
-                <form id="studentForm">
+        </tr>
+    `;
+}
 
-                    <input
-                        type="hidden"
-                        id="studentEditId"
-                    >
+/* ======================================================
+   LIFECYCLE ACTIONS
+====================================================== */
 
-                    <div class="form-grid">
+function getLifecycleActions(student) {
+
+    const id =
+        student._id ||
+        student.id;
+
+    switch (student.status) {
+
+        case "Pending":
+            return `
+                <button
+                    type="button"
+                    class="student-action-button approve"
+                    onclick="approveStudent('${id}')"
+                    title="Approve student"
+                >
+                    ✓
+                </button>
+
+                <button
+                    type="button"
+                    class="student-action-button reject"
+                    onclick="rejectStudent('${id}')"
+                    title="Reject student"
+                >
+                    ✕
+                </button>
+            `;
+
+        case "Active":
+            return `
+                <button
+                    type="button"
+                    class="student-action-button suspend"
+                    onclick="suspendStudent('${id}')"
+                    title="Suspend student"
+                >
+                    ⏸
+                </button>
+
+                <button
+                    type="button"
+                    class="student-action-button graduate"
+                    onclick="graduateStudent('${id}')"
+                    title="Graduate student"
+                >
+                    🎓
+                </button>
+
+                <button
+                    type="button"
+                    class="student-action-button archive"
+                    onclick="archiveStudent('${id}')"
+                    title="Archive student"
+                >
+                    📦
+                </button>
+            `;
+
+        case "Suspended":
+            return `
+                <button
+                    type="button"
+                    class="student-action-button approve"
+                    onclick="reinstateStudent('${id}')"
+                    title="Reinstate student"
+                >
+                    ▶
+                </button>
+            `;
+
+        case "Graduated":
+            return `
+                <button
+                    type="button"
+                    class="student-action-button archive"
+                    onclick="archiveStudent('${id}')"
+                    title="Archive student"
+                >
+                    📦
+                </button>
+            `;
+
+        case "Rejected":
+            return `
+                <button
+                    type="button"
+                    class="student-action-button approve"
+                    onclick="approveStudent('${id}')"
+                    title="Approve student"
+                >
+                    ✓
+                </button>
+            `;
+
+        case "Archived":
+            return "";
+
+        default:
+            return "";
+    }
+}
+
+/* ======================================================
+   RESULT COUNT
+====================================================== */
+
+function updateStudentResultCount() {
+
+    const element =
+        document.getElementById(
+            "studentResultCount"
+        );
+
+    if (!element) return;
+
+    const count =
+        filteredStudents.length;
+
+    element.textContent =
+        `${count} ${
+            count === 1
+                ? "student"
+                : "students"
+        }`;
+}
+
+/* ======================================================
+   OPEN STUDENT MODAL
+====================================================== */
+
+function openStudentModal(
+    student = null
+) {
+
+    editingStudentId =
+        student?._id ||
+        student?.id ||
+        null;
+
+    const existing =
+        document.getElementById(
+            "studentModal"
+        );
+
+    if (existing) {
+        existing.remove();
+    }
+
+    const modal =
+        document.createElement(
+            "div"
+        );
+
+    modal.id =
+        "studentModal";
+
+    modal.className =
+        "student-modal-overlay";
+
+    modal.innerHTML = `
+        <div class="student-modal">
+
+            <div class="student-modal-header">
+
+                <div>
+                    <h2>
+                        ${
+                            student
+                                ? "Edit Student"
+                                : "Register Student"
+                        }
+                    </h2>
+
+                    <p>
+                        ${
+                            student
+                                ? "Update student information."
+                                : "Create a new student registration."
+                        }
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="student-modal-close"
+                    id="studentModalClose"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <form
+                id="studentForm"
+                class="student-form"
+            >
+
+                ${
+                    student
+                        ? ""
+                        : `
+                            <div class="student-form-section">
+                                <h3>
+                                    Account
+                                </h3>
+
+                                <div class="student-form-grid">
+
+                                    <div class="form-group">
+                                        <label>
+                                            Password
+                                        </label>
+
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            minlength="6"
+                                            placeholder="Optional"
+                                        >
+                                    </div>
+
+                                </div>
+                            </div>
+                          `
+                }
+
+                <div class="student-form-section">
+
+                    <h3>
+                        Personal Information
+                    </h3>
+
+                    <div class="student-form-grid">
 
                         <div class="form-group">
                             <label>
-                                First Name
+                                First Name *
                             </label>
 
                             <input
                                 type="text"
-                                id="studentFirstName"
+                                name="first_name"
                                 required
+                                value="${escapeAttribute(
+                                    student?.first_name ||
+                                    ""
+                                )}"
                             >
                         </div>
 
                         <div class="form-group">
                             <label>
-                                Last Name
+                                Last Name *
                             </label>
 
                             <input
                                 type="text"
-                                id="studentLastName"
+                                name="last_name"
                                 required
+                                value="${escapeAttribute(
+                                    student?.last_name ||
+                                    ""
+                                )}"
                             >
                         </div>
 
@@ -690,29 +879,11 @@ const StudentManager = (() => {
 
                             <input
                                 type="text"
-                                id="studentOtherName"
-                            >
-                        </div>
-
-                        <div class="form-group">
-                            <label>
-                                Email
-                            </label>
-
-                            <input
-                                type="email"
-                                id="studentEmail"
-                            >
-                        </div>
-
-                        <div class="form-group">
-                            <label>
-                                Phone
-                            </label>
-
-                            <input
-                                type="text"
-                                id="studentPhone"
+                                name="other_name"
+                                value="${escapeAttribute(
+                                    student?.other_name ||
+                                    ""
+                                )}"
                             >
                         </div>
 
@@ -721,18 +892,43 @@ const StudentManager = (() => {
                                 Gender
                             </label>
 
-                            <select id="studentGender">
-                                <option value="Not Specified">
+                            <select
+                                name="gender"
+                            >
+
+                                <option value="Not Specified"
+                                    ${
+                                        student?.gender ===
+                                        "Not Specified"
+                                            ? "selected"
+                                            : ""
+                                    }
+                                >
                                     Not Specified
                                 </option>
 
-                                <option value="Male">
+                                <option value="Male"
+                                    ${
+                                        student?.gender ===
+                                        "Male"
+                                            ? "selected"
+                                            : ""
+                                    }
+                                >
                                     Male
                                 </option>
 
-                                <option value="Female">
+                                <option value="Female"
+                                    ${
+                                        student?.gender ===
+                                        "Female"
+                                            ? "selected"
+                                            : ""
+                                    }
+                                >
                                     Female
                                 </option>
+
                             </select>
                         </div>
 
@@ -743,19 +939,68 @@ const StudentManager = (() => {
 
                             <input
                                 type="date"
-                                id="studentDateOfBirth"
+                                name="date_of_birth"
+                                value="${formatDateInput(
+                                    student?.date_of_birth
+                                )}"
                             >
                         </div>
 
                         <div class="form-group">
                             <label>
-                                Class
+                                Phone
                             </label>
 
                             <input
                                 type="text"
-                                id="studentClassName"
+                                name="phone"
+                                value="${escapeAttribute(
+                                    student?.phone ||
+                                    ""
+                                )}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                value="${escapeAttribute(
+                                    student?.email ||
+                                    ""
+                                )}"
+                            >
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="student-form-section">
+
+                    <h3>
+                        Academic Information
+                    </h3>
+
+                    <div class="student-form-grid">
+
+                        <div class="form-group">
+                            <label>
+                                Class *
+                            </label>
+
+                            <input
+                                type="text"
+                                name="class_name"
                                 required
+                                value="${escapeAttribute(
+                                    student?.class_name ||
+                                    ""
+                                )}"
                             >
                         </div>
 
@@ -766,7 +1011,11 @@ const StudentManager = (() => {
 
                             <input
                                 type="text"
-                                id="studentArm"
+                                name="arm"
+                                value="${escapeAttribute(
+                                    student?.arm ||
+                                    ""
+                                )}"
                             >
                         </div>
 
@@ -777,7 +1026,11 @@ const StudentManager = (() => {
 
                             <input
                                 type="text"
-                                id="studentDepartment"
+                                name="department"
+                                value="${escapeAttribute(
+                                    student?.department ||
+                                    ""
+                                )}"
                             >
                         </div>
 
@@ -788,20 +1041,26 @@ const StudentManager = (() => {
 
                             <input
                                 type="text"
-                                id="studentAcademicSession"
+                                name="academic_session"
+                                placeholder="2026/2027"
+                                value="${escapeAttribute(
+                                    student?.academic_session ||
+                                    ""
+                                )}"
                             >
                         </div>
 
-                        <div class="form-group">
-                            <label>
-                                Admission Date
-                            </label>
+                    </div>
 
-                            <input
-                                type="date"
-                                id="studentAdmissionDate"
-                            >
-                        </div>
+                </div>
+
+                <div class="student-form-section">
+
+                    <h3>
+                        Additional Information
+                    </h3>
+
+                    <div class="student-form-grid">
 
                         <div class="form-group full-width">
                             <label>
@@ -809,9 +1068,12 @@ const StudentManager = (() => {
                             </label>
 
                             <textarea
-                                id="studentHomeAddress"
+                                name="home_address"
                                 rows="3"
-                            ></textarea>
+                            >${escapeHtml(
+                                student?.home_address ||
+                                ""
+                            )}</textarea>
                         </div>
 
                         <div class="form-group full-width">
@@ -820,656 +1082,1073 @@ const StudentManager = (() => {
                             </label>
 
                             <textarea
-                                id="studentMedicalInformation"
+                                name="medical_information"
                                 rows="3"
-                            ></textarea>
+                            >${escapeHtml(
+                                student?.medical_information ||
+                                ""
+                            )}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Passport URL
+                            </label>
+
+                            <input
+                                type="text"
+                                name="passport"
+                                value="${escapeAttribute(
+                                    student?.passport ||
+                                    ""
+                                )}"
+                            >
                         </div>
 
                     </div>
-
-                    <div class="form-actions">
-
-                        <button
-                            type="button"
-                            class="secondary-button"
-                            id="studentCancelButton"
-                        >
-                            Cancel
-                        </button>
-
-                        <button
-                            type="submit"
-                            class="primary-button"
-                            id="studentSaveButton"
-                        >
-                            Register Student
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        document
-            .getElementById("studentModalClose")
-            .addEventListener("click", closeStudentModal);
-
-        document
-            .getElementById("studentCancelButton")
-            .addEventListener("click", closeStudentModal);
-
-        document
-            .getElementById("studentForm")
-            .addEventListener("submit", saveStudent);
-
-        modal.addEventListener("click", event => {
-            if (event.target === modal) {
-                closeStudentModal();
-            }
-        });
-    }
-
-    function openStudentModal(student = null) {
-        createStudentModal();
-
-        const modal = document.getElementById("studentModal");
-        const form = document.getElementById("studentForm");
-
-        form.reset();
-
-        document.getElementById("studentEditId").value =
-            student?._id || "";
-
-        document.getElementById("studentFirstName").value =
-            student?.first_name || "";
-
-        document.getElementById("studentLastName").value =
-            student?.last_name || "";
-
-        document.getElementById("studentOtherName").value =
-            student?.other_name || "";
-
-        document.getElementById("studentEmail").value =
-            student?.email || "";
-
-        document.getElementById("studentPhone").value =
-            student?.phone || "";
-
-        document.getElementById("studentGender").value =
-            student?.gender || "Not Specified";
-
-        document.getElementById("studentClassName").value =
-            student?.class_name || "";
-
-        document.getElementById("studentArm").value =
-            student?.arm || "";
-
-        document.getElementById("studentDepartment").value =
-            student?.department || "";
-
-        document.getElementById("studentAcademicSession").value =
-            student?.academic_session || "";
-
-        document.getElementById("studentHomeAddress").value =
-            student?.home_address || "";
-
-        document.getElementById("studentMedicalInformation").value =
-            student?.medical_information || "";
-
-        if (student?.date_of_birth) {
-            document.getElementById("studentDateOfBirth").value =
-                formatDateForInput(student.date_of_birth);
-        }
-
-        if (student?.admission_date) {
-            document.getElementById("studentAdmissionDate").value =
-                formatDateForInput(student.admission_date);
-        }
-
-        const editing = Boolean(student);
-
-        document.getElementById("studentModalTitle").textContent =
-            editing ? "Edit Student" : "Register Student";
-
-        document.getElementById("studentSaveButton").textContent =
-            editing ? "Save Changes" : "Register Student";
-
-        modal.classList.remove("hidden");
-        document.body.classList.add("modal-open");
-    }
-
-    function closeStudentModal() {
-        const modal = document.getElementById("studentModal");
-
-        if (!modal) {
-            return;
-        }
-
-        modal.classList.add("hidden");
-        document.body.classList.remove("modal-open");
-    }
-
-    function formatDateForInput(value) {
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return "";
-        }
-
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-    }
-
-    function collectStudentForm() {
-        return {
-            first_name:
-                document.getElementById("studentFirstName").value.trim(),
-
-            last_name:
-                document.getElementById("studentLastName").value.trim(),
-
-            other_name:
-                document.getElementById("studentOtherName").value.trim(),
-
-            email:
-                document.getElementById("studentEmail").value.trim(),
-
-            phone:
-                document.getElementById("studentPhone").value.trim(),
-
-            gender:
-                document.getElementById("studentGender").value,
-
-            date_of_birth:
-                document.getElementById("studentDateOfBirth").value || null,
-
-            class_name:
-                document.getElementById("studentClassName").value.trim(),
-
-            arm:
-                document.getElementById("studentArm").value.trim(),
-
-            department:
-                document.getElementById("studentDepartment").value.trim(),
-
-            academic_session:
-                document
-                    .getElementById("studentAcademicSession")
-                    .value
-                    .trim(),
-
-            admission_date:
-                document.getElementById("studentAdmissionDate").value ||
-                undefined,
-
-            home_address:
-                document.getElementById("studentHomeAddress").value.trim(),
-
-            medical_information:
-                document
-                    .getElementById("studentMedicalInformation")
-                    .value
-                    .trim()
-        };
-    }
-
-    async function saveStudent(event) {
-        event.preventDefault();
-
-        const id =
-            document.getElementById("studentEditId").value;
-
-        const payload = collectStudentForm();
-
-        const saveButton =
-            document.getElementById("studentSaveButton");
-
-        saveButton.disabled = true;
-
-        try {
-            if (id) {
-                await apiRequest(`${API_BASE}/${id}`, {
-                    method: "PUT",
-                    body: JSON.stringify(payload)
-                });
-
-                showToast("Student updated successfully.");
-            } else {
-                await apiRequest(`${API_BASE}/register`, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
-
-                showToast(
-                    "Student registered successfully. Awaiting approval."
-                );
-            }
-
-            closeStudentModal();
-
-            await loadStudents();
-
-        } catch (error) {
-            console.error("Save student error:", error);
-            showToast(error.message, "error");
-        } finally {
-            saveButton.disabled = false;
-        }
-    }
-
-    async function viewStudent(id) {
-        try {
-            const data = await getStudent(id);
-
-            const student =
-                data.student ||
-                data.data ||
-                data;
-
-            openStudentDetails(student);
-
-        } catch (error) {
-            console.error("View student error:", error);
-            showToast(error.message, "error");
-        }
-    }
-
-    function openStudentDetails(student) {
-        const existing =
-            document.getElementById("studentDetailsModal");
-
-        if (existing) {
-            existing.remove();
-        }
-
-        const modal = document.createElement("div");
-
-        modal.id = "studentDetailsModal";
-        modal.className = "modal-overlay";
-
-        const fullName = getFullName(student);
-
-        modal.innerHTML = `
-            <div class="modal student-details-modal">
-
-                <div class="modal-header">
-
-                    <div>
-                        <h3>
-                            ${escapeHtml(fullName)}
-                        </h3>
-
-                        <p>
-                            Student Profile
-                        </p>
-                    </div>
-
-                    <button
-                        type="button"
-                        class="modal-close"
-                        id="studentDetailsClose"
-                    >
-                        ×
-                    </button>
 
                 </div>
 
-                <div class="student-details">
-
-                    <div class="student-details-header">
-
-                        <div class="student-large-avatar">
-                            ${escapeHtml(
-                                getInitials(fullName)
-                            )}
-                        </div>
-
-                        <div>
-
-                            <h3>
-                                ${escapeHtml(fullName)}
-                            </h3>
-
-                            <p>
-                                Admission:
-                                ${escapeHtml(
-                                    student.admission_number || "—"
-                                )}
-                            </p>
-
-                            ${
-                                student.matric_number
-                                    ? `
-                                        <p>
-                                            Matric:
-                                            ${escapeHtml(
-                                                student.matric_number
-                                            )}
-                                        </p>
-                                    `
-                                    : ""
-                            }
-
-                            <div>
-                                ${formatStatus(student.status)}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="student-detail-grid">
-
-                        ${detailItem(
-                            "Gender",
-                            student.gender || "Not Specified"
-                        )}
-
-                        ${detailItem(
-                            "Class",
-                            student.class_name || "—"
-                        )}
-
-                        ${detailItem(
-                            "Arm",
-                            student.arm || "—"
-                        )}
-
-                        ${detailItem(
-                            "Department",
-                            student.department || "—"
-                        )}
-
-                        ${detailItem(
-                            "Email",
-                            student.email || "—"
-                        )}
-
-                        ${detailItem(
-                            "Phone",
-                            student.phone || "—"
-                        )}
-
-                        ${detailItem(
-                            "Academic Session",
-                            student.academic_session || "—"
-                        )}
-
-                        ${detailItem(
-                            "Admission Date",
-                            formatDisplayDate(student.admission_date)
-                        )}
-
-                        ${detailItem(
-                            "Date of Birth",
-                            formatDisplayDate(student.date_of_birth)
-                        )}
-
-                        ${detailItem(
-                            "Parent ID",
-                            student.parent_id || "Not linked"
-                        )}
-
-                    </div>
-
-                    ${
-                        student.home_address
-                            ? `
-                                <div class="student-detail-section">
-                                    <strong>Home Address</strong>
-                                    <p>
-                                        ${escapeHtml(
-                                            student.home_address
-                                        )}
-                                    </p>
-                                </div>
-                            `
-                            : ""
-                    }
-
-                    ${
-                        student.medical_information
-                            ? `
-                                <div class="student-detail-section">
-                                    <strong>
-                                        Medical Information
-                                    </strong>
-
-                                    <p>
-                                        ${escapeHtml(
-                                            student.medical_information
-                                        )}
-                                    </p>
-                                </div>
-                            `
-                            : ""
-                    }
-
-                    ${
-                        student.suspension_reason
-                            ? `
-                                <div class="student-detail-section">
-                                    <strong>
-                                        Suspension Reason
-                                    </strong>
-
-                                    <p>
-                                        ${escapeHtml(
-                                            student.suspension_reason
-                                        )}
-                                    </p>
-                                </div>
-                            `
-                            : ""
-                    }
-
-                </div>
-
-                <div class="form-actions">
+                <div class="student-modal-actions">
 
                     <button
                         type="button"
                         class="secondary-button"
-                        id="studentDetailsEdit"
+                        id="studentCancelButton"
                     >
-                        Edit Student
+                        Cancel
                     </button>
 
                     <button
-                        type="button"
+                        type="submit"
                         class="primary-button"
-                        id="studentDetailsDone"
                     >
-                        Close
+                        ${
+                            student
+                                ? "Save Changes"
+                                : "Register Student"
+                        }
                     </button>
 
                 </div>
 
-            </div>
-        `;
+            </form>
 
-        document.body.appendChild(modal);
-        document.body.classList.add("modal-open");
+        </div>
+    `;
 
-        document
-            .getElementById("studentDetailsClose")
-            .addEventListener("click", closeStudentDetails);
+    document.body.appendChild(
+        modal
+    );
 
-        document
-            .getElementById("studentDetailsDone")
-            .addEventListener("click", closeStudentDetails);
+    document
+        .getElementById(
+            "studentModalClose"
+        )
+        ?.addEventListener(
+            "click",
+            closeStudentModal
+        );
 
-        document
-            .getElementById("studentDetailsEdit")
-            .addEventListener("click", () => {
-                closeStudentDetails();
-                openStudentModal(student);
-            });
+    document
+        .getElementById(
+            "studentCancelButton"
+        )
+        ?.addEventListener(
+            "click",
+            closeStudentModal
+        );
 
-        modal.addEventListener("click", event => {
-            if (event.target === modal) {
-                closeStudentDetails();
+    document
+        .getElementById(
+            "studentForm"
+        )
+        ?.addEventListener(
+            "submit",
+            handleStudentFormSubmit
+        );
+
+    modal.addEventListener(
+        "click",
+        event => {
+            if (
+                event.target === modal
+            ) {
+                closeStudentModal();
             }
-        });
+        }
+    );
+}
+
+/* ======================================================
+   CLOSE MODAL
+====================================================== */
+
+function closeStudentModal() {
+
+    const modal =
+        document.getElementById(
+            "studentModal"
+        );
+
+    if (modal) {
+        modal.remove();
     }
 
-    function detailItem(label, value) {
-        return `
-            <div class="student-detail-item">
+    editingStudentId = null;
+}
 
-                <span>
-                    ${escapeHtml(label)}
+/* ======================================================
+   FORM SUBMIT
+====================================================== */
+
+async function handleStudentFormSubmit(
+    event
+) {
+
+    event.preventDefault();
+
+    const form =
+        event.currentTarget;
+
+    const formData =
+        new FormData(form);
+
+    const payload = {};
+
+    formData.forEach(
+        (value, key) => {
+
+            if (
+                value !== ""
+            ) {
+                payload[key] =
+                    value;
+            }
+        }
+    );
+
+    try {
+
+        const button =
+            form.querySelector(
+                "button[type='submit']"
+            );
+
+        if (button) {
+            button.disabled = true;
+            button.textContent =
+                editingStudentId
+                    ? "Saving..."
+                    : "Registering...";
+        }
+
+        if (editingStudentId) {
+
+            await studentApiRequest(
+                `/${editingStudentId}`,
+                {
+                    method: "PUT",
+                    body: JSON.stringify(
+                        payload
+                    )
+                }
+            );
+
+            showStudentToast(
+                "Student updated successfully.",
+                "success"
+            );
+
+        } else {
+
+            await studentApiRequest(
+                "/register",
+                {
+                    method: "POST",
+                    body: JSON.stringify(
+                        payload
+                    )
+                }
+            );
+
+            showStudentToast(
+                "Student registered successfully.",
+                "success"
+            );
+        }
+
+        closeStudentModal();
+
+        await loadStudents();
+
+    } catch (error) {
+
+        console.error(
+            "STUDENT FORM ERROR:",
+            error
+        );
+
+        showStudentToast(
+            error.message ||
+            "Unable to save student.",
+            "error"
+        );
+
+        const button =
+            form.querySelector(
+                "button[type='submit']"
+            );
+
+        if (button) {
+            button.disabled = false;
+            button.textContent =
+                editingStudentId
+                    ? "Save Changes"
+                    : "Register Student";
+        }
+    }
+}
+
+/* ======================================================
+   VIEW STUDENT
+====================================================== */
+
+async function viewStudent(id) {
+
+    try {
+
+        const data =
+            await studentApiRequest(
+                `/${id}`
+            );
+
+        if (!data?.student) return;
+
+        openStudentViewModal(
+            data.student
+        );
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to load student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   VIEW MODAL
+====================================================== */
+
+function openStudentViewModal(
+    student
+) {
+
+    const existing =
+        document.getElementById(
+            "studentViewModal"
+        );
+
+    if (existing) {
+        existing.remove();
+    }
+
+    const fullName = [
+        student.first_name,
+        student.other_name,
+        student.last_name
+    ]
+        .filter(Boolean)
+        .join(" ");
+
+    const modal =
+        document.createElement(
+            "div"
+        );
+
+    modal.id =
+        "studentViewModal";
+
+    modal.className =
+        "student-modal-overlay";
+
+    modal.innerHTML = `
+        <div class="student-modal">
+
+            <div class="student-modal-header">
+
+                <div>
+                    <h2>
+                        Student Profile
+                    </h2>
+
+                    <p>
+                        ${escapeHtml(
+                            fullName
+                        )}
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="student-modal-close"
+                    onclick="closeStudentViewModal()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div class="student-profile-view">
+
+                <div class="student-profile-avatar">
+                    ${getInitials(
+                        fullName
+                    )}
+                </div>
+
+                <h2>
+                    ${escapeHtml(
+                        fullName
+                    )}
+                </h2>
+
+                <span class="student-status ${getStatusClass(
+                    student.status
+                )}">
+                    ${escapeHtml(
+                        student.status ||
+                        "Pending"
+                    )}
                 </span>
 
-                <strong>
-                    ${escapeHtml(value)}
-                </strong>
+                <div class="student-detail-grid">
+
+                    <div>
+                        <small>
+                            Admission Number
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.admission_number ||
+                                "—"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Matric Number
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.matric_number ||
+                                "Not assigned"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Gender
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.gender ||
+                                "—"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Class
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.class_name ||
+                                "—"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Arm
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.arm ||
+                                "—"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Department
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.department ||
+                                "—"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Email
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.email ||
+                                "—"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Phone
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.phone ||
+                                "—"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Academic Session
+                        </small>
+
+                        <strong>
+                            ${escapeHtml(
+                                student.academic_session ||
+                                "—"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>
+                            Admission Date
+                        </small>
+
+                        <strong>
+                            ${formatDisplayDate(
+                                student.admission_date
+                            )}
+                        </strong>
+                    </div>
+
+                </div>
 
             </div>
-        `;
+
+            <div class="student-modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    onclick="closeStudentViewModal()"
+                >
+                    Close
+                </button>
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    onclick="editStudent('${student._id}')"
+                >
+                    Edit Student
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(
+        modal
+    );
+}
+
+function closeStudentViewModal() {
+
+    document
+        .getElementById(
+            "studentViewModal"
+        )
+        ?.remove();
+}
+
+/* ======================================================
+   EDIT STUDENT
+====================================================== */
+
+async function editStudent(id) {
+
+    closeStudentViewModal();
+
+    try {
+
+        const data =
+            await studentApiRequest(
+                `/${id}`
+            );
+
+        if (!data?.student) {
+            return;
+        }
+
+        openStudentModal(
+            data.student
+        );
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to load student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   APPROVE
+====================================================== */
+
+async function approveStudent(id) {
+
+    const confirmed =
+        window.confirm(
+            "Approve this student?"
+        );
+
+    if (!confirmed) return;
+
+    try {
+
+        await studentApiRequest(
+            `/${id}/approve`,
+            {
+                method: "PATCH"
+            }
+        );
+
+        showStudentToast(
+            "Student approved successfully.",
+            "success"
+        );
+
+        await loadStudents();
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to approve student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   REJECT
+====================================================== */
+
+async function rejectStudent(id) {
+
+    const confirmed =
+        window.confirm(
+            "Reject this student registration?"
+        );
+
+    if (!confirmed) return;
+
+    try {
+
+        await studentApiRequest(
+            `/${id}/reject`,
+            {
+                method: "PATCH"
+            }
+        );
+
+        showStudentToast(
+            "Student registration rejected.",
+            "success"
+        );
+
+        await loadStudents();
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to reject student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   SUSPEND
+====================================================== */
+
+async function suspendStudent(id) {
+
+    const reason =
+        window.prompt(
+            "Enter suspension reason:"
+        );
+
+    if (
+        reason === null
+    ) {
+        return;
     }
 
-    function closeStudentDetails() {
-        const modal =
-            document.getElementById("studentDetailsModal");
+    try {
 
-        if (modal) {
-            modal.remove();
-        }
+        await studentApiRequest(
+            `/${id}/suspend`,
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    reason
+                })
+            }
+        );
 
-        document.body.classList.remove("modal-open");
+        showStudentToast(
+            "Student suspended successfully.",
+            "success"
+        );
+
+        await loadStudents();
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to suspend student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   REINSTATE
+====================================================== */
+
+async function reinstateStudent(id) {
+
+    const confirmed =
+        window.confirm(
+            "Reinstate this student?"
+        );
+
+    if (!confirmed) return;
+
+    try {
+
+        await studentApiRequest(
+            `/${id}/reinstate`,
+            {
+                method: "PATCH"
+            }
+        );
+
+        showStudentToast(
+            "Student reinstated successfully.",
+            "success"
+        );
+
+        await loadStudents();
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to reinstate student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   GRADUATE
+====================================================== */
+
+async function graduateStudent(id) {
+
+    const confirmed =
+        window.confirm(
+            "Mark this student as graduated?"
+        );
+
+    if (!confirmed) return;
+
+    try {
+
+        await studentApiRequest(
+            `/${id}/graduate`,
+            {
+                method: "PATCH"
+            }
+        );
+
+        showStudentToast(
+            "Student graduated successfully.",
+            "success"
+        );
+
+        await loadStudents();
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to graduate student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   ARCHIVE
+====================================================== */
+
+async function archiveStudent(id) {
+
+    const confirmed =
+        window.confirm(
+            "Archive this student?"
+        );
+
+    if (!confirmed) return;
+
+    try {
+
+        await studentApiRequest(
+            `/${id}/archive`,
+            {
+                method: "PATCH"
+            }
+        );
+
+        showStudentToast(
+            "Student archived successfully.",
+            "success"
+        );
+
+        await loadStudents();
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to archive student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   DELETE
+====================================================== */
+
+async function deleteStudent(id) {
+
+    const confirmed =
+        window.confirm(
+            "Delete this student permanently? This cannot be undone."
+        );
+
+    if (!confirmed) return;
+
+    try {
+
+        await studentApiRequest(
+            `/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        showStudentToast(
+            "Student deleted successfully.",
+            "success"
+        );
+
+        await loadStudents();
+
+    } catch (error) {
+
+        showStudentToast(
+            error.message ||
+            "Unable to delete student.",
+            "error"
+        );
+    }
+}
+
+/* ======================================================
+   STATUS CLASS
+====================================================== */
+
+function getStatusClass(
+    status
+) {
+
+    return String(
+        status || ""
+    )
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+}
+
+/* ======================================================
+   INITIALS
+====================================================== */
+
+function getInitials(
+    name
+) {
+
+    const parts =
+        String(name || "")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+    if (!parts.length) {
+        return "ST";
     }
 
-    function formatDisplayDate(value) {
-        if (!value) {
-            return "—";
-        }
+    if (parts.length === 1) {
+        return parts[0]
+            .substring(0, 2)
+            .toUpperCase();
+    }
 
-        const date = new Date(value);
+    return (
+        parts[0][0] +
+        parts[parts.length - 1][0]
+    ).toUpperCase();
+}
 
-        if (Number.isNaN(date.getTime())) {
-            return "—";
-        }
+/* ======================================================
+   DATE HELPERS
+====================================================== */
 
-        return date.toLocaleDateString("en-NG", {
+function formatDateInput(
+    date
+) {
+
+    if (!date) return "";
+
+    const parsed =
+        new Date(date);
+
+    if (
+        Number.isNaN(
+            parsed.getTime()
+        )
+    ) {
+        return "";
+    }
+
+    return parsed
+        .toISOString()
+        .split("T")[0];
+}
+
+function formatDisplayDate(
+    date
+) {
+
+    if (!date) return "—";
+
+    const parsed =
+        new Date(date);
+
+    if (
+        Number.isNaN(
+            parsed.getTime()
+        )
+    ) {
+        return "—";
+    }
+
+    return parsed.toLocaleDateString(
+        "en-GB",
+        {
             day: "2-digit",
             month: "short",
             year: "numeric"
-        });
-    }
-
-    function handleTableActions(event) {
-        const button =
-            event.target.closest("button[data-id]");
-
-        if (!button) {
-            return;
         }
+    );
+}
 
-        const id = button.dataset.id;
+/* ======================================================
+   HTML SAFETY
+====================================================== */
 
-        if (!id) {
-            return;
-        }
+function escapeHtml(
+    value
+) {
 
-        if (button.classList.contains("view-student")) {
-            viewStudent(id);
-            return;
-        }
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
 
-        if (button.classList.contains("approve-student")) {
-            approveStudent(id);
-            return;
-        }
+function escapeAttribute(
+    value
+) {
+    return escapeHtml(
+        value
+    );
+}
 
-        if (button.classList.contains("reject-student")) {
-            rejectStudent(id);
-            return;
-        }
+/* ======================================================
+   TOAST
+====================================================== */
 
-        if (button.classList.contains("suspend-student")) {
-            suspendStudent(id);
-            return;
-        }
+function showStudentToast(
+    message,
+    type = "success"
+) {
 
-        if (button.classList.contains("reinstate-student")) {
-            reinstateStudent(id);
-            return;
-        }
-
-        if (button.classList.contains("edit-student")) {
-            editStudent(id);
-        }
-    }
-
-    async function editStudent(id) {
-        try {
-            const data = await getStudent(id);
-
-            const student =
-                data.student ||
-                data.data ||
-                data;
-
-            openStudentModal(student);
-
-        } catch (error) {
-            console.error("Edit student error:", error);
-            showToast(error.message, "error");
-        }
-    }
-
-    function bindEvents() {
-        elements.search?.addEventListener(
-            "input",
-            applyFilters
+    let toast =
+        document.getElementById(
+            "toast"
         );
 
-        elements.statusFilter?.addEventListener(
-            "change",
-            applyFilters
-        );
+    if (!toast) {
 
-        elements.table?.addEventListener(
-            "click",
-            handleTableActions
-        );
+        toast =
+            document.createElement(
+                "div"
+            );
 
-        elements.addButton?.addEventListener(
-            "click",
-            () => openStudentModal()
+        toast.id =
+            "toast";
+
+        toast.className =
+            "toast";
+
+        document.body.appendChild(
+            toast
         );
     }
 
-    function init() {
-        cacheElements();
-        bindEvents();
-        createStudentModal();
-    }
+    toast.textContent =
+        message;
 
-    return {
-        init,
-        loadStudents,
-        getStudent,
-        approveStudent,
-        rejectStudent,
-        suspendStudent,
-        reinstateStudent,
-        graduateStudent,
-        archiveStudent,
-        deleteStudent,
-        openStudentModal,
-        editStudent
-    };
-})();
+    toast.classList.remove(
+        "show",
+        "success",
+        "error"
+    );
 
-document.addEventListener("DOMContentLoaded", () => {
-    StudentManager.init();
-});
+    toast.classList.add(
+        type,
+        "show"
+    );
+
+    clearTimeout(
+        showStudentToast.timer
+    );
+
+    showStudentToast.timer =
+        setTimeout(
+            () => {
+                toast.classList.remove(
+                    "show"
+                );
+            },
+            3500
+        );
+}
+
+/* ======================================================
+   REFRESH PUBLIC API
+====================================================== */
+
+window.loadStudents =
+    loadStudents;
+
+window.viewStudent =
+    viewStudent;
+
+window.editStudent =
+    editStudent;
+
+window.approveStudent =
+    approveStudent;
+
+window.rejectStudent =
+    rejectStudent;
+
+window.suspendStudent =
+    suspendStudent;
+
+window.reinstateStudent =
+    reinstateStudent;
+
+window.graduateStudent =
+    graduateStudent;
+
+window.archiveStudent =
+    archiveStudent;
+
+window.deleteStudent =
+    deleteStudent;
+
+window.openStudentModal =
+    openStudentModal;
+
+window.closeStudentModal =
+    closeStudentModal;
+
+window.closeStudentViewModal =
+    closeStudentViewModal;
