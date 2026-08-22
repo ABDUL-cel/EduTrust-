@@ -77,31 +77,6 @@ function showToast(message, type = "success") {
 }
 
 /* ============================================================
-   STUDENT APPROVAL HANDLER
-============================================================ */
-async function handleApproveStudent(studentId) {
-    if (!confirm("Are you sure you want to approve this student and generate their official matric number?")) {
-        return;
-    }
-
-    try {
-        const data = await apiRequest(`/students/${studentId}/approve`, {
-            method: "PATCH"
-        });
-
-        if (data.success) {
-            showToast(`Student approved successfully! Official Matric No: ${data.official_matric_number || data.matric_number}`);
-            loadStudents();
-        } else {
-            showToast(data.message || "Approval failed.", "error");
-        }
-    } catch (error) {
-        console.error("APPROVE STUDENT ERROR:", error);
-        showToast(error.message || "Failed to approve student.", "error");
-    }
-}
-
-/* ============================================================
    SCHOOL / USER DATA
 ============================================================ */
 let currentSchool = null;
@@ -208,7 +183,9 @@ function showPage(pageName) {
             loadSchoolPage();
             break;
         case "students":
-            loadStudents();
+            if (typeof window.loadStudents === "function") {
+                window.loadStudents();
+            }
             break;
         case "parents":
             loadParents();
@@ -231,84 +208,6 @@ navItems.forEach(item => {
         if (pageName) showPage(pageName);
     });
 });
-
-/* ============================================================
-   LOAD STUDENTS (FIXED)
-============================================================ */
-async function loadStudents() {
-    const table = document.getElementById("studentsTable");
-    if (!table) return;
-
-    table.innerHTML = `
-        <tr>
-            <td colspan="6" style="text-align:center;">Loading students...</td>
-        </tr>
-    `;
-
-    try {
-        const data = await apiRequest("/students");
-
-        // Accommodate multiple API response structures (data.students, data.data, or direct array)
-        const students = Array.isArray(data) ? data : (data.students || data.data || []);
-
-        updateElement("totalStudents", students.length.toLocaleString());
-
-        if (!students.length) {
-            table.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center;">No students found.</td>
-                </tr>
-            `;
-            return;
-        }
-
-        table.innerHTML = students.map(student => {
-            const fullName = [student.first_name, student.other_name, student.last_name]
-                .filter(Boolean)
-                .join(" ");
-
-            const regNo = student.matric_number || student.admission_number || "—";
-            const isPending = String(student.status || "").toLowerCase() === "pending";
-
-            return `
-                <tr>
-                    <td>${escapeHtml(regNo)}</td>
-                    <td>${escapeHtml(fullName || "N/A")}</td>
-                    <td>${escapeHtml(student.gender || "N/A")}</td>
-                    <td>${escapeHtml(student.class_name || student.class || "N/A")}</td>
-                    <td>
-                        <span class="status ${getStatusClass(student.status)}">
-                            ${escapeHtml(student.status || "Active")}
-                        </span>
-                    </td>
-                    <td>
-                        ${
-                            isPending
-                                ? `<button 
-                                        class="btn-approve" 
-                                        onclick="handleApproveStudent('${student._id}')"
-                                        style="padding: 4px 8px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 4px;"
-                                   >
-                                        Approve
-                                   </button>`
-                                : `<span style="color: #6c757d; font-size: 0.85rem;">Approved</span>`
-                        }
-                    </td>
-                </tr>
-            `;
-        }).join("");
-
-    } catch (error) {
-        console.error("LOAD STUDENTS ERROR:", error);
-        table.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align:center; color: #d9534f;">
-                    ${escapeHtml(error.message || "Unable to load students.")}
-                </td>
-            </tr>
-        `;
-    }
-}
 
 /* ============================================================
    STAFF & PARENTS & DASHBOARD
@@ -382,7 +281,11 @@ async function loadParents() {
 }
 
 async function loadDashboardOverview() {
-    await Promise.allSettled([loadStudents(), loadParents()]);
+    const tasks = [loadParents()];
+    if (typeof window.loadStudents === "function") {
+        tasks.push(window.loadStudents());
+    }
+    await Promise.allSettled(tasks);
 }
 
 async function loadSchoolPage() {
@@ -424,8 +327,6 @@ if (logoutButton) {
         window.location.href = "login.html";
     });
 }
-
-window.handleApproveStudent = handleApproveStudent;
 
 async function initializeDashboard() {
     showPage("overview");
