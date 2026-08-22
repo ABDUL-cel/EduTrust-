@@ -26,7 +26,8 @@
 =========================================================
 */
 
-const STUDENT_API = "/api/students";
+// student.js (Line 24)
+const STUDENT_API = "https://edutrust-15ii.onrender.com/api/students";
 
 let allStudents = [];
 let filteredStudents = [];
@@ -47,13 +48,13 @@ function getAuthToken() {
     );
 }
 
-function authHeaders(json = true) {
+// student.js
+function authHeaders(json = false) {
     const headers = {};
-
     const token = getAuthToken();
 
     if (token) {
-        headers.Authorization = `Bearer ${token}`;
+        headers["Authorization"] = `Bearer ${token}`;
     }
 
     if (json) {
@@ -62,28 +63,19 @@ function authHeaders(json = true) {
 
     return headers;
 }
-
 /* ======================================================
    API HELPER
 ====================================================== */
 
-async function studentApiRequest(
-    endpoint,
-    options = {}
-) {
-    const response = await fetch(
-        `${STUDENT_API}${endpoint}`,
-        {
-            ...options,
-            headers: {
-                ...authHeaders(
-                    options.body !== undefined
-                ),
-                ...(options.headers || {})
-            }
+// student.js
+async function studentApiRequest(endpoint, options = {}) {
+    const response = await fetch(`${STUDENT_API}${endpoint}`, {
+        ...options,
+        headers: {
+            ...authHeaders(options.body !== undefined),
+            ...(options.headers || {})
         }
-    );
-
+    });
     let data = null;
 
     try {
