@@ -324,7 +324,124 @@ const loginStudent = async (req, res) => {
         });
     }
 };
+// =====================================================
+// STUDENT SEARCH & FILTER
+// =====================================================
 
+function setupStudentSearch() {
+
+    const searchInput =
+        document.querySelector("#studentSearchInput");
+
+    const statusFilter =
+        document.querySelector("#studentStatusFilter");
+
+    if (!searchInput || !statusFilter) {
+        return;
+    }
+
+    searchInput.addEventListener("input", () => {
+        filterStudents();
+    });
+
+    statusFilter.addEventListener("change", () => {
+        filterStudents();
+    });
+}
+
+
+// =====================================================
+// FILTER STUDENTS
+// =====================================================
+
+function filterStudents() {
+
+    const searchInput =
+        document.querySelector("#studentSearchInput");
+
+    const statusFilter =
+        document.querySelector("#studentStatusFilter");
+
+    const table =
+        document.querySelector("#studentsTable");
+
+    if (!searchInput || !statusFilter || !table) {
+        return;
+    }
+
+    const search =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+    const selectedStatus =
+        statusFilter.value;
+
+    // Use the students already loaded by loadStudents()
+    const students =
+        window.loadedStudents || [];
+
+    const filteredStudents =
+        students.filter(student => {
+
+            // -----------------------------------------
+            // STATUS FILTER
+            // -----------------------------------------
+
+            if (
+                selectedStatus !== "all" &&
+                student.status !== selectedStatus
+            ) {
+                return false;
+            }
+
+
+            // -----------------------------------------
+            // SEARCH FILTER
+            // -----------------------------------------
+
+            if (!search) {
+                return true;
+            }
+
+            const fullName = [
+                student.first_name,
+                student.other_name,
+                student.last_name
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            const admissionNumber =
+                String(
+                    student.admission_number || ""
+                ).toLowerCase();
+
+            const className =
+                String(
+                    student.class_name || ""
+                ).toLowerCase();
+
+            const arm =
+                String(
+                    student.arm || ""
+                ).toLowerCase();
+
+
+            return (
+                fullName.includes(search) ||
+                admissionNumber.includes(search) ||
+                className.includes(search) ||
+                arm.includes(search)
+            );
+
+        });
+
+
+    renderStudents(filteredStudents);
+
+}
 /* =========================================================
    GET ALL STUDENTS
    GET /api/students
