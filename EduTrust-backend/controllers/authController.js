@@ -5,20 +5,15 @@ const mongoose = require("mongoose");
 const School = require("../models/school");
 const User = require("../models/User");
 const Admin = require('../models/Admin');
-/**
- * Generate signed JWT Token helper containing user roles
- */
-const generateToken = (user) => {
-    return jwt.sign(
-        { 
-            id: user._id || user.id,
-            role: user.role || "SuperAdmin",
-            school_id: user.school_id || null
-        }, 
-        process.env.JWT_SECRET || "edutrust_secret_key", 
-        { expiresIn: "1d" }
-    );
 
+// Consolidated secret key reference
+const JWT_SECRET = process.env.JWT_SECRET || "edutrust_secret_key_2026";
+
+/**
+ * Universal JWT Token Generator Helper
+ */
+const generateToken = (payload, expiresIn = '1d') => {
+    return jwt.sign(payload, JWT_SECRET, { expiresIn });
 };
 
 /**
@@ -37,7 +32,6 @@ exports.loginAdmin = async (req, res) => {
             });
         }
 
-        // Find admin and explicitly include hidden password field for validation
         const admin = await Admin.findOne({ 
             $or: [{ username: username.toLowerCase() }, { email: username.toLowerCase() }] 
         }).select('+password');
@@ -49,7 +43,6 @@ exports.loginAdmin = async (req, res) => {
             });
         }
 
-        // Verify password
         const isMatch = await admin.matchPassword(password);
         if (!isMatch) {
             return res.status(401).json({
@@ -57,8 +50,12 @@ exports.loginAdmin = async (req, res) => {
                 message: 'Invalid admin credentials.'
             });
         }
-// Inside loginAdmin:
-const token = generateToken(admin);
+
+        // Include id and normalized role in payload
+        const token = generateToken({
+            id: admin._id,
+            role: admin.role || 'SuperAdmin'
+        }, '1d');
 
         res.status(200).json({
             success: true,
@@ -81,9 +78,9 @@ const token = generateToken(admin);
 };
 
 /**
- * @desc    Initial Seeder to create default Super Admin if none exists
+ * @desc    Initial Seeder to create default Super Admin
  * @route   POST /api/admin/seed
- * @access  Public (Should be disabled after setup)
+ * @access  Public
  */
 exports.seedSuperAdmin = async (req, res) => {
     try {
@@ -99,7 +96,7 @@ exports.seedSuperAdmin = async (req, res) => {
             username: req.body.username || 'superadmin',
             email: req.body.email || 'admin@edutrust.com',
             password: req.body.password || 'EduTrust@2026Secret',
-            role: 'Super Admin'
+            role: 'SuperAdmin' // Normalized role string without spaces
         });
 
         res.status(201).json({
@@ -111,11 +108,6 @@ exports.seedSuperAdmin = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-const JWT_SECRET = process.env.JWT_SECRET || "edutrust_fallback_secret_key";
-
-// ======================================================
-// HELPER FUNCTIONS: SCHOOL CODE
-// ======================================================
 
 function generateSchoolCode(schoolName) {
   const prefix = String(schoolName || "SCHOOL")
@@ -140,10 +132,6 @@ async function createUniqueSchoolCode(schoolName) {
   return schoolCode;
 }
 
-// ======================================================
-// REGISTER SCHOOL + PRINCIPAL
-// ======================================================
-
 exports.registerSchool = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -166,7 +154,6 @@ exports.registerSchool = async (req, res) => {
       password
     } = req.body;
 
-    // 1. Validation
     if (
       !school_name ||
       !school_email ||
@@ -177,8 +164,7 @@ exports.registerSchool = async (req, res) => {
       await session.endSession();
       return res.status(400).json({
         success: false,
-        message:
-          "School name, school email, principal name, principal email, and password are required."
+        message: "School name, school email, principal name, principal email, and password are required."
       });
     }
 
@@ -190,13 +176,11 @@ exports.registerSchool = async (req, res) => {
       });
     }
 
-    // 2. Normalization
     const schoolName = String(school_name).trim();
     const schoolEmail = String(school_email).trim().toLowerCase();
     const principalName = String(principal_name).trim();
     const principalEmail = String(principal_email).trim().toLowerCase();
 
-    // 3. Duplicate Checks
     const existingSchool = await School.findOne({ email: schoolEmail }).session(session);
     if (existingSchool) {
       await session.endSession();
@@ -215,11 +199,9 @@ exports.registerSchool = async (req, res) => {
       });
     }
 
-    // 4. Generate Code & Hash Password
     const schoolCode = await createUniqueSchoolCode(schoolName);
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 5. Create School
     const [school] = await School.create(
       [
         {
@@ -240,7 +222,6 @@ exports.registerSchool = async (req, res) => {
       { session }
     );
 
-    // 6. Create Principal User
     const nameParts = principalName.split(" ");
     const firstName = nameParts[0] || "";
     const lastName = nameParts.slice(1).join(" ") || "";
@@ -262,11 +243,9 @@ exports.registerSchool = async (req, res) => {
       { session }
     );
 
-    // 7. Link Principal back to School
     school.principal_id = user._id;
     await school.save({ session });
 
-    // Commit Transaction
     await session.commitTransaction();
     session.endSession();
 
@@ -310,10 +289,6 @@ exports.registerSchool = async (req, res) => {
   }
 };
 
-// ======================================================
-// PRINCIPAL / SCHOOL LOGIN
-// ======================================================
-
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -327,7 +302,6 @@ exports.login = async (req, res) => {
 
     const normalizedEmail = String(email).trim().toLowerCase();
 
-    // 1. Find User
     const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(401).json({
@@ -336,15 +310,15 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 2. Role Validation
-    if (user.role !== "Principal" && user.role !== "SuperAdmin") {
+    // Role check supporting normalized strings
+    const userRole = String(user.role).replace(/\s+/g, '');
+    if (userRole !== "Principal" && userRole !== "SuperAdmin") {
       return res.status(403).json({
         success: false,
         message: "Only Principal accounts can use the School Portal login."
       });
     }
 
-    // 3. Status Check
     if (user.status !== "Active") {
       return res.status(403).json({
         success: false,
@@ -352,7 +326,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 4. Password Check
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       return res.status(401).json({
@@ -361,13 +334,12 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 5. Load Associated School
     let school = null;
     if (user.school_id) {
       school = await School.findById(user.school_id).lean();
     }
 
-    if (user.role !== "SuperAdmin" && !school) {
+    if (userRole !== "SuperAdmin" && !school) {
       return res.status(403).json({
         success: false,
         message: "This account is not connected to a valid school."
@@ -381,9 +353,8 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 6. JWT Generation
-    const token = jwt.sign(
-      {
+    // Standardized token payload generation
+    const token = generateToken({
         id: user._id,
         school_id: user.school_id,
         role: user.role,
@@ -391,12 +362,8 @@ exports.login = async (req, res) => {
         student_id: user.student_id,
         teacher_id: user.teacher_id,
         staff_id: user.staff_id
-      },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    }, '7d');
 
-    // 7. Response
     return res.status(200).json({
       success: true,
       message: "Login successful.",
@@ -439,10 +406,6 @@ exports.login = async (req, res) => {
     });
   }
 };
-
-// ======================================================
-// GET LOGGED-IN USER PROFILE
-// ======================================================
 
 exports.getProfile = async (req, res) => {
   try {
