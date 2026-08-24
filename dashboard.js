@@ -1,10 +1,16 @@
 // dashboard.js
 // =========================================================
-// KEEP THIS STUDENT PAGE NAVIGATION.
-// DO NOT CREATE/REBUILD A SECOND STUDENT PAGE HERE.
-// student.js owns student registration, search, loading,
-// approval, rejection, suspension, reinstatement, etc.
+// EDU TRUST - DASHBOARD NAVIGATION
 // =========================================================
+//
+// IMPORTANT:
+// - This file owns dashboard/page navigation only.
+// - student.js owns student management.
+// - Do NOT declare navItems anywhere else in this file.
+// - Do NOT render students from this file.
+// =========================================================
+
+"use strict";
 
 const navItems = document.querySelectorAll(
     ".nav-item[data-page], .submenu-item[data-page]"
@@ -13,16 +19,24 @@ const navItems = document.querySelectorAll(
 const pageTitle = document.getElementById("pageTitle");
 const contentArea = document.getElementById("contentArea");
 
+// =========================================================
+// SHOW PAGE
+// =========================================================
+
 function showStaticPage(pageName) {
     if (!pageName) return;
 
-    const pages = document.querySelectorAll(".page-content");
+    const pages =
+        document.querySelectorAll(".page-content");
 
+    // Hide all pages
     pages.forEach(page => {
         page.classList.add("hidden");
     });
 
-    const target = document.getElementById(`${pageName}Page`);
+    // Find requested page
+    const target =
+        document.getElementById(`${pageName}Page`);
 
     if (!target) {
         console.warn(
@@ -31,54 +45,75 @@ function showStaticPage(pageName) {
         return;
     }
 
+    // Show requested page
     target.classList.remove("hidden");
 
+    // Remove active state
     navItems.forEach(nav => {
         nav.classList.remove("active");
     });
 
-    const activeItem = document.querySelector(
-        `[data-page="${CSS.escape(pageName)}"]`
-    );
+    // Find active navigation item
+    let activeItem = null;
+
+    try {
+        activeItem = document.querySelector(
+            `[data-page="${CSS.escape(pageName)}"]`
+        );
+    } catch (error) {
+        // Fallback for older browsers
+        activeItem = Array.from(navItems).find(
+            nav => nav.dataset.page === pageName
+        );
+    }
 
     activeItem?.classList.add("active");
 
+    // Update page title
     if (pageTitle) {
         pageTitle.textContent =
             activeItem?.textContent?.trim() ||
             pageName
                 .replace(/-/g, " ")
-                .replace(/\b\w/g, letter => letter.toUpperCase());
+                .replace(
+                    /\b\w/g,
+                    letter => letter.toUpperCase()
+                );
     }
 
-    /*
-    ========================================================
-    STUDENTS
+    // =====================================================
+    // STUDENTS
+    // =====================================================
+    //
+    // dashboard.js DOES NOT render students.
+    //
+    // student.js owns:
+    // - loading
+    // - searching
+    // - filtering
+    // - registration
+    // - approval
+    // - rejection
+    // - suspension
+    // - reinstatement
+    // - graduation
+    // - archive
+    // - deletion
+    //
+    // We only request a refresh if student.js exposes
+    // loadStudents().
+    // =====================================================
 
-    Do NOT render students here.
-
-    student.js already owns:
-      - loading students
-      - search
-      - filters
-      - register
-      - approve
-      - reject
-      - suspend
-      - reinstate
-      - graduate
-      - archive
-      - delete
-
-    We only tell student.js to refresh.
-    ========================================================
-    */
-
-    if (pageName === "students") {
-        if (typeof window.loadStudents === "function") {
-            window.loadStudents();
-        }
+    if (
+        pageName === "students" &&
+        typeof window.loadStudents === "function"
+    ) {
+        window.loadStudents();
     }
+
+    // =====================================================
+    // MOBILE SIDEBAR
+    // =====================================================
 
     if (window.innerWidth <= 768) {
         document
@@ -87,20 +122,35 @@ function showStaticPage(pageName) {
     }
 }
 
+// =========================================================
+// NAVIGATION EVENTS
+// =========================================================
+
 navItems.forEach(item => {
+
     item.addEventListener("click", event => {
+
         event.preventDefault();
         event.stopPropagation();
 
-        const page = item.dataset.page;
+        const page =
+            item.dataset.page;
 
-        if (page) {
-            showStaticPage(page);
+        if (!page) {
+            return;
         }
+
+        showStaticPage(page);
     });
+
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+// =========================================================
+// INITIAL PAGE
+// =========================================================
+
+function initializeDashboard() {
+
     const visiblePage =
         document.querySelector(
             ".page-content:not(.hidden)"
@@ -110,128 +160,34 @@ document.addEventListener("DOMContentLoaded", () => {
         visiblePage?.id &&
         visiblePage.id.endsWith("Page")
     ) {
-        showStaticPage(
-            visiblePage.id.slice(0, -4)
-        );
+
+        const pageName =
+            visiblePage.id.slice(0, -4);
+
+        showStaticPage(pageName);
+
     } else {
+
         showStaticPage("overview");
-    }
-});// dashboard.js
-// =========================================================
-// KEEP THIS STUDENT PAGE NAVIGATION.
-// DO NOT CREATE/REBUILD A SECOND STUDENT PAGE HERE.
-// student.js owns student registration, search, loading,
-// approval, rejection, suspension, reinstatement, etc.
-// =========================================================
 
-const navItems = document.querySelectorAll(
-    ".nav-item[data-page], .submenu-item[data-page]"
-);
-
-const pageTitle = document.getElementById("pageTitle");
-const contentArea = document.getElementById("contentArea");
-
-function showStaticPage(pageName) {
-    if (!pageName) return;
-
-    const pages = document.querySelectorAll(".page-content");
-
-    pages.forEach(page => {
-        page.classList.add("hidden");
-    });
-
-    const target = document.getElementById(`${pageName}Page`);
-
-    if (!target) {
-        console.warn(
-            `Dashboard page not found: ${pageName}Page`
-        );
-        return;
-    }
-
-    target.classList.remove("hidden");
-
-    navItems.forEach(nav => {
-        nav.classList.remove("active");
-    });
-
-    const activeItem = document.querySelector(
-        `[data-page="${CSS.escape(pageName)}"]`
-    );
-
-    activeItem?.classList.add("active");
-
-    if (pageTitle) {
-        pageTitle.textContent =
-            activeItem?.textContent?.trim() ||
-            pageName
-                .replace(/-/g, " ")
-                .replace(/\b\w/g, letter => letter.toUpperCase());
-    }
-
-    /*
-    ========================================================
-    STUDENTS
-
-    Do NOT render students here.
-
-    student.js already owns:
-      - loading students
-      - search
-      - filters
-      - register
-      - approve
-      - reject
-      - suspend
-      - reinstate
-      - graduate
-      - archive
-      - delete
-
-    We only tell student.js to refresh.
-    ========================================================
-    */
-
-    if (pageName === "students") {
-        if (typeof window.loadStudents === "function") {
-            window.loadStudents();
-        }
-    }
-
-    if (window.innerWidth <= 768) {
-        document
-            .getElementById("sidebar")
-            ?.classList.remove("show");
     }
 }
 
-navItems.forEach(item => {
-    item.addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
+// =========================================================
+// DOM READY
+// =========================================================
 
-        const page = item.dataset.page;
+if (
+    document.readyState === "loading"
+) {
 
-        if (page) {
-            showStaticPage(page);
-        }
-    });
-});
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeDashboard
+    );
 
-document.addEventListener("DOMContentLoaded", () => {
-    const visiblePage =
-        document.querySelector(
-            ".page-content:not(.hidden)"
-        );
+} else {
 
-    if (
-        visiblePage?.id &&
-        visiblePage.id.endsWith("Page")
-    ) {
-        showStaticPage(
-            visiblePage.id.slice(0, -4)
-        );
-    } else {
-        showStaticPage("overview");
-    }
-});
+    initializeDashboard();
+
+}
