@@ -20,12 +20,12 @@ let studentLoadInProgress = false;
 /* =========================================================
    AUTH
 ========================================================= */
-
 function getAuthToken() {
     return (
         localStorage.getItem("token") ||
         localStorage.getItem("authToken") ||
         localStorage.getItem("accessToken") ||
+        localStorage.getItem("edutrust_token") ||
         sessionStorage.getItem("token") ||
         sessionStorage.getItem("authToken") ||
         sessionStorage.getItem("accessToken") ||
@@ -33,8 +33,8 @@ function getAuthToken() {
     );
 }
 
-
 function authHeaders(includeJson = true) {
+
     const headers = {};
 
     const token = getAuthToken();
@@ -53,6 +53,7 @@ function authHeaders(includeJson = true) {
 }
 
 
+
 /* =========================================================
    API
 ========================================================= */
@@ -61,41 +62,71 @@ async function studentApiRequest(
     endpoint = "",
     options = {}
 ) {
+
     const token = getAuthToken();
 
+    console.log(
+        "STUDENT API REQUEST:",
+        `${STUDENT_API}${endpoint}`
+    );
+
+    console.log(
+        "TOKEN FOUND:",
+        Boolean(token)
+    );
+
     if (!token) {
+
         throw new Error(
-            "Authentication required. Please log in again."
+            "Authentication token not found. Please log in again."
         );
     }
 
-    const response = await fetch(
-        `${STUDENT_API}${endpoint}`,
-        {
-            ...options,
+    const response =
+        await fetch(
+            `${STUDENT_API}${endpoint}`,
+            {
+                ...options,
 
-            headers: {
-                ...authHeaders(
-                    options.body !== undefined
-                ),
+                headers: {
+                    ...authHeaders(
+                        options.body !== undefined
+                    ),
 
-                ...(options.headers || {})
+                    ...(options.headers || {})
+                }
             }
-        }
-    );
+        );
+
 
     let data = {};
 
     try {
-        data = await response.json();
+        data =
+            await response.json();
+
     } catch {
         data = {};
     }
 
+
+    console.log(
+        "STUDENT API STATUS:",
+        response.status
+    );
+
+    console.log(
+        "STUDENT API RESPONSE:",
+        data
+    );
+
+
     if (response.status === 401) {
+
         localStorage.removeItem("token");
         localStorage.removeItem("authToken");
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("edutrust_token");
 
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("authToken");
@@ -107,23 +138,27 @@ async function studentApiRequest(
         );
     }
 
+
     if (response.status === 403) {
+
         throw new Error(
             data?.message ||
-            "You do not have permission to perform this action."
+            "School access was denied by the backend."
         );
     }
 
+
     if (!response.ok) {
+
         throw new Error(
             data?.message ||
             `Request failed with status ${response.status}.`
         );
     }
 
+
     return data;
 }
-
 
 /* =========================================================
    INITIALIZATION
@@ -880,7 +915,60 @@ async function archiveStudent(id) {
         );
     }
 }
+function showStudentToast(
+    message,
+    type = "success"
+) {
 
+    let toast =
+        document.getElementById("toast");
+
+
+    if (!toast) {
+
+        toast =
+            document.createElement("div");
+
+        toast.id = "toast";
+        toast.className = "toast";
+
+        document.body.appendChild(toast);
+    }
+
+
+    toast.textContent = message;
+
+
+    toast.classList.remove(
+        "show",
+        "success",
+        "error"
+    );
+
+
+    toast.classList.add(
+        type,
+        "show"
+    );
+
+
+    clearTimeout(
+        showStudentToast.timer
+    );
+
+
+    showStudentToast.timer =
+        setTimeout(
+            function () {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            3500
+        );
+}
 
 /* =========================================================
    PUBLIC
