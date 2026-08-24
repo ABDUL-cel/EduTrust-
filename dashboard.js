@@ -1,549 +1,208 @@
+// dashboard.js
+// =========================================================
+// DASHBOARD NAVIGATION ONLY
+// student.js owns student management and backend requests.
+// =========================================================
+
 "use strict";
 
-/*
-=========================================================
- EDU TRUST - DASHBOARD NAVIGATION
-=========================================================
+const navItems = document.querySelectorAll(
+    ".nav-item[data-page], .submenu-item[data-page]"
+);
 
- dashboard.js ONLY controls:
-
- - Sidebar navigation
- - Page switching
- - Active sidebar item
- - Page title
- - Mobile sidebar
-
- student.js controls:
-
- - Students
- - Student registration
- - Student loading
- - Search
- - Filters
- - Approve
- - Reject
- - Suspend
- - Reinstate
- - Graduate
- - Archive
- - Delete
-
- IMPORTANT:
- DO NOT add another navItems declaration anywhere
- in this file.
-=========================================================
-*/
-
-
-/* =========================================================
-   DOM ELEMENTS
-========================================================= */
-
-let navItems = [];
-let pageTitle = null;
-let sidebar = null;
-let menuToggle = null;
-
-
-/* =========================================================
-   INITIALIZE DASHBOARD
-========================================================= */
-
-function initializeDashboard() {
-
-    navItems = document.querySelectorAll(
-        ".nav-item[data-page], .submenu-item[data-page]"
-    );
-
-    pageTitle =
-        document.getElementById("pageTitle");
-
-    sidebar =
-        document.getElementById("sidebar") ||
-        document.querySelector(".sidebar");
-
-    menuToggle =
-        document.getElementById("menu-toggle");
-
-
-    console.log(
-        "EDU TRUST dashboard initialized."
-    );
-
-    console.log(
-        "Navigation items:",
-        navItems.length
-    );
-
-
-    /* =====================================================
-       SIDEBAR NAVIGATION
-    ===================================================== */
-
-    navItems.forEach(item => {
-
-        item.addEventListener(
-            "click",
-            function(event) {
-
-                event.preventDefault();
-
-                const page =
-                    item.getAttribute("data-page");
-
-                if (!page) {
-                    return;
-                }
-
-                console.log(
-                    "Dashboard navigation:",
-                    page
-                );
-
-                showPage(page, item);
-            }
-        );
-
-    });
-
-
-    /* =====================================================
-       MOBILE / DESKTOP SIDEBAR TOGGLE
-    ===================================================== */
-
-    if (menuToggle && sidebar) {
-
-        menuToggle.addEventListener(
-            "click",
-            function(event) {
-
-                event.preventDefault();
-
-                if (
-                    window.innerWidth <= 768
-                ) {
-
-                    sidebar.classList.toggle(
-                        "show"
-                    );
-
-                } else {
-
-                    sidebar.classList.toggle(
-                        "collapsed"
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       INITIAL PAGE
-    ===================================================== */
-
-    let initialPage = null;
-
-    /*
-     * Look for an already visible page.
-     */
-
-    const visiblePage =
-        document.querySelector(
-            ".page-content:not(.hidden)"
-        );
-
-    if (
-        visiblePage &&
-        visiblePage.id &&
-        visiblePage.id.endsWith("Page")
-    ) {
-
-        initialPage =
-            visiblePage.id.substring(
-                0,
-                visiblePage.id.length - 4
-            );
-
-    }
-
-
-    /*
-     * If nothing is visible,
-     * use overview.
-     */
-
-    if (!initialPage) {
-
-        initialPage = "overview";
-
-    }
-
-
-    /*
-     * Find matching navigation button.
-     */
-
-    const initialNavItem =
-        Array.from(navItems).find(
-            item =>
-                item.getAttribute("data-page") ===
-                initialPage
-        );
-
-
-    /*
-     * Show initial page.
-     */
-
-    showPage(
-        initialPage,
-        initialNavItem
-    );
-
-}
+const pageTitle = document.getElementById("pageTitle");
+const contentArea = document.getElementById("contentArea");
 
 
 /* =========================================================
    SHOW PAGE
 ========================================================= */
 
-function showPage(
-    pageName,
-    clickedNavItem = null
-) {
+function showStaticPage(pageName) {
+    if (!pageName) return;
 
-    if (!pageName) {
-        return;
-    }
-
-
-    /*
-    =======================================================
-    FIND ALL STATIC PAGE CONTENT
-    =======================================================
-    */
-
-    const pages =
-        document.querySelectorAll(
-            ".page-content"
-        );
-
-
-    /*
-    =======================================================
-    HIDE ALL PAGES
-    =======================================================
-    */
+    const pages = document.querySelectorAll(".page-content");
 
     pages.forEach(page => {
-
-        page.classList.add(
-            "hidden"
-        );
-
+        page.classList.add("hidden");
     });
 
+    const target = document.getElementById(
+        `${pageName}Page`
+    );
 
-    /*
-    =======================================================
-    FIND TARGET PAGE
-    =======================================================
-    */
-
-    const targetPage =
-        document.getElementById(
-            `${pageName}Page`
-        );
-
-
-    /*
-    =======================================================
-    PAGE DOES NOT EXIST
-    =======================================================
-    */
-
-    if (!targetPage) {
-
+    if (!target) {
         console.warn(
             `Dashboard page not found: ${pageName}Page`
         );
-
-        /*
-         * Do not leave the content area completely blank.
-         */
-
-        const contentArea =
-            document.getElementById(
-                "contentArea"
-            );
-
-        if (contentArea) {
-
-            contentArea.innerHTML = `
-                <div
-                    class="page-content"
-                    style="
-                        display:block;
-                        padding:40px;
-                    "
-                >
-
-                    <h2>
-                        ${escapeDashboardText(
-                            formatPageName(pageName)
-                        )}
-                    </h2>
-
-                    <p>
-                        This page has not been created yet.
-                    </p>
-
-                </div>
-            `;
-
-        }
-
         return;
     }
 
+    target.classList.remove("hidden");
 
-    /*
-    =======================================================
-    SHOW TARGET PAGE
-    =======================================================
-    */
 
-    targetPage.classList.remove(
-        "hidden"
+    /* -----------------------------------------------------
+       ACTIVE SIDEBAR ITEM
+    ----------------------------------------------------- */
+
+    navItems.forEach(nav => {
+        nav.classList.remove("active");
+    });
+
+    const activeItem = document.querySelector(
+        `[data-page="${CSS.escape(pageName)}"]`
     );
 
+    activeItem?.classList.add("active");
 
-    /*
-    =======================================================
-    ACTIVE NAVIGATION
-    =======================================================
-    */
 
-    navItems.forEach(item => {
+    /* -----------------------------------------------------
+       PAGE TITLE
+    ----------------------------------------------------- */
 
-        item.classList.remove(
-            "active"
+    if (pageTitle) {
+        pageTitle.textContent =
+            activeItem?.textContent?.trim() ||
+            pageName
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, letter =>
+                    letter.toUpperCase()
+                );
+    }
+
+
+    /* -----------------------------------------------------
+       STUDENTS
+       
+       student.js owns all student/backend operations.
+    ----------------------------------------------------- */
+
+    if (pageName === "students") {
+
+        if (typeof window.loadStudents === "function") {
+
+            console.log(
+                "Dashboard: asking student.js to load students..."
+            );
+
+            window.loadStudents();
+
+        } else {
+
+            console.warn(
+                "student.js loadStudents() is not available."
+            );
+
+        }
+    }
+
+
+    /* -----------------------------------------------------
+       MOBILE SIDEBAR
+    ----------------------------------------------------- */
+
+    if (window.innerWidth <= 768) {
+
+        document
+            .getElementById("sidebar")
+            ?.classList.remove("show");
+
+    }
+}
+
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+========================================================= */
+
+navItems.forEach(item => {
+
+    item.addEventListener("click", event => {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const page = item.dataset.page;
+
+        console.log(
+            "Dashboard navigation clicked:",
+            page
         );
+
+        if (page) {
+            showStaticPage(page);
+        }
 
     });
 
-
-    /*
-    Use clicked item if available.
-    Otherwise find it by data-page.
-    */
-
-    let activeItem =
-        clickedNavItem;
+});
 
 
-    if (!activeItem) {
+/* =========================================================
+   REPORTS / SETTINGS DROPDOWNS
+========================================================= */
 
-        activeItem =
-            Array.from(navItems).find(
-                item =>
-                    item.getAttribute(
-                        "data-page"
-                    ) === pageName
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const reportsToggle =
+            document.querySelector(".reports-toggle");
+
+        const settingsToggle =
+            document.querySelector(".settings-toggle");
+
+
+        reportsToggle?.addEventListener(
+            "click",
+            () => {
+
+                const group =
+                    reportsToggle.closest(".nav-group");
+
+                group?.classList.toggle("open");
+
+            }
+        );
+
+
+        settingsToggle?.addEventListener(
+            "click",
+            () => {
+
+                const group =
+                    settingsToggle.closest(".nav-group");
+
+                group?.classList.toggle("open");
+
+            }
+        );
+
+
+        /* -------------------------------------------------
+           INITIAL PAGE
+        ------------------------------------------------- */
+
+        const visiblePage =
+            document.querySelector(
+                ".page-content:not(.hidden)"
             );
 
-    }
 
+        if (
+            visiblePage?.id &&
+            visiblePage.id.endsWith("Page")
+        ) {
 
-    if (activeItem) {
+            showStaticPage(
+                visiblePage.id.slice(0, -4)
+            );
 
-        activeItem.classList.add(
-            "active"
-        );
+        } else {
 
-    }
-
-
-    /*
-    =======================================================
-    PAGE TITLE
-    =======================================================
-    */
-
-    if (pageTitle) {
-
-        let title = "";
-
-        if (activeItem) {
-
-            /*
-             * Submenu items contain their text
-             * directly inside a span.
-             */
-
-            title =
-                activeItem.textContent
-                    ?.trim() || "";
+            showStaticPage("overview");
 
         }
 
-
-        if (!title) {
-
-            title =
-                formatPageName(
-                    pageName
-                );
-
-        }
-
-
-        pageTitle.textContent =
-            title;
-
     }
-
-
-    /*
-    =======================================================
-    STUDENTS
-    =======================================================
-
-    DO NOT render students here.
-
-    student.js owns the student page.
-
-    We simply tell student.js to load the
-    students after the page becomes visible.
-    =======================================================
-    */
-
-    if (
-        pageName === "students"
-    ) {
-
-        /*
-         * student.js exposes:
-         *
-         * window.loadStudents
-         */
-
-        setTimeout(
-            function() {
-
-                if (
-                    typeof window.loadStudents ===
-                    "function"
-                ) {
-
-                    window.loadStudents();
-
-                }
-
-            },
-            50
-        );
-
-    }
-
-
-    /*
-    =======================================================
-    CLOSE MOBILE SIDEBAR
-    =======================================================
-    */
-
-    if (
-        window.innerWidth <= 768 &&
-        sidebar
-    ) {
-
-        sidebar.classList.remove(
-            "show"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   FORMAT PAGE NAME
-========================================================= */
-
-function formatPageName(
-    pageName
-) {
-
-    return String(pageName || "")
-        .replace(
-            /-/g,
-            " "
-        )
-        .replace(
-            /\b\w/g,
-            letter =>
-                letter.toUpperCase()
-        );
-
-}
-
-
-/* =========================================================
-   ESCAPE TEXT
-========================================================= */
-
-function escapeDashboardText(
-    value
-) {
-
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/* =========================================================
-   DOM READY
-========================================================= */
-
-if (
-    document.readyState ===
-    "loading"
-) {
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        initializeDashboard
-    );
-
-} else {
-
-    initializeDashboard();
-
-}
+);
