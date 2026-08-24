@@ -5,15 +5,20 @@ const mongoose = require("mongoose");
 const School = require("../models/school");
 const User = require("../models/User");
 const Admin = require('../models/Admin');
-
-
 /**
- * Generate signed JWT Token helper
+ * Generate signed JWT Token helper containing user roles
  */
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || 'edutrust_secret_key_2026', {
-        expiresIn: '1d' // Token expires in 24 hours
-    });
+const generateToken = (user) => {
+    return jwt.sign(
+        { 
+            id: user._id || user.id,
+            role: user.role || "SuperAdmin",
+            school_id: user.school_id || null
+        }, 
+        process.env.JWT_SECRET || "edutrust_secret_key", 
+        { expiresIn: "1d" }
+    );
+
 };
 
 /**
@@ -52,9 +57,8 @@ exports.loginAdmin = async (req, res) => {
                 message: 'Invalid admin credentials.'
             });
         }
-
-        // Issue JWT token
-        const token = generateToken(admin._id);
+// Inside loginAdmin:
+const token = generateToken(admin);
 
         res.status(200).json({
             success: true,
