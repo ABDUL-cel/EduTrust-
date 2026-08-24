@@ -13,20 +13,17 @@ const authorizeRoles = (...allowedRoles) => {
         if (!req.user || !req.user.role) {
             return res.status(403).json({
                 success: false,
-                message: "You do not have permission to perform this action."
+                message: " You do not have permission to perform this action."
             });
         }
 
-        // Normalize allowed roles and user role for case-insensitive comparison
         const userRole = String(req.user.role).trim().toLowerCase();
-        const normalizedAllowedRoles = allowedRoles.map((r) =>
-            String(r).trim().toLowerCase()
-        );
+        const allowed = allowedRoles.map(r => String(r).trim().toLowerCase());
 
-        if (!normalizedAllowedRoles.includes(userRole)) {
+        if (!allowed.includes(userRole)) {
             return res.status(403).json({
                 success: false,
-                message: "You do not have permission to perform this action."
+                message: " You do not have permission to perform this action."
             });
         }
 
