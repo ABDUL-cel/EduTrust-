@@ -1,195 +1,338 @@
+// authMiddleware.js
+
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Admin = require("../models/Admin");
 const Student = require("../models/student");
 
-const JWT_SECRET = process.env.JWT_SECRET || "edutrust_secret_key";
+const JWT_SECRET =
+    process.env.JWT_SECRET ||
+    "edutrust_secret_key";
 
-/**
- * Super Admin Middleware: Verifies admin tokens against Admin collection
- */
-const protectAdmin = async (req, res, next) => {
-    let token;
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+/* =========================================================
+   SUPER ADMIN
+========================================================= */
+
+const protectAdmin =
+    async (req, res, next) => {
+
         try {
-            token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, JWT_SECRET);
 
-            const admin = await Admin.findById(decoded.id).select('-password').lean();
+            const authHeader =
+                req.headers.authorization || "";
+
+            if (
+                !authHeader.startsWith(
+                    "Bearer "
+                )
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Not authorized: Access token missing."
+                });
+            }
+
+            const token =
+                authHeader
+                    .substring(7)
+                    .trim();
+
+            const decoded =
+                jwt.verify(
+                    token,
+                    JWT_SECRET
+                );
+
+            const admin =
+                await Admin.findById(
+                    decoded.id
+                )
+                    .select("-password")
+                    .lean();
 
             if (!admin) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Not authorized: Admin user no longer exists.'
+                    message:
+                        "Not authorized: Admin user no longer exists."
                 });
             }
 
             req.admin = admin;
+
             req.user = {
                 ...admin,
-                role: admin.role || "superadmin"
+                role:
+                    admin.role ||
+                    "superadmin"
             };
 
-            return next();
+            next();
+
         } catch (error) {
-            console.error('JWT Admin Auth Verification Error:', error.message);
+
+            console.error(
+                "JWT ADMIN AUTH ERROR:",
+                error
+            );
+
             return res.status(401).json({
                 success: false,
-                message: 'Not authorized: Token failed or expired.'
+                message:
+                    "Not authorized: Token failed or expired."
             });
         }
-    }
+    };
 
-    if (!token) {
-        return res.status(401).json({
-            success: false,
-            message: 'Not authorized: Access token missing.'
-        });
-    }
-};
 
-/**
- * Standard User Middleware: Verifies tokens against Student, User, or Admin collections
- */
-const authMiddleware = async (req, res, next) => {
-    try {
-        const authHeader = req.headers.authorization;
+/* =========================================================
+   NORMAL AUTH
+========================================================= */
 
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                success: false,
-                message: "Authentication required."
-            });
-        }
+const authMiddleware =
+    async (req, res, next) => {
 
-        const token = authHeader.substring(7).trim();
+        try {
 
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: "Authentication token is missing."
-            });
-        }
+            const authHeader =
+                req.headers.authorization || "";
 
-        const decoded = jwt.verify(token, JWT_SECRET);
-
-        // 1. Check if Student token
-        if (decoded.role === "student" || decoded.student_id) {
-            const student = await Student.findById(decoded.id || decoded.student_id).lean();
-
-            if (!student) {
+            if (
+                !authHeader.startsWith(
+                    "Bearer "
+                )
+            ) {
                 return res.status(401).json({
                     success: false,
-                    message: "Student account no longer exists."
+                    message:
+                        "Authentication required."
                 });
             }
 
-            if (student.status === "Suspended" || student.status === "Archived") {
-                return res.status(403).json({
+            const token =
+                authHeader
+                    .substring(7)
+                    .trim();
+
+            if (!token) {
+                return res.status(401).json({
                     success: false,
-                    message: `Account is ${student.status.toLowerCase()}. Access denied.`
+                    message:
+                        "Authentication token is missing."
                 });
             }
 
-            req.user = {
-                id: student._id,
-                _id: student._id,
-                student_id: student._id,
-                school_id: student.school_id,
-                role: "student",
-                first_name: student.first_name,
-                last_name: student.last_name
-            };
+            const decoded =
+                jwt.verify(
+                    token,
+                    JWT_SECRET
+                );
 
-            return next();
-        }
 
-        // 2. Check User collection (Staff / SchoolAdmin / Parent / Admin)
-        let user = await User.findById(decoded.id).select("-password").lean();
+            /* =================================================
+               STUDENT TOKEN
+            ================================================= */
 
-        // 3. Fallback check for Admin collection if not found in User collection
-        if (!user) {
-            const admin = await Admin.findById(decoded.id).select("-password").lean();
-            if (admin) {
+            if (
+                decoded.role === "student" ||
+                decoded.student_id
+            ) {
+
+                const student =
+                    await Student.findById(
+                        decoded.id ||
+                        decoded.student_id
+                    ).lean();
+
+                if (!student) {
+                    return res.status(401).json({
+                        success: false,
+                        message:
+                            "Student account no longer exists."
+                    });
+                }
+
+                if (
+                    [
+                        "Suspended",
+                        "Archived"
+                    ].includes(
+                        student.status
+                    )
+                ) {
+                    return res.status(403).json({
+                        success: false,
+                        message:
+                            `Account is ${String(
+                                student.status
+                            ).toLowerCase()}. Access denied.`
+                    });
+                }
+
                 req.user = {
-                    ...admin,
-                    role: admin.role || "superadmin"
+                    id: student._id,
+                    _id: student._id,
+
+                    student_id:
+                        student._id,
+
+                    school_id:
+                        student.school_id,
+
+                    role:
+                        "student",
+
+                    first_name:
+                        student.first_name,
+
+                    last_name:
+                        student.last_name
                 };
-                req.admin = admin;
+
                 return next();
             }
 
-            return res.status(401).json({
+
+            /* =================================================
+               USER / SCHOOL ADMIN / STAFF / PARENT
+            ================================================= */
+
+            let user =
+                await User.findById(
+                    decoded.id
+                )
+                    .select("-password")
+                    .lean();
+
+
+            /* =================================================
+               ADMIN FALLBACK
+            ================================================= */
+
+            if (!user) {
+
+                const admin =
+                    await Admin.findById(
+                        decoded.id
+                    )
+                        .select("-password")
+                        .lean();
+
+                if (!admin) {
+                    return res.status(401).json({
+                        success: false,
+                        message:
+                            "User account no longer exists."
+                    });
+                }
+
+                req.admin = admin;
+
+                req.user = {
+                    ...admin,
+                    role:
+                        admin.role ||
+                        "superadmin"
+                };
+
+                return next();
+            }
+
+
+            /* =================================================
+               USER STATUS
+            ================================================= */
+
+            if (
+                user.status &&
+                String(user.status)
+                    .trim()
+                    .toLowerCase() !==
+                    "active"
+            ) {
+                return res.status(403).json({
+                    success: false,
+                    message:
+                        "This account is not active."
+                });
+            }
+
+
+            /* =================================================
+               SCHOOL CONNECTION
+            ================================================= */
+
+            const role =
+                String(user.role || "")
+                    .trim()
+                    .toLowerCase();
+
+            const isSystemAdmin =
+                [
+                    "superadmin",
+                    "admin"
+                ].includes(role);
+
+            if (
+                !isSystemAdmin &&
+                !user.school_id
+            ) {
+                return res.status(403).json({
+                    success: false,
+                    message:
+                        "This account is not connected to a school."
+                });
+            }
+
+
+            req.user = user;
+
+            next();
+
+        } catch (error) {
+
+            console.error(
+                "AUTH MIDDLEWARE ERROR:",
+                error
+            );
+
+
+            if (
+                error.name ===
+                "TokenExpiredError"
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Authentication token has expired."
+                });
+            }
+
+
+            if (
+                error.name ===
+                "JsonWebTokenError"
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Invalid authentication token."
+                });
+            }
+
+
+            return res.status(500).json({
                 success: false,
-                message: "User account no longer exists."
+                message:
+                    "Authentication error."
             });
         }
-
-        if (user.status && user.status !== "Active") {
-            return res.status(403).json({
-                success: false,
-                message: "This account is not active."
-            });
-        }
-
-        const userRoleLower = (user.role || "").toLowerCase();
-        if (userRoleLower !== "superadmin" && userRoleLower !== "admin" && !user.school_id) {
-            return res.status(403).json({
-                success: false,
-                message: "This account is not connected to a school."
-            });
-        }
-
-        req.user = user;
-        next();
-
-    } catch (error) {
-        console.error("AUTH MIDDLEWARE ERROR:", error);
-
-        if (error.name === "TokenExpiredError") {
-            return res.status(401).json({
-                success: false,
-                message: "Authentication token has expired."
-            });
-        }
-
-        if (error.name === "JsonWebTokenError") {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid authentication token."
-            });
-        }
-
-        return res.status(500).json({
-            success: false,
-            message: "Authentication error."
-        });
-    }
-};
-
-/**
- * Role-Based Authorization Middleware
- */
-const authorizeRoles = (...allowedRoles) => {
-    return (req, res, next) => {
-        const rawRole = req.user?.role || req.admin?.role || "";
-        const userRole = String(rawRole).toLowerCase().trim();
-        const normalizedAllowed = allowedRoles.map(r => String(r).toLowerCase().trim());
-
-        if (!userRole || !normalizedAllowed.includes(userRole)) {
-            return res.status(403).json({
-                success: false,
-                message: "You do not have permission to perform this action."
-            });
-        }
-
-        next();
     };
-};
+
 
 module.exports = {
     protectAdmin,
-    authMiddleware,
-    authorizeRoles
+    authMiddleware
 };
