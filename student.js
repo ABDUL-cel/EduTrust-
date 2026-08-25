@@ -71,7 +71,6 @@ function authHeaders(includeJson = true) {
 /* =========================================================
    API REQUEST WRAPPER
 ========================================================= */
-
 async function studentApiRequest(endpoint = "", options = {}) {
     const token = getAuthToken();
 
@@ -83,14 +82,17 @@ async function studentApiRequest(endpoint = "", options = {}) {
         throw new Error("Authentication token not found.");
     }
 
+    // Merge default headers with custom options cleanly
+    const headers = {
+        ...authHeaders(true),
+        ...(options.headers || {})
+    };
+
     let response;
     try {
         response = await fetch(`${STUDENT_API}${endpoint}`, {
             ...options,
-            headers: {
-                ...authHeaders(options.body !== undefined),
-                ...(options.headers || {})
-            }
+            headers
         });
     } catch (networkError) {
         console.error("NETWORK ERROR:", networkError);
