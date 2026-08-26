@@ -1,32 +1,32 @@
 // dashboard.js
 // =========================================================
-// DASHBOARD NAVIGATION ONLY
-// student.js owns student management and backend requests.
+// DASHBOARD NAVIGATION
+// student.js owns student functionality.
 // =========================================================
 
 "use strict";
 
-const navItems = document.querySelectorAll(
-    ".nav-item[data-page], .submenu-item[data-page]"
-);
+let dashboardInitialized = false;
 
-const pageTitle = document.getElementById("pageTitle");
-const contentArea = document.getElementById("contentArea");
-
-
-/* =========================================================
-   SHOW PAGE
-========================================================= */
+function getNavItems() {
+    return document.querySelectorAll(
+        ".nav-item[data-page], .submenu-item[data-page]"
+    );
+}
 
 function showStaticPage(pageName) {
-    if (!pageName) return;
+    if (!pageName) {
+        pageName = "overview";
+    }
 
     const pages = document.querySelectorAll(".page-content");
 
+    // Hide EVERY page first
     pages.forEach(page => {
         page.classList.add("hidden");
     });
 
+    // Find requested page
     const target = document.getElementById(
         `${pageName}Page`
     );
@@ -35,30 +35,37 @@ function showStaticPage(pageName) {
         console.warn(
             `Dashboard page not found: ${pageName}Page`
         );
+
+        // Fall back to overview
+        const overview =
+            document.getElementById("overviewPage");
+
+        if (overview) {
+            overview.classList.remove("hidden");
+        }
+
         return;
     }
 
+    // Show ONLY requested page
     target.classList.remove("hidden");
 
-
-    /* -----------------------------------------------------
-       ACTIVE SIDEBAR ITEM
-    ----------------------------------------------------- */
-
-    navItems.forEach(nav => {
-        nav.classList.remove("active");
+    // Update navigation
+    getNavItems().forEach(item => {
+        item.classList.remove("active");
     });
 
     const activeItem = document.querySelector(
         `[data-page="${CSS.escape(pageName)}"]`
     );
 
-    activeItem?.classList.add("active");
+    if (activeItem) {
+        activeItem.classList.add("active");
+    }
 
-
-    /* -----------------------------------------------------
-       PAGE TITLE
-    ----------------------------------------------------- */
+    // Update page title if element exists
+    const pageTitle =
+        document.getElementById("pageTitle");
 
     if (pageTitle) {
         pageTitle.textContent =
@@ -70,137 +77,202 @@ function showStaticPage(pageName) {
                 );
     }
 
-
-    /* -----------------------------------------------------
-       STUDENTS
-       
-       student.js owns all student/backend operations.
-    ----------------------------------------------------- */
+    // =====================================================
+    // STUDENTS
+    // student.js owns loading students.
+    // =====================================================
 
     if (pageName === "students") {
-
         if (typeof window.loadStudents === "function") {
-
-            console.log(
-                "Dashboard: asking student.js to load students..."
-            );
-
             window.loadStudents();
-
-        } else {
-
-            console.warn(
-                "student.js loadStudents() is not available."
-            );
-
         }
     }
 
-
-    /* -----------------------------------------------------
-       MOBILE SIDEBAR
-    ----------------------------------------------------- */
-
+    // Mobile sidebar
     if (window.innerWidth <= 768) {
-
         document
             .getElementById("sidebar")
             ?.classList.remove("show");
-
     }
 }
 
 
-/* =========================================================
-   SIDEBAR NAVIGATION
-========================================================= */
+// =========================================================
+// NAVIGATION EVENTS
+// =========================================================
 
-navItems.forEach(item => {
+function bindDashboardNavigation() {
 
-    item.addEventListener("click", event => {
+    if (dashboardInitialized) {
+        return;
+    }
 
-        event.preventDefault();
-        event.stopPropagation();
+    dashboardInitialized = true;
 
-        const page = item.dataset.page;
+    getNavItems().forEach(item => {
 
-        console.log(
-            "Dashboard navigation clicked:",
-            page
-        );
+        item.addEventListener("click", event => {
 
-        if (page) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const page =
+                item.dataset.page;
+
+            if (!page) {
+                return;
+            }
+
             showStaticPage(page);
-        }
+        });
 
     });
+}
 
-});
+
+// =========================================================
+// REPORTS / SETTINGS DROPDOWN
+// =========================================================
+
+function bindDropdownMenus() {
+
+    const reportsToggle =
+        document.querySelector(
+            ".reports-toggle"
+        );
+
+    const settingsToggle =
+        document.querySelector(
+            ".settings-toggle"
+        );
+
+    const reportGroup =
+        reportsToggle?.closest(
+            ".nav-group"
+        );
+
+    const settingsGroup =
+        settingsToggle?.closest(
+            ".nav-group"
+        );
 
 
-/* =========================================================
-   REPORTS / SETTINGS DROPDOWNS
-========================================================= */
+    if (reportsToggle && reportGroup) {
+
+        reportsToggle.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                reportGroup.classList.toggle(
+                    "open"
+                );
+
+            }
+        );
+    }
+
+
+    if (settingsToggle && settingsGroup) {
+
+        settingsToggle.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                settingsGroup.classList.toggle(
+                    "open"
+                );
+
+            }
+        );
+    }
+}
+
+
+// =========================================================
+// MOBILE SIDEBAR
+// =========================================================
+
+function bindMobileMenu() {
+
+    const menuButton =
+        document.getElementById(
+            "menu-toggle"
+        );
+
+    const sidebar =
+        document.getElementById(
+            "sidebar"
+        );
+
+    if (!menuButton || !sidebar) {
+        return;
+    }
+
+    menuButton.addEventListener(
+        "click",
+        event => {
+
+            event.preventDefault();
+
+            sidebar.classList.toggle(
+                "show"
+            );
+
+        }
+    );
+}
+
+
+// =========================================================
+// INITIALIZATION
+// =========================================================
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        const reportsToggle =
-            document.querySelector(".reports-toggle");
+        // Navigation
+        bindDashboardNavigation();
 
-        const settingsToggle =
-            document.querySelector(".settings-toggle");
+        // Reports / Settings
+        bindDropdownMenus();
 
+        // Mobile menu
+        bindMobileMenu();
 
-        reportsToggle?.addEventListener(
-            "click",
-            () => {
-
-                const group =
-                    reportsToggle.closest(".nav-group");
-
-                group?.classList.toggle("open");
-
-            }
-        );
-
-
-        settingsToggle?.addEventListener(
-            "click",
-            () => {
-
-                const group =
-                    settingsToggle.closest(".nav-group");
-
-                group?.classList.toggle("open");
-
-            }
-        );
-
-
-        /* -------------------------------------------------
-           INITIAL PAGE
-        ------------------------------------------------- */
-
+        // Determine initial page
         const visiblePage =
             document.querySelector(
                 ".page-content:not(.hidden)"
             );
 
-
         if (
-            visiblePage?.id &&
+            visiblePage &&
+            visiblePage.id &&
             visiblePage.id.endsWith("Page")
         ) {
 
+            const pageName =
+                visiblePage.id.slice(
+                    0,
+                    -4
+                );
+
             showStaticPage(
-                visiblePage.id.slice(0, -4)
+                pageName
             );
 
         } else {
 
-            showStaticPage("overview");
+            showStaticPage(
+                "overview"
+            );
 
         }
 
