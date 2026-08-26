@@ -20,7 +20,11 @@ body {
 .dashboard-card, .stat-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-}/* ================================
+}
+.hidden {
+    display: none !important;
+}
+/* ================================
    RESET
 ================================ */
 
